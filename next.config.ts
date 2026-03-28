@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/',
-        destination: '/vertex-light-final v2.html',
+        destination: '/vertex-light.html',
       },
     ];
   },

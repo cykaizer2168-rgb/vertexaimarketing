@@ -729,20 +729,24 @@ footer{background:#0f0f1a;padding:60px 0;border-top:1px solid rgba(255,255,255,0
   <div id="lcbox">
     <div class="lc-top">
       <div class="lc-icon">&#9889;</div>
-      <div class="lc-title">Kamusta! Bago ka mag-explore,<br>ipakilala mo muna ang sarili mo</div>
-      <p class="lc-sub">Para makapag-send kami ng personalized insights at exclusive offers para sa iyo.</p>
+      <div class="lc-title" id="lc-title-text">Kamusta! Bago ka mag-explore,<br>ipakilala mo muna ang sarili mo</div>
+      <p class="lc-sub" id="lc-sub-text">Para makapag-send kami ng personalized insights at exclusive offers para sa iyo.</p>
     </div>
     <div class="lc-body">
       <div class="lc-field">
-        <label class="lc-label" for="lcname">Full Name</label>
+        <label class="lc-label" for="lcname">Full Name *</label>
         <input class="lc-input" id="lcname" type="text" placeholder="Juan dela Cruz" autocomplete="name"/>
       </div>
       <div class="lc-field">
-        <label class="lc-label" for="lcphone">Contact Number</label>
+        <label class="lc-label" for="lcbusiness">Business / Company *</label>
+        <input class="lc-input" id="lcbusiness" type="text" placeholder="e.g. Juan's Salon, ABC Restaurant"/>
+      </div>
+      <div class="lc-field">
+        <label class="lc-label" for="lcphone">Contact Number *</label>
         <input class="lc-input" id="lcphone" type="tel" placeholder="+63 912 345 6789" autocomplete="tel"/>
       </div>
       <div class="lc-field">
-        <label class="lc-label" for="lcemail">Email Address</label>
+        <label class="lc-label" for="lcemail">Email Address *</label>
         <input class="lc-input" id="lcemail" type="email" placeholder="juan@yourbusiness.com" autocomplete="email"/>
       </div>
       <button class="lc-btn" onclick="lcSubmit()">Get My Free Business Audit &#8594;</button>
@@ -765,7 +769,7 @@ footer{background:#0f0f1a;padding:60px 0;border-top:1px solid rgba(255,255,255,0
       <a href="#portfolio">Portfolio</a>
       <a href="#audit">Contact</a>
     </div>
-    <button class="nav-cta" onclick="scrollTo('audit')">Book a Call</button>
+    <button class="nav-cta" onclick="openChatAndBook()">Book a Call</button>
   </div>
 </nav>
 
@@ -774,10 +778,10 @@ footer{background:#0f0f1a;padding:60px 0;border-top:1px solid rgba(255,255,255,0
 <section class="hero">
   <div class="eyebrow"><span class="eyebrow-dot"></span> ERP &amp; Automation Specialist &middot; NetSuite &middot; n8n &middot; AI</div>
   <h1 class="hero-title">ERP &amp; AI Automation Systems That <span class="blue">Actually Work</span></h1>
-  <p class="hero-sub">I build <strong>n8n automation workflows</strong>, and <strong>AI-powered lead pipelines</strong> — so your business runs efficiently while you focus on what matters.</p>
+  <p class="hero-sub">I build <strong>NetSuite ERP systems</strong>, <strong>n8n automation workflows</strong>, and <strong>AI-powered lead pipelines</strong> — so your business runs efficiently while you focus on what matters.</p>
   <form id="hf" class="hero-form" onsubmit="lead(event,'he')">
     <input type="email" id="he" placeholder="Enter your business email" required/>
-    <button type="submit" class="btn-primary">Book a Scoping Call →</button>
+    <button type="button" class="btn-primary" onclick="openChatAndBook()">Book a Scoping Call →</button>
   </form>
   <p class="hero-trust"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Free scoping call. No pressure. Just a clear automation plan for your business.</p>
 
@@ -849,7 +853,7 @@ footer{background:#0f0f1a;padding:60px 0;border-top:1px solid rgba(255,255,255,0
               </div>
               <div>
                 <div class="vsl-play-title">Watch How We Build Your Machine</div>
-                <div class="vsl-play-sub">40-sec · Vertex AI Marketing Overview</div>
+                <div class="vsl-play-sub">3 min · Vertex AI Marketing Overview</div>
               </div>
             </div>
             <div class="vsl-chapters">
@@ -885,7 +889,7 @@ footer{background:#0f0f1a;padding:60px 0;border-top:1px solid rgba(255,255,255,0
           <div class="vsl-stat-div"></div>
           <div class="vsl-stat"><span class="vsl-stat-n">100%</span><span class="vsl-stat-l">Free audit after</span></div>
         </div>
-        <button class="btn-primary" onclick="scrollTo('audit')" style="flex-shrink:0">Book Free Audit →</button>
+        <button class="btn-primary" onclick="openChatAndBook()" style="flex-shrink:0">Book Free Audit →</button>
       </div>
     </div>
   </div>
@@ -1216,7 +1220,7 @@ footer{background:#0f0f1a;padding:60px 0;border-top:1px solid rgba(255,255,255,0
           <span class="blue">Real Business Operations</span>
         </h2>
         <p class="about-body">
-          As a <strong>Senior NetSuite Consultant</strong>, I specialize ERP implementation, combined with modern n8n automation workflows and AI-powered business systems.
+          As a <strong>Senior NetSuite Consultant at Oracle Philippines (ACS)</strong>, I specialize in ERP implementation, SuiteScript 2.1, SuiteFlow, WMS, and manufacturing modules — combined with modern n8n automation workflows and AI-powered business systems.
         </p>
         <p class="about-body">
           I don't just "set up automations." I design ERP and AI systems that reflect how your business actually runs — from lead intake to follow-up, decision workflows, and operational reporting.
@@ -1224,7 +1228,7 @@ footer{background:#0f0f1a;padding:60px 0;border-top:1px solid rgba(255,255,255,0
         <ul class="about-checklist">
           <li>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            NetSuite consulting — Oracle ACS Philippines, specializing in Inventory Management and Supply Chain, SuiteScript 2.1, SuiteBuilder and Workflows &amp; manufacturing modules
+            NetSuite consulting — Oracle ACS Philippines, specializing in WMS, SuiteScript 2.1, SuiteFlow &amp; manufacturing modules
           </li>
           <li>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1232,11 +1236,11 @@ footer{background:#0f0f1a;padding:60px 0;border-top:1px solid rgba(255,255,255,0
           </li>
           <li>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            AI chatbot systems — Messenger, WhatsApp, voice AI, with Google Calendar booking
+            AI chatbot systems — Messenger, WhatsApp, voice AI, with GCash payment integration and Google Calendar booking
           </li>
           <li>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            ERP-certified path — Cloud Digital Leader → ACE → Professional Cloud Developer, powering automation agency infrastructure
+            GCP-certified path — Cloud Digital Leader → ACE → Professional Cloud Developer, powering automation agency infrastructure
           </li>
         </ul>
         <div class="about-tags">
@@ -1249,7 +1253,7 @@ footer{background:#0f0f1a;padding:60px 0;border-top:1px solid rgba(255,255,255,0
           <span class="about-tag">Oracle ACS</span>
           <span class="about-tag">Vertex AI</span>
         </div>
-        <button class="btn-primary" onclick="scrollTo('audit')" style="margin-top:32px;padding:14px 32px;font-size:14px">
+        <button class="btn-primary" onclick="openChatAndBook()" style="margin-top:32px;padding:14px 32px;font-size:14px">
           Book a Scoping Call &#8594;
         </button>
       </div>
@@ -1378,7 +1382,7 @@ footer{background:#0f0f1a;padding:60px 0;border-top:1px solid rgba(255,255,255,0
     <p class="cta-sub">Mag-book ng libreng scoping call. Tutukuyin namin kung anong ERP, automation, o AI system ang pinaka-angkop sa inyong negosyo — tapos magbibigay kami ng exact na quote.</p>
     <form class="cta-form" onsubmit="lead(event,'ce')">
       <input type="email" id="ce" placeholder="Your business email address" required/>
-      <button type="submit" class="btn-white">Book Scoping Call →</button>
+      <button type="button" class="btn-white" onclick="openChatAndBook()">Book Scoping Call →</button>
     </form>
     <p class="cta-note">100% free. No commitment. Tatanggap lang kami ng 5 clients per month.</p>
   </div>
@@ -1415,8 +1419,21 @@ footer{background:#0f0f1a;padding:60px 0;border-top:1px solid rgba(255,255,255,0
 </div>
 
 <script>
-const LEAD_WH='https://n8n.srv1356414.hstgr.cloud/webhook/vertex-lead';
-const CHAT_WH='https://n8n.srv1356414.hstgr.cloud/webhook/vertex-chat';
+const LEAD_WH='https://n8n.srv1356414.hstgr.cloud/webhook/vertex';
+const CHAT_WH='https://n8n.srv1356414.hstgr.cloud/webhook/vertex';
+// ── CLAUDE API KEY — Replace with your actual Anthropic API key ──
+// Get yours at: https://console.anthropic.com/settings/keys
+const CLAUDE_API_KEY='YOUR_ANTHROPIC_API_KEY_HERE';
+// ── TELEGRAM NOTIFICATIONS ──
+// 1. Create bot via @BotFather on Telegram, copy the token
+// 2. Send a message to your bot, then open: https://api.telegram.org/bot<TOKEN>/getUpdates — copy the chat id
+const TG_TOKEN='YOUR_TELEGRAM_BOT_TOKEN';   // e.g. 7123456789:AAFxxxxxxxxxxxx
+const TG_CHAT='YOUR_TELEGRAM_CHAT_ID';      // e.g. 123456789
+// ── GOOGLE SHEETS DATABASE ──
+// 1. Open Google Sheets → Extensions → Apps Script
+// 2. Paste the contents of vertex-sheets-script.gs
+// 3. Deploy → New Deployment → Web App → Anyone → Copy URL below
+const SHEETS_URL='https://script.google.com/macros/s/AKfycbyWJZmSxaXvVGECaeJZravaERKKsytrEVKlW1DbfuC_rv7N6DXlnJgA_QX6IIX_aKFduQ/exec';
 const PF_PIN='1234';
 const PF_KEY='vx_portfolio';
 
@@ -1424,7 +1441,36 @@ function scrollTo(id){document.getElementById(id)?.scrollIntoView({behavior:'smo
 
 function toast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),4000);}
 
-async function lead(e,id){e.preventDefault();const email=document.getElementById(id).value;if(!email)return;try{await fetch(LEAD_WH,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,source:'website',timestamp:new Date().toISOString()})});}catch{}document.getElementById(id).value='';toast('Request received! Check your email shortly.');}
+function tgNotify(lines){
+  if(!TG_TOKEN||TG_TOKEN==='YOUR_TELEGRAM_BOT_TOKEN')return;
+  fetch('https://api.telegram.org/bot'+TG_TOKEN+'/sendMessage',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({chat_id:TG_CHAT,text:lines,parse_mode:'HTML'})
+  }).catch(()=>{});
+}
+
+function sheetsLog(payload){
+  if(!SHEETS_URL||SHEETS_URL==='YOUR_APPS_SCRIPT_WEB_APP_URL')return;
+  fetch(SHEETS_URL,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify(payload)
+  }).catch(()=>{});
+}
+
+async function lead(e,id){
+  e.preventDefault();
+  const email=document.getElementById(id).value.trim().toLowerCase();
+  if(!email||!email.includes('@'))return;
+  // Pre-fill email in modal and open for complete details
+  document.getElementById('lcemail').value=email;
+  document.getElementById(id).value='';
+  document.getElementById('lcov').classList.add('on');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('lcname').focus(),400);
+  toast('Almost there! Fill in your details to get your free audit.');
+}
 
 window.addEventListener('scroll',()=>{document.querySelector('nav').style.padding=window.scrollY>60?'10px 40px':'14px 40px';});
 
@@ -2031,6 +2077,7 @@ pfLoad();
 // CHATBOT — Qualify → Services → Scoping Call
 let co=false, cmc=0;
 const sid='vx_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+let chatHistory=[]; // full conversation log [{role:'user'|'bot', text:'...', ts:'...'}]
 
 // ── STATE MACHINE ──
 const BS={
@@ -2043,7 +2090,9 @@ const BS={
   COLLECT_EMAIL:'collect_email',
   COLLECT_SCHEDULE:'collect_schedule',
   CONFIRM:'confirm',
-  DONE:'done'
+  DONE:'done',
+  MODAL_SELECT_SERVICES:'modal_select_services', // from modal — skip data collection
+  MODAL_COLLECT_SCHEDULE:'modal_collect_schedule' // from modal — just need schedule
 };
 let bookingState=BS.IDLE;
 let bookingData={name:'',phone:'',email:'',schedule:'',business:'',problems:[],services:[]};
@@ -2059,10 +2108,43 @@ const SERVICES=[
   {id:'funnel',    label:'\u26a1 Full Funnel System',      desc:'Lahat combined — UGC ads → AI chatbot → GCash → CRM → reporting. Complete 24/7 sales machine'}
 ];
 
+// ── LANGUAGE DETECTION ──
+let detectedLang='fil';
+function detectLang(txt){
+  const s=txt.toLowerCase();
+  const fil=(s.match(/\b(ako|mo|ka|ng|sa|ang|na|mga|ko|po|opo|namin|ninyo|kayo|ito|para|kung|anong|bakit|paano|gusto|kailangan|magkano|meron|wala|hindi|oo|sige|salamat|negosyo|presyo)\b/g)||[]).length;
+  const eng=(s.match(/\b(what|how|when|where|why|can|could|would|should|please|thank|hello|hi|yes|no|want|need|help|price|cost|service|business)\b/g)||[]).length;
+  return eng>fil?'eng':'fil';
+}
+function bil(fil,eng){return detectedLang==='eng'?eng:fil;}
 const GREET={
-  text:"Hey! \ud83d\udc4b Ako si Vertex, ang AI assistant ng Vertex AI Marketing.\n\nBago ko sabihin ang presyo, gusto ko munang maunawaan ang inyong negosyo — para malaman namin kung anong solusyon talaga ang kailangan ninyo. \ud83d\ude0a\n\nAnong uri ng negosyo ang meron kayo?",
-  qr:['\ud83c\udf7d\ufe0f Food / Restaurant','\ud83d\udc87 Salon / Clinic','\ud83d\udecb\ufe0f E-commerce / Shop','\ud83d\udcbc Ibang Negosyo']
+  get text(){return bil(
+    "Hey! \ud83d\udc4b Ako si Vertex, ang AI assistant ng Vertex AI Marketing.\n\nBago ko sabihin ang presyo, gusto ko munang maunawaan ang inyong negosyo. \ud83d\ude0a\n\nAnong uri ng negosyo ang meron kayo?",
+    "Hey! \ud83d\udc4b I\'m Vertex, the AI assistant of Vertex AI Marketing.\n\nBefore I share pricing, I\'d love to understand your business first. \ud83d\ude0a\n\nWhat type of business do you have?"
+  )},
+  get qr(){return detectedLang==='eng'
+    ?['\ud83c\udf7d\ufe0f Food / Restaurant','\ud83d\udc87 Salon / Clinic','\ud83d\udecb\ufe0f E-commerce / Shop','\ud83d\udcbc Other Business']
+    :['\ud83c\udf7d\ufe0f Food / Restaurant','\ud83d\udc87 Salon / Clinic','\ud83d\udecb\ufe0f E-commerce / Shop','\ud83d\udcbc Ibang Negosyo'];
+  }
 };
+
+function openChatAndBook(){
+  // Update modal copy for Book a Call context
+  const titleEl = document.getElementById('lc-title-text');
+  const subEl   = document.getElementById('lc-sub-text');
+  if(titleEl) titleEl.innerHTML = bil(
+    'I-book ang inyong libreng<br>Scoping Call ngayon',
+    'Book your free<br>Scoping Call today'
+  );
+  if(subEl) subEl.textContent = bil(
+    'Punan ang form at makikipag-usap agad ang aming AI assistant sa inyo.',
+    'Fill in the form and our AI assistant will chat with you right after.'
+  );
+  window._fromBookBtn = true;
+  document.getElementById('lcov').classList.add('on');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('lcname').focus(),300);
+}
 
 function chatToggle(){
   co=!co;
@@ -2075,9 +2157,33 @@ function chatToggle(){
   if(co&&cmc===0)setTimeout(showGreet,350);
   if(co)setTimeout(()=>document.getElementById('vxi').focus(),400);
 }
-function showGreet(){showTyp();setTimeout(()=>{rmTyp();addBot(GREET.text);setQR(GREET.qr);},900);}
-function addBot(t){cmc++;const e=document.createElement('div');e.className='msg b';e.innerHTML=`<div class="mav">\u26a1</div><div class="bbl">${esc(t)}</div>`;document.getElementById('vxm').appendChild(e);sc();}
-function addUser(t){cmc++;clrQR();const e=document.createElement('div');e.className='msg u';e.innerHTML=`<div class="bbl">${esc(t)}</div><div class="mav">\ud83d\udc64</div>`;document.getElementById('vxm').appendChild(e);sc();}
+function showGreet(){
+  tgNotify('<b>💬 CHAT STARTED — Vertex AI</b>\n\nA visitor just opened the chatbot.\nTime: '+new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'}));
+  showTyp();setTimeout(()=>{rmTyp();addBot(GREET.text);setQR(GREET.qr);},900);
+}
+
+function showGreetPersonalized(name, business){
+  tgNotify('<b>💬 CHAT STARTED — Vertex AI</b>\n\nName: '+name+'\nBusiness: '+business+'\nTime: '+new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'}));
+  showTyp();
+  setTimeout(()=>{
+    rmTyp();
+    // Details already from modal — skip data collection, go straight to services + schedule
+    addBot(bil(
+      'Salamat, '+name+'! \ud83d\ude0a\n\n'+
+      'Nakuha na namin ang inyong details para sa inyong '+business+'.\n\n'+
+      'Para ma-prepare namin ang pinaka-angkop na solusyon — anong services ang most relevant sa inyo?',
+      'Thanks, '+name+'! \ud83d\ude0a\n\n'+
+      'We\'ve got your details for '+business+'.\n\n'+
+      'To prepare the best solution — which of our services are you most interested in?'
+    ));
+    setQR(detectedLang==='eng'
+      ?['\ud83e\udd16 AI Chatbot','\u26a1 n8n Automation','\ud83d\udcf1 FB/IG Ads','\ud83d\uded2 Full Funnel','\ud83d\udcbc NetSuite ERP','\ud83c\udfa5 UGC Content']
+      :['\ud83e\udd16 AI Chatbot','\u26a1 n8n Automation','\ud83d\udcf1 FB/IG Ads','\ud83d\uded2 Full Funnel','\ud83d\udcbc NetSuite ERP','\ud83c\udfa5 UGC Content']);
+    bookingState=BS.MODAL_SELECT_SERVICES;
+  }, 900);
+}
+function addBot(t){cmc++;chatHistory.push({role:'bot',text:t,ts:new Date().toISOString()});const e=document.createElement('div');e.className='msg b';e.innerHTML=`<div class="mav">\u26a1</div><div class="bbl">${esc(t)}</div>`;document.getElementById('vxm').appendChild(e);sc();}
+function addUser(t){cmc++;clrQR();if(cmc<=3)detectedLang=detectLang(t);chatHistory.push({role:'user',text:t,ts:new Date().toISOString()});const e=document.createElement('div');e.className='msg u';e.innerHTML=`<div class="bbl">${esc(t)}</div><div class="mav">\ud83d\udc64</div>`;document.getElementById('vxm').appendChild(e);sc();}
 function showTyp(){const e=document.createElement('div');e.className='msg b typing';e.id='vxtyp';e.innerHTML=`<div class="mav">\u26a1</div><div class="bbl"><span class="td"></span><span class="td"></span><span class="td"></span></div>`;document.getElementById('vxm').appendChild(e);sc();}
 function rmTyp(){const t=document.getElementById('vxtyp');if(t)t.remove();}
 function setQR(a){const q=document.getElementById('vxqr');q.innerHTML='';a.forEach(r=>{const b=document.createElement('button');b.className='qrb';b.textContent=r;b.onclick=()=>smt(r);q.appendChild(b);});}
@@ -2141,6 +2247,26 @@ function selectService(id){
 // ── BOOKING FLOW HANDLER ──
 function startScopingCall(){
   bookingData.services=Array.from(selectedServices);
+  // Require business type before collecting contact details
+  const hasBusiness = bookingData.business &&
+    bookingData.business !== 'Your Business' &&
+    bookingData.business !== 'Not yet specified' &&
+    bookingData.business.length > 1;
+  if(!hasBusiness){
+    bookingState=BS.QUALIFY_PROBLEM;
+    showTyp();
+    setTimeout(()=>{
+      rmTyp();
+      addBot(bil(
+        'Bago tayo mag-proceed, anong uri ng negosyo ang meron kayo?\n\nHalimbawa: Salon, Restaurant, E-commerce, Clinic, etc.',
+        'Before we proceed, what type of business do you have?\n\nE.g. Salon, Restaurant, E-commerce, Clinic, etc.'
+      ));
+      setQR(detectedLang==='eng'
+        ?['\ud83c\udf7d\ufe0f Food / Restaurant','\ud83d\udc87 Salon / Clinic','\ud83d\udecb\ufe0f E-commerce / Shop','\ud83d\udcbc Other Business']
+        :['\ud83c\udf7d\ufe0f Food / Restaurant','\ud83d\udc87 Salon / Clinic','\ud83d\udecb\ufe0f E-commerce / Shop','\ud83d\udcbc Ibang Negosyo']);
+    },700);
+    return;
+  }
   bookingState=BS.COLLECT_NAME;
   showTyp();
   setTimeout(()=>{
@@ -2148,7 +2274,7 @@ function startScopingCall(){
     const svcSummary=bookingData.services.length>0
       ? 'Napili mo: '+bookingData.services.map(id=>SERVICES.find(s=>s.id===id)?.label||id).join(', ')+'.\n\n'
       : '';
-    addBot(svcSummary+'Para ma-set up ang inyong scoping call, kailangan ko lang ng ilang details.\n\nAno ang inyong buong pangalan?');
+    addBot(svcSummary+bil('Para ma-set up ang inyong scoping call, kailangan ko lang ng ilang details.\n\nAno ang inyong buong pangalan?','To set up your scoping call, I just need a few details.\n\nWhat\'s your full name?'));
   },800);
 }
 
@@ -2160,7 +2286,7 @@ function handleBookingFlow(text){
       showTyp();
       setTimeout(()=>{
         rmTyp();
-        addBot('Naiintindihan ko! Yan ay isa sa mga pinakacommon na challenges ng mga negosyante. \ud83d\udc4d\n\nGawa tayo ng solusyon para dyan. Tingnan natin kung anong services ang angkop sa inyong sitwasyon:');
+        addBot(bil('Naiintindihan ko! Yan ay isa sa mga pinakacommon na challenges ng mga negosyante. \ud83d\udc4d\n\nGawa tayo ng solusyon para dyan. Tingnan natin kung anong services ang angkop sa inyong sitwasyon:','Totally get that! It\'s one of the most common challenges. \ud83d\udc4d\n\nLet me show you what services might fit your situation:'));
         setTimeout(showServices,800);
       },700);
       return true;
@@ -2177,30 +2303,48 @@ function handleBookingFlow(text){
       return true;
 
     case BS.COLLECT_NAME:
-      if(text.trim().length<2){setTimeout(()=>addBot('Parang hindi kumpleto ang pangalan. Subukan ulit?'),500);return true;}
-      bookingData.name=text;
+      const cleanName=text.trim().replace(/\s+/g,' ');if(cleanName.length<2){setTimeout(()=>addBot(bil('Parang hindi kumpleto ang pangalan. Subukan ulit?','Name seems too short. Please try again.')),500);return true;}
+      bookingData.name=cleanName;
       bookingState=BS.COLLECT_PHONE;
       showTyp();
-      setTimeout(()=>{rmTyp();addBot('Salamat, '+bookingData.name+'! \ud83d\ude0a\n\nAno ang inyong contact number?');},700);
+      setTimeout(()=>{rmTyp();addBot(bil('Salamat, '+bookingData.name+'! \ud83d\ude0a\n\nAno ang inyong contact number?','Thanks, '+bookingData.name+'! \ud83d\ude0a\n\nWhat\'s your contact number?'));},700);
       return true;
 
     case BS.COLLECT_PHONE:
-      if(text.replace(/\D/g,'').length<10){setTimeout(()=>addBot('Parang hindi valid ang number. Subukan ulit? (hal: 09171234567)'),500);return true;}
-      bookingData.phone=text;
+      const cleanPhone=text.trim().replace(/[\s\-().+]/g,'');if(cleanPhone.replace(/\D/g,'').length<7){setTimeout(()=>addBot(bil('Parang hindi valid ang number. Subukan ulit? (hal: 09171234567)','Seems like an invalid number. Try again? (e.g. 09171234567)')),500);return true;}
+      bookingData.phone=text.trim();
       bookingState=BS.COLLECT_EMAIL;
       showTyp();
-      setTimeout(()=>{rmTyp();addBot('Salamat! Ano naman ang inyong email address? Doon namin ipapadala ang details ng inyong scoping call.');},700);
+      setTimeout(()=>{rmTyp();addBot(bil('Salamat! Ano naman ang inyong email address? Doon namin ipapadala ang details ng inyong scoping call.','Got it! What\'s your email address? We\'ll send the scoping call details there.'));},700);
       return true;
 
     case BS.COLLECT_EMAIL:
-      if(!text.includes('@')||!text.includes('.')){setTimeout(()=>addBot('Parang hindi valid ang email. Subukan ulit? (hal: juan@gmail.com)'),500);return true;}
-      bookingData.email=text;
+      const cleanEmail=text.trim().toLowerCase();if(!cleanEmail.includes('@')||!cleanEmail.includes('.')||cleanEmail.length<5){setTimeout(()=>addBot(bil('Parang hindi valid ang email. Subukan ulit? (hal: juan@gmail.com)','Seems like an invalid email. Try again? (e.g. juan@gmail.com)')),500);return true;}
+      bookingData.email=cleanEmail;
+      // ── SAVE PARTIAL LEAD IMMEDIATELY ─────────────────────────────────────
+      // Kapag nakuha na ang email — i-save agad sa Leads kahit hindi pa nag-confirm
+      // Para hindi mawala ang data kapag nag-abandon ang user
+      try{fetch(LEAD_WH,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          action:'lead',
+          name:bookingData.name||'—',
+          phone:bookingData.phone||'—',
+          email:cleanEmail,
+          business:bookingData.business||'—',
+          source:'chatbot_partial_lead',
+          notes:'Partial lead — reached email step. Business: '+(bookingData.business||'?')+
+                ' | Problems: '+(bookingData.problems.join(', ')||'?')+
+                ' | Services: '+(Array.from(selectedServices).join(', ')||'?'),
+          timestamp:new Date().toISOString()
+        })
+      });}catch{}
+      // ──────────────────────────────────────────────────────────────────────
       bookingState=BS.COLLECT_SCHEDULE;
       showTyp();
       setTimeout(()=>{
         rmTyp();
-        addBot('Huling hakbang! \ud83d\udcc5\n\nKailan kayo available para sa libreng 30-minute scoping call?\n\nSlots: Weekdays 9am–6pm o Weekends 10am–2pm (PH Time)');
-        setQR(['\u26a1 Bukas','📅 This Weekend','\ud83d\udd50 Ibang araw']);
+        addBot(bil('Huling hakbang! \ud83d\udcc5\n\nKailan kayo available para sa libreng 30-minute scoping call?\n\nSlots: Weekdays 9am–6pm o Weekends 10am–2pm (PH Time)','Almost done! \ud83d\udcc5\n\nWhen are you available for a free 30-minute scoping call?\n\nSlots: Weekdays 9am–6pm or Weekends 10am–2pm (PH Time)'));
+        setQR(detectedLang==='eng'?['\u26a1 Tomorrow','📅 This Weekend','\ud83d\udd50 Another day']:['\u26a1 Bukas','📅 This Weekend','\ud83d\udd50 Ibang araw']);
       },700);
       return true;
 
@@ -2227,26 +2371,92 @@ function handleBookingFlow(text){
           svcList+
           '\n\nTama ba ang lahat?'
         );
-        setQR(['\u2705 I-confirm!','\u270f\ufe0f Baguhin Schedule','\u274c Kanselahin']);
+        setQR(detectedLang==='eng'?['\u2705 Confirm!','\u270f\ufe0f Change Schedule','\u274c Cancel']:['\u2705 I-confirm!','\u270f\ufe0f Baguhin Schedule','\u274c Kanselahin']);
       },800);
       return true;
 
     case BS.CONFIRM:
       const lc=text.toLowerCase();
-      if(lc.includes('confirm')||lc.includes('oo')||lc.includes('yes')||lc.includes('tama')){
+      if(lc.includes('confirm')||lc.includes('oo')||lc.includes('yes')||lc.includes('tama')||text.includes('✅')||lc.includes('i-confirm')||lc.includes('sige')||lc.includes('ok')||lc.includes('yep')){
         bookingState=BS.DONE;
         submitBooking();
         return true;
-      } else if(lc.includes('schedule')||lc.includes('baguhin')){
+      } else if(lc.includes('schedule')||lc.includes('baguhin')||lc.includes('change')||text.includes('✏️')){
         bookingState=BS.COLLECT_SCHEDULE;
         setTimeout(()=>addBot('Sige! Kailan kayo available? (Weekdays 9am–6pm o Weekends 10am–2pm PHT)'),500);
         return true;
-      } else if(lc.includes('cancel')||lc.includes('huwag')||lc.includes('kanselahin')){
+      } else if(lc.includes('cancel')||lc.includes('huwag')||lc.includes('kanselahin')||text.includes('❌')){
         bookingState=BS.IDLE;
         setTimeout(()=>{addBot('Okay! Nandito lang kami pag handa na kayo. \ud83d\ude0a');setQR(['\ud83d\udcc5 Book Scoping Call','\u26a1 Mga Serbisyo','\ud83d\udcb0 Magkano?']);},500);
         return true;
       }
       return false;
+
+    case BS.MODAL_SELECT_SERVICES:
+      // Save selected service(s) and ask for schedule
+      if(!bookingData.services) bookingData.services=[];
+      bookingData.services.push(text);
+      bookingState=BS.MODAL_COLLECT_SCHEDULE;
+      showTyp();
+      setTimeout(()=>{
+        rmTyp();
+        addBot(bil(
+          'Nice na choice! \ud83d\udc4d\n\n'+
+          'Last question — kailan kayo available para sa libreng 30-minute scoping call?\n\n'+
+          'Available slots: Weekdays 9am\u20136pm o Weekends 10am\u20132pm (PH Time)',
+          'Great choice! \ud83d\udc4d\n\n'+
+          'Last question — when are you available for a free 30-minute scoping call?\n\n'+
+          'Available slots: Weekdays 9am\u20136pm or Weekends 10am\u20132pm (PH Time)'
+        ));
+        setQR(detectedLang==='eng'
+          ?['\u26a1 Tomorrow','\ud83d\udcc5 This Weekend','\ud83d\udd50 Next Week','\ud83d\udcdd Specific date']
+          :['\u26a1 Bukas','\ud83d\udcc5 This Weekend','\ud83d\udd50 Next Week','\ud83d\udcdd Specific date']);
+      },700);
+      return true;
+
+    case BS.MODAL_COLLECT_SCHEDULE:
+      // Got schedule — go straight to confirm
+      let modalSched=text;
+      const lms=text.toLowerCase();
+      if(lms.includes('bukas')||lms.includes('tomorrow')){
+        const td=new Date();td.setDate(td.getDate()+1);
+        modalSched=td.toLocaleDateString('en-PH',{weekday:'long',month:'long',day:'numeric'})+', 10:00 AM PHT';
+      } else if(lms.includes('weekend')||lms.includes('saturday')||lms.includes('sunday')){
+        modalSched='This Weekend, 10:00 AM PHT';
+      } else if(lms.includes('next week')||lms.includes('next')){
+        modalSched='Next Week, 10:00 AM PHT';
+      }
+      bookingData.schedule=modalSched;
+      bookingState=BS.CONFIRM;
+      showTyp();
+      setTimeout(()=>{
+        rmTyp();
+        const svcDisplay=Array.isArray(bookingData.services)
+          ? bookingData.services.map(id=>SERVICES.find(s=>s.id===id)?.label||id).join(', ')
+          : bookingData.services||text;
+        addBot(bil(
+          '\ud83d\udcdd Confirmation ng inyong Scoping Call:\n\n'+
+          '\ud83d\udc64 Pangalan: '+bookingData.name+'\n'+
+          '\ud83c\udfe2 Negosyo: '+bookingData.business+'\n'+
+          '\ud83d\udcf1 Phone: '+bookingData.phone+'\n'+
+          '\ud83d\udce7 Email: '+bookingData.email+'\n'+
+          '\ud83d\udee0\ufe0f Services: '+svcDisplay+'\n'+
+          '\ud83d\udcc5 Schedule: '+modalSched+'\n\n'+
+          'Tama ba ang lahat?',
+          '\ud83d\udcdd Scoping Call Confirmation:\n\n'+
+          '\ud83d\udc64 Name: '+bookingData.name+'\n'+
+          '\ud83c\udfe2 Business: '+bookingData.business+'\n'+
+          '\ud83d\udcf1 Phone: '+bookingData.phone+'\n'+
+          '\ud83d\udce7 Email: '+bookingData.email+'\n'+
+          '\ud83d\udee0\ufe0f Services: '+svcDisplay+'\n'+
+          '\ud83d\udcc5 Schedule: '+modalSched+'\n\n'+
+          'Does everything look correct?'
+        ));
+        setQR(detectedLang==='eng'
+          ?['\u2705 Confirm!','\u270f\ufe0f Change Schedule','\u274c Cancel']
+          :['\u2705 I-confirm!','\u270f\ufe0f Baguhin Schedule','\u274c Kanselahin']);
+      },800);
+      return true;
 
     default:
       return false;
@@ -2255,25 +2465,54 @@ function handleBookingFlow(text){
 
 function submitBooking(){
   showTyp();
+  const svcList=bookingData.services.length?bookingData.services.join(', '):'Not specified';
+  const ph=new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'});
+  tgNotify(
+    '<b>🎯 SCOPING CALL BOOKED — Vertex AI</b>\n\n'+
+    'Name: <b>'+bookingData.name+'</b>\n'+
+    'Phone: '+bookingData.phone+'\n'+
+    'Email: '+bookingData.email+'\n'+
+    'Business: '+bookingData.business+'\n'+
+    'Schedule: '+bookingData.schedule+'\n'+
+    'Services: '+svcList+'\n'+
+    'Time: '+ph+'\n\n'+
+    '<i>Confirm the appointment ASAP!</i>'
+  );
+  sheetsLog({
+    type:'booking',
+    name:bookingData.name,
+    phone:bookingData.phone,
+    email:bookingData.email,
+    business:bookingData.business,
+    schedule:bookingData.schedule,
+    services:bookingData.services,
+    source:'chatbot_scoping_call'
+  });
   try{
+    // Single clean request — action:'booking' para ma-route ng n8n
     fetch(CHAT_WH,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'book_appointment',bookingData,sessionId:sid,source:'website_scoping_call',timestamp:new Date().toISOString()})
-    });
-    fetch(LEAD_WH,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:bookingData.name,phone:bookingData.phone,email:bookingData.email,
-        source:'scoping_call_chatbot',
-        notes:'Business: '+bookingData.business+' | Schedule: '+bookingData.schedule+' | Services: '+bookingData.services.join(', '),
-        timestamp:new Date().toISOString()})
+      body:JSON.stringify({
+        action:'booking',
+        name:bookingData.name,
+        phone:bookingData.phone,
+        email:bookingData.email,
+        business:bookingData.business||'Not specified',
+        schedule:bookingData.schedule||'TBC',
+        services:Array.isArray(bookingData.services)?bookingData.services.join(', '):'Not specified',
+        notes:'Business: '+(bookingData.business||'?')+' | Schedule: '+(bookingData.schedule||'TBC'),
+        source:'chatbot_scoping_call',
+        sessionId:sid,
+        timestamp:new Date().toISOString()
+      })
     });
   }catch(e){}
   setTimeout(()=>{
     rmTyp();
-    addBot(
-      '\u2705 Naka-book na ang inyong scoping call!\n\n'+
-      'Makokontak namin si '+bookingData.name+' sa '+bookingData.phone+' para i-confirm ang exact na schedule.\n\n'+
-      'Sa scoping call, tatalagahin namin ang exact na solusyon at magbibigay ng detailed na quote para sa inyong negosyo. Abangan! \ud83d\ude80'
-    );
-    setQR(['\ud83d\udc4d Salamat!','\ud83d\udcac May tanong pa?']);
+    addBot(bil(
+      '\u2705 Naka-book na ang inyong scoping call!\n\nMakokontak namin si '+bookingData.name+' sa '+bookingData.phone+' para i-confirm ang exact na schedule.\n\nSa scoping call, tatalagahin namin ang exact na solusyon at magbibigay ng detailed na quote. Abangan! \ud83d\ude80',
+      '\u2705 Your scoping call is booked!\n\nWe\'ll reach out to '+bookingData.name+' at '+bookingData.phone+' to confirm the schedule.\n\nDuring the call, we\'ll map out the right solution and give you a detailed quote. Talk soon! \ud83d\ude80'
+    ));
+    setQR(detectedLang==='eng'?['\ud83d\udc4d Thank you!','\ud83d\udcac Any questions?']:['\ud83d\udc4d Salamat!','\ud83d\udcac May tanong pa?']);
     bookingData={name:'',phone:'',email:'',schedule:'',business:'',problems:[],services:[]};
     selectedServices.clear();
   },1200);
@@ -2329,34 +2568,56 @@ async function smt(text){
     showTyp();
     setTimeout(()=>{
       rmTyp();
-      addBot('Nice! \ud83d\ude0a Anong pinakamalaking challenge sa inyong '+text+' ngayon na gusto ninyong i-solve?');
-      setQR(['\ud83d\udcac Hindi nare-reply ang leads','\ud83d\udcb8 Mababa ang ROAS ng ads','\u23f0 Lahat manual at mabagal','\ud83e\udd37 Hindi alam kung saan magsimula']);
+      addBot(bil('Nice! \ud83d\ude0a Anong pinakamalaking challenge sa inyong '+text+' ngayon?','Nice! \ud83d\ude0a What\'s your biggest challenge with your '+text+' right now?'));
+      setQR(detectedLang==='eng'?['\ud83d\udcac Leads not being replied to','\ud83d\udcb8 Low ROAS on ads','\u23f0 Everything is manual','\ud83e\udd37 Not sure where to start']:['\ud83d\udcac Hindi nare-reply ang leads','\ud83d\udcb8 Mababa ang ROAS ng ads','\u23f0 Lahat manual at mabagal','\ud83e\udd37 Hindi alam kung saan magsimula']);
     },800);
     return;
   }
 
-  // General AI fallback
+  // General AI fallback — direct Claude API
   document.getElementById('vxsb').disabled=true;
   showTyp();
   try{
-    const r=await fetch(CHAT_WH,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:text,sessionId:sid,action:'chat',source:'website_chatbot',timestamp:new Date().toISOString(),page:window.location.href})
+    const r=await fetch(CHAT_WH,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        action:'chat',
+        message:text,
+        history:chatHistory.slice(-10), // last 10 messages for context
+        sessionId:sid,
+        source:'website_chatbot',
+        lang:detectedLang,
+        timestamp:new Date().toISOString()
+      })
     });
     rmTyp();
     if(r.ok){
       const d=await r.json();
-      let rep='Para ma-give ng exact na quote, kailangan namin munang i-scope ang inyong needs. Mag-book tayo ng libreng scoping call!',qrs=[];
-      if(typeof d==='string')rep=d;
-      else if(d.reply){rep=d.reply;if(Array.isArray(d.quickReplies))qrs=d.quickReplies;}
-      else if(d.output)rep=d.output;
-      else if(d.text)rep=d.text;
-      addBot(rep);
+      let raw=d.reply||bil('Pasensya, may error. Subukan ulit!','Sorry, something went wrong. Please try again!');
+      let qrs=Array.isArray(d.quickReplies)?d.quickReplies:[];
+
+      // Log to Google Sheets
+      sheetsLog({
+        type:'chat',
+        message:text,
+        reply:raw,
+        sessionId:sid,
+        source:'website_chatbot',
+        fullLog:chatHistory.map(m=>m.role.toUpperCase()+': '+m.text).join(' | ')
+      });
+
+      addBot(raw);
       if(qrs.length)setQR(qrs);
-      else setQR(['\ud83d\udcc5 Book Scoping Call','\u26a1 Mga Serbisyo','\ud83d\udcac Ibang tanong']);
-    }else{addBot('May nangyaring error. Subukan ulit o i-click ang Book a Call button! \ud83d\ude4f');}
+      else setQR(detectedLang==='eng'
+        ?['\ud83d\udcc5 Book Scoping Call','\u26a1 Our Services','\ud83d\udcb0 How much?']
+        :['\ud83d\udcc5 Book Scoping Call','\u26a1 Mga Serbisyo','\ud83d\udcb0 Magkano?']);
+    }else{
+      addBot(bil('May nangyaring error. Subukan ulit!','Something went wrong. Please try again!'));
+    }
   }catch{
     rmTyp();
-    addBot('Hindi ma-connect ngayon. I-click ang Book a Call button para makipag-ugnayan sa amin! \ud83d\ude4f');
+    addBot(bil('Hindi ma-connect ngayon. Subukan ulit sandali!','Can\'t connect right now. Please try again in a moment!'));
   }
   document.getElementById('vxsb').disabled=false;
   document.getElementById('vxi').focus();
@@ -2397,25 +2658,62 @@ setTimeout(() => { const d = document.getElementById('vxnd'); if (d && !co) d.st
 (function(){
   const LC_KEY='vx_lc_done';
   function lcOpen(){document.getElementById('lcov').classList.add('on');document.body.style.overflow='hidden';setTimeout(()=>document.getElementById('lcname').focus(),400);}
-  function lcClose(){document.getElementById('lcov').classList.remove('on');document.body.style.overflow='';}
+  function lcClose(){
+    document.getElementById('lcov').classList.remove('on');
+    document.body.style.overflow='';
+    // Reset title back to default
+    const titleEl=document.getElementById('lc-title-text');
+    const subEl=document.getElementById('lc-sub-text');
+    if(titleEl) titleEl.innerHTML='Kamusta! Bago ka mag-explore,<br>ipakilala mo muna ang sarili mo';
+    if(subEl) subEl.textContent='Para makapag-send kami ng personalized insights at exclusive offers para sa iyo.';
+    window._fromBookBtn=false;
+  }
   window.lcSkip=function(){localStorage.setItem(LC_KEY,'skipped');lcClose();}
   window.lcSubmit=function(){
     const name=document.getElementById('lcname').value.trim();
+    const business=document.getElementById('lcbusiness').value.trim();
     const phone=document.getElementById('lcphone').value.trim();
-    const email=document.getElementById('lcemail').value.trim();
-    if(!name){document.getElementById('lcname').focus();document.getElementById('lcname').style.borderColor='#ef4444';return;}
-    if(!phone){document.getElementById('lcphone').focus();document.getElementById('lcphone').style.borderColor='#ef4444';return;}
-    if(!email||!email.includes('@')){document.getElementById('lcemail').focus();document.getElementById('lcemail').style.borderColor='#ef4444';return;}
+    const email=document.getElementById('lcemail').value.trim().toLowerCase();
+    let err=false;
+    if(!name){document.getElementById('lcname').style.borderColor='#ef4444';if(!err)document.getElementById('lcname').focus();err=true;}
+    else document.getElementById('lcname').style.borderColor='';
+    if(!business){document.getElementById('lcbusiness').style.borderColor='#ef4444';if(!err)document.getElementById('lcbusiness').focus();err=true;}
+    else document.getElementById('lcbusiness').style.borderColor='';
+    if(!phone||phone.replace(/\D/g,'').length<7){document.getElementById('lcphone').style.borderColor='#ef4444';if(!err)document.getElementById('lcphone').focus();err=true;}
+    else document.getElementById('lcphone').style.borderColor='';
+    if(!email||!email.includes('@')||!email.includes('.')){document.getElementById('lcemail').style.borderColor='#ef4444';if(!err)document.getElementById('lcemail').focus();err=true;}
+    else document.getElementById('lcemail').style.borderColor='';
+    if(err)return;
     localStorage.setItem(LC_KEY,'submitted');
-    // Send to lead webhook
-    try{fetch(LEAD_WH,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,phone,email,source:'modal_lead_capture',timestamp:new Date().toISOString()})});}catch{}
+    tgNotify('<b>📥 MODAL LEAD — Vertex AI</b>\n\nName: <b>'+name+'</b>\nBusiness: '+business+'\nPhone: '+phone+'\nEmail: '+email+'\nTime: '+new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'}));
+    sheetsLog({type:'lead',name,business,phone,email,source:'modal_lead_capture'});
+    try{fetch(LEAD_WH,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'lead',name,business,phone,email,notes:'Business: '+business,source:'modal_lead_capture',timestamp:new Date().toISOString()})});}catch{}
     lcClose();
-    toast('Welcome, '+name+'! We\'ll reach out to you soon. &#128075;');
+    toast('Welcome, '+name+'! Starting your consultation now... &#128075;');
+    // Open chatbot after modal submit with personalized greeting
+    setTimeout(()=>{
+      if(!co) chatToggle();
+      // Pre-fill bookingData with what we collected
+      bookingData.name=name;
+      bookingData.business=business;
+      bookingData.phone=phone;
+      bookingData.email=email;
+      // Show personalized greeting after modal
+      setTimeout(()=>{
+        if(cmc===0) showGreetPersonalized(name, business);
+        else showGreetPersonalized(name, business);
+      }, 500);
+    }, 400);
+    window._fromBookBtn = false;
   }
   // Reset border color on input
-  ['lcname','lcphone','lcemail'].forEach(id=>{document.getElementById(id).addEventListener('input',function(){this.style.borderColor='';});});
-  // Show on every page load (no session check — fires each reload)
-  setTimeout(lcOpen, 800);
+  ['lcname','lcbusiness','lcphone','lcemail'].forEach(id=>{document.getElementById(id).addEventListener('input',function(){this.style.borderColor='';});});
+  // Show once per session for regular visitors
+  // (Book a Call button uses openChatAndBook which opens it directly)
+  if(!sessionStorage.getItem('vx_modal_shown')){
+    sessionStorage.setItem('vx_modal_shown','1');
+    setTimeout(lcOpen, 1500);
+  }
 })();
 </script>
 </body>
