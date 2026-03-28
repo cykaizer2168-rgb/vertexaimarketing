@@ -2674,6 +2674,7 @@ setTimeout(() => { const d = document.getElementById('vxnd'); if (d && !co) d.st
     const business=document.getElementById('lcbusiness').value.trim();
     const phone=document.getElementById('lcphone').value.trim();
     const email=document.getElementById('lcemail').value.trim().toLowerCase();
+    console.log('lcSubmit called', {name, business, phone, email});
     let err=false;
     if(!name){document.getElementById('lcname').style.borderColor='#ef4444';if(!err)document.getElementById('lcname').focus();err=true;}
     else document.getElementById('lcname').style.borderColor='';
@@ -2687,7 +2688,10 @@ setTimeout(() => { const d = document.getElementById('vxnd'); if (d && !co) d.st
     localStorage.setItem(LC_KEY,'submitted');
     tgNotify('<b>📥 MODAL LEAD — Vertex AI</b>\n\nName: <b>'+name+'</b>\nBusiness: '+business+'\nPhone: '+phone+'\nEmail: '+email+'\nTime: '+new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'}));
     sheetsLog({type:'lead',name,business,phone,email,source:'modal_lead_capture'});
-    try{fetch(LEAD_WH,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'lead',name,business,phone,email,notes:'Business: '+business,source:'modal_lead_capture',timestamp:new Date().toISOString()})});}catch{}
+    console.log('Sending to webhook:', LEAD_WH);
+    fetch(LEAD_WH,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'lead',name,business,phone,email,notes:'Business: '+business,source:'modal_lead_capture',timestamp:new Date().toISOString()})})
+      .then(r=>console.log('Webhook response:', r.status))
+      .catch(e=>console.error('Webhook error:', e));
     lcClose();
     toast('Welcome, '+name+'! Starting your consultation now... &#128075;');
     // Open chatbot after modal submit with personalized greeting
@@ -2705,7 +2709,7 @@ setTimeout(() => { const d = document.getElementById('vxnd'); if (d && !co) d.st
       }, 500);
     }, 400);
     window._fromBookBtn = false;
-  }
+  };
   // Reset border color on input
   ['lcname','lcbusiness','lcphone','lcemail'].forEach(id=>{document.getElementById(id).addEventListener('input',function(){this.style.borderColor='';});});
   // Show once per session for regular visitors
