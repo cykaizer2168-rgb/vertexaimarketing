@@ -14,13 +14,15 @@ interface Props {
 
 export default function StatusDropdown({ currentStatus, onSelect, onClose }: Props) {
   const ref = useRef<HTMLDivElement>(null)
+  const onCloseRef = useRef(onClose)
+  useEffect(() => { onCloseRef.current = onClose }, [onClose])
 
   useEffect(() => {
     function handleMouseDown(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
+      if (ref.current && !ref.current.contains(e.target as Node)) onCloseRef.current()
     }
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') onCloseRef.current()
     }
     document.addEventListener('mousedown', handleMouseDown)
     document.addEventListener('keydown', handleKeyDown)
@@ -28,16 +30,18 @@ export default function StatusDropdown({ currentStatus, onSelect, onClose }: Pro
       document.removeEventListener('mousedown', handleMouseDown)
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [onClose])
+  }, []) // empty deps — handlers use ref, never go stale
 
   return (
     <div
       ref={ref}
+      role="menu"
       className="absolute top-full left-0 z-50 mt-1 w-36 bg-[#0f0f1a] border border-white/[0.1] rounded-lg shadow-xl overflow-hidden"
     >
       {STATUS_ORDER.map(status => (
         <button
           key={status}
+          role="menuitem"
           onClick={() => { onSelect(status); onClose() }}
           className="w-full flex items-center justify-between px-3 py-2 text-[12px] hover:bg-[#141425] transition-colors"
         >
