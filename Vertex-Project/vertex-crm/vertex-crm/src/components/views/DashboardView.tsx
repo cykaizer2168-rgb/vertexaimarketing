@@ -1,9 +1,11 @@
 // src/components/views/DashboardView.tsx
+import { useState } from 'react'
 import { Users, Target, DollarSign, Zap, TrendingUp, ArrowUpRight,
          Mail, Calendar, MoreHorizontal, ChevronDown, AlertTriangle } from 'lucide-react'
-import type { Lead } from '@/types'
+import type { Lead, LeadStatus } from '@/types'
 import { ScoreBadge, STATUS_COLORS } from './shared'
 import toast from 'react-hot-toast'
+import StatusDropdown from './StatusDropdown'
 
 interface Props {
   leads:         Lead[]
@@ -113,12 +115,14 @@ export default function DashboardView({
 }
 
 // ── Shared table used by DashboardView and LeadsView ──────────────────────────
-export function LeadsTable({ leads, authenticated, onEmailLead, onBookingLead }: {
-  leads:         Lead[]
-  authenticated: boolean
-  onEmailLead:   (lead: Lead) => void
-  onBookingLead: (lead: Lead) => void
+export function LeadsTable({ leads, authenticated, onEmailLead, onBookingLead, onStatusChange }: {
+  leads:           Lead[]
+  authenticated:   boolean
+  onEmailLead:     (lead: Lead) => void
+  onBookingLead:   (lead: Lead) => void
+  onStatusChange?: (lead: Lead, status: LeadStatus) => void
 }) {
+  const [openId, setOpenId] = useState<string | null>(null)
   return (
     <div className="bg-[#0f0f1a] border border-white/[0.06] rounded-xl overflow-hidden">
       <table className="w-full border-collapse">
@@ -148,9 +152,21 @@ export function LeadsTable({ leads, authenticated, onEmailLead, onBookingLead }:
               </td>
               <td className="px-4 py-3 font-mono text-[12px] text-slate-300">₱{lead.estimatedValue.toLocaleString()}</td>
               <td className="px-4 py-3">
-                <span className={`text-[11px] px-2 py-0.5 rounded border font-medium capitalize ${STATUS_COLORS[lead.status] || STATUS_COLORS.new}`}>
-                  {lead.status}
-                </span>
+                <div className="relative inline-block">
+                  <span
+                    onClick={() => onStatusChange && setOpenId(openId === lead.id ? null : lead.id)}
+                    className={`text-[11px] px-2 py-0.5 rounded border font-medium capitalize ${STATUS_COLORS[lead.status] || STATUS_COLORS.new} ${onStatusChange ? 'cursor-pointer hover:ring-1 hover:ring-white/20' : ''}`}
+                  >
+                    {lead.status}
+                  </span>
+                  {onStatusChange && openId === lead.id && (
+                    <StatusDropdown
+                      currentStatus={lead.status}
+                      onSelect={status => onStatusChange(lead, status)}
+                      onClose={() => setOpenId(null)}
+                    />
+                  )}
+                </div>
               </td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
