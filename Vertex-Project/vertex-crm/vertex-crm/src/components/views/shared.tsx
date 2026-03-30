@@ -11,6 +11,15 @@ export const STATUS_COLORS: Record<string, string> = {
   closed:    'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
 }
 
+export const STATUS_TEXT_COLORS: Record<string, string> = {
+  hot:       'text-red-400',
+  qualified: 'text-blue-400',
+  contacted: 'text-amber-400',
+  nurture:   'text-purple-400',
+  new:       'text-slate-400',
+  closed:    'text-emerald-400',
+}
+
 export const LOG_COLORS: Record<string, string> = {
   enriched:      'border-blue-500 text-blue-400',
   scored:        'border-emerald-500 text-emerald-400',
