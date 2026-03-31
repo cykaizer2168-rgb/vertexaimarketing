@@ -108,7 +108,7 @@ export default function DashboardPage() {
       const res = await fetch('/api/leads', {
         method:  'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ id: lead.id, sheetRow: lead.sheetRow, status }),
+        body:    JSON.stringify({ sheetRow: lead.sheetRow, status }),
       })
       if (!res.ok) throw new Error('Update failed')
       toast.success('Status updated')

@@ -21,7 +21,7 @@ export interface Lead {
   createdAt: string
   lastContacted?: string
   // Google Sheets row reference for updates
-  sheetRow?: number
+  sheetRow: number
 }
 
 // ─── Email ───────────────────────────────────────────────────────────────────

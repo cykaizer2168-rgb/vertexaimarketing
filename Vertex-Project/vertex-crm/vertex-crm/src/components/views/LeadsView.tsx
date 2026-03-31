@@ -9,7 +9,7 @@ interface Props {
   authenticated:   boolean
   onEmailLead:     (lead: Lead) => void
   onBookingLead:   (lead: Lead) => void
-  onSignIn:        () => void
+  onSignIn?:       () => void
   onStatusChange?: (lead: Lead, status: LeadStatus) => void
 }
 
