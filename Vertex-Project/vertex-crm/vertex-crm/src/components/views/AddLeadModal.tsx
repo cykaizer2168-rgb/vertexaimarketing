@@ -18,7 +18,7 @@ const INDUSTRIES = [
   'Other',
 ]
 
-interface AddLeadData {
+export interface AddLeadData {
   name:        string
   email:       string
   company:     string
@@ -41,6 +41,7 @@ export default function AddLeadModal({ onClose, onAdd }: Props) {
   const [phone,         setPhone]         = useState('')
   const [painPoints,    setPainPoints]    = useState('')
   const [submitting,    setSubmitting]    = useState(false)
+  const [error,         setError]         = useState<string | null>(null)
   const nameRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -55,6 +56,7 @@ export default function AddLeadModal({ onClose, onAdd }: Props) {
 
   async function handleSubmit() {
     if (!canSubmit) return
+    setError(null)
     setSubmitting(true)
     try {
       await onAdd({
@@ -66,8 +68,10 @@ export default function AddLeadModal({ onClose, onAdd }: Props) {
         painPoints:  painPoints.trim() || undefined,
       })
       onClose()
-    } finally {
+      // Do not reset submitting — component is about to unmount
+    } catch {
       setSubmitting(false)
+      setError('Failed to add lead. Please try again.')
     }
   }
 
@@ -153,6 +157,9 @@ export default function AddLeadModal({ onClose, onAdd }: Props) {
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-white/[0.06]">
+          {error && (
+            <p className="flex-1 text-[11px] text-red-400">{error}</p>
+          )}
           <button onClick={onClose}
             className="px-4 py-2 text-xs font-semibold text-slate-400 bg-[#141425] border border-white/[0.06] rounded-lg hover:text-slate-200 hover:bg-[#1a1a2e] transition-colors">
             Cancel
