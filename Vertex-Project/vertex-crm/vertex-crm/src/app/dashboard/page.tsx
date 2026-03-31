@@ -127,7 +127,7 @@ export default function DashboardPage() {
       sheetRow:            0,
       name:                data.name,
       email:               data.email,
-      phone:               data.phone ?? '',
+      phone:               data.phone,
       company:             data.company,
       industry:            data.industry,
       aiScore:             0,
@@ -140,11 +140,8 @@ export default function DashboardPage() {
       createdAt:           new Date().toISOString().split('T')[0],
     }
 
-    let snapshot: Lead[] | null = null
-    setLeads(prev => {
-      snapshot = prev
-      return [optimistic, ...prev]
-    })
+    const snapshot = leads
+    setLeads(prev => [optimistic, ...prev])
 
     try {
       const res = await fetch('/api/leads', {
@@ -157,7 +154,7 @@ export default function DashboardPage() {
       setLeads(prev => prev.map(l => l.id === tempId ? { ...l, sheetRow: json.sheetRow } : l))
       toast.success('Lead added')
     } catch {
-      if (snapshot !== null) setLeads(snapshot)
+      setLeads(snapshot)
       toast.error('Failed to add lead')
       throw new Error('Failed to add lead')
     }
