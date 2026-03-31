@@ -12,7 +12,7 @@ export interface AppSettings {
   chatLogsTab: string
   calendlyUrl: string
   adminEmail:  string
-  webhookUrl?: string
+  webhookUrl:  string
 }
 
 export async function readSettings(): Promise<AppSettings> {
@@ -31,5 +31,6 @@ export async function readSettings(): Promise<AppSettings> {
     chatLogsTab: process.env.GOOGLE_SHEET_CHAT_LOGS_TAB   || 'Chat Logs',
     calendlyUrl: process.env.NEXT_PUBLIC_CALENDLY_URL     || '',
     adminEmail:  process.env.NEXT_PUBLIC_ADMIN_EMAIL      || '',
+    webhookUrl:  process.env.N8N_WEBHOOK_URL              || '',
   }
 }

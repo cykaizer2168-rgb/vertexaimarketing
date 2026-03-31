@@ -11,6 +11,7 @@ interface AppSettings {
   chatLogsTab: string
   calendlyUrl: string
   adminEmail:  string
+  webhookUrl:  string
 }
 
 interface Props {
@@ -27,6 +28,7 @@ export default function SettingsView({ userEmail, userName, userImage }: Props) 
     chatLogsTab: 'Chat Logs',
     calendlyUrl: '',
     adminEmail:  '',
+    webhookUrl:  '',
   })
   const [loading, setLoading] = useState(true)
   const [saving,  setSaving]  = useState(false)
@@ -154,6 +156,13 @@ export default function SettingsView({ userEmail, userName, userImage }: Props) 
             <input value={settings.calendlyUrl} onChange={e => set('calendlyUrl', e.target.value)}
               className="w-full bg-[#141425] border border-white/[0.08] rounded-lg px-3 py-2 text-[13px] text-slate-200 outline-none focus:border-blue-500/50 transition-colors"
               placeholder="https://calendly.com/your-link" />
+          </div>
+          <div>
+            <label className="text-[11px] text-slate-500 uppercase tracking-wider font-medium mb-1 block">n8n Webhook URL</label>
+            <input value={settings.webhookUrl} onChange={e => set('webhookUrl', e.target.value)}
+              type="text"
+              className="w-full bg-[#141425] border border-white/[0.08] rounded-lg px-3 py-2 text-[13px] text-slate-200 font-mono outline-none focus:border-blue-500/50 transition-colors"
+              placeholder="https://your-n8n.com/webhook/abc123" />
           </div>
         </div>
       </section>
