@@ -99,8 +99,11 @@ export default function DashboardPage() {
   const showSidePanel = !FULL_WIDTH_PAGES.has(activePage)
 
   async function handleStatusChange(lead: Lead, status: LeadStatus) {
-    const prev = leads
-    setLeads(leads.map(l => l.id === lead.id ? { ...l, status } : l))
+    let snapshot: Lead[] | null = null
+    setLeads(prev => {
+      snapshot = prev
+      return prev.map(l => l.id === lead.id ? { ...l, status } : l)
+    })
     try {
       const res = await fetch('/api/leads', {
         method:  'PATCH',
@@ -110,7 +113,7 @@ export default function DashboardPage() {
       if (!res.ok) throw new Error('Update failed')
       toast.success('Status updated')
     } catch {
-      setLeads(prev)
+      if (snapshot !== null) setLeads(snapshot)
       toast.error('Failed to update status')
     }
   }
