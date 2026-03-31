@@ -115,3 +115,46 @@ export async function appendScopingCall(data: {
     },
   })
 }
+
+// ─── Append a new lead ────────────────────────────────────────────────────────
+export async function appendLead(data: {
+  name:       string
+  email:      string
+  phone?:     string
+  company:    string
+  industry:   string
+  painPoints?: string
+}): Promise<number> {
+  const sheets = await getSheetsClient()
+  const now = new Date().toISOString()
+  const res = await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_ID,
+    range:         `${LEADS_TAB}!A:P`,
+    valueInputOption: 'RAW',
+    insertDataOption: 'INSERT_ROWS',
+    requestBody: {
+      values: [[
+        '',                    // row_number (not written — Sheets auto-assigns row)
+        data.name,
+        data.email,
+        data.phone      || '',
+        data.company,
+        data.industry,
+        data.painPoints || '',
+        '0',                   // ai_score
+        '',                    // suggested_automation
+        '',                    // estimated_roi
+        '',                    // outreach_hook
+        'new',                 // status
+        '0',                   // estimated_value
+        'manual',              // source
+        now,                   // created_at
+        '',                    // last_contacted
+      ]],
+    },
+  })
+  // Parse row number from updatedRange e.g. "Leads!A25:P25"
+  const updatedRange = res.data.updates?.updatedRange || ''
+  const match = updatedRange.match(/(\d+)$/)
+  return match ? parseInt(match[1]) : 0
+}

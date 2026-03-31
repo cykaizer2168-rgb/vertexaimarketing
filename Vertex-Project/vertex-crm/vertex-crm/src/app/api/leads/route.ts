@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getLeads, updateLeadStatus } from '@/lib/sheets'
+import { getLeads, updateLeadStatus, appendLead } from '@/lib/sheets'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { triggerWebhook } from '@/lib/webhook'
@@ -37,6 +37,26 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
+}
+
+/** POST /api/leads — append a new lead */
+export async function POST(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const { name, email, company, industry, phone, painPoints } = await req.json()
+    if (!name || !email || !company || !industry) {
+      return NextResponse.json({ error: 'Missing required fields: name, email, company, industry' }, { status: 400 })
+    }
+
+    const sheetRow = await appendLead({ name, email, company, industry, phone, painPoints })
+    return NextResponse.json({ success: true, sheetRow })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[API /leads POST]', message)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
