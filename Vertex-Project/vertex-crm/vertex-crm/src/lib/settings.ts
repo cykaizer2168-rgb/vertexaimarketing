@@ -3,7 +3,7 @@ import { readFile } from 'fs/promises'
 import { existsSync } from 'fs'
 import { join } from 'path'
 
-const SETTINGS_PATH = join(process.cwd(), 'settings.json')
+export const SETTINGS_PATH = join(process.cwd(), 'settings.json')
 
 export interface AppSettings {
   sheetId:     string

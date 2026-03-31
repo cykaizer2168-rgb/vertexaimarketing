@@ -15,11 +15,11 @@ export async function triggerWebhook(
     const settings = await readSettings()
     if (!settings.webhookUrl) return
 
-    await fetch(settings.webhookUrl, {
+    void fetch(settings.webhookUrl, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ type, ...payload, timestamp: new Date().toISOString() }),
-    })
+    }).catch(err => console.error('[webhook]', err))
   } catch (err) {
     console.error('[webhook]', err)
   }

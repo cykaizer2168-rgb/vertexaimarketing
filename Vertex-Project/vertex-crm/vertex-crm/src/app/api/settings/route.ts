@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { writeFile } from 'fs/promises'
-import { join } from 'path'
-import { readSettings, AppSettings } from '@/lib/settings'
-
-const SETTINGS_PATH = join(process.cwd(), 'settings.json')
+import { readSettings, AppSettings, SETTINGS_PATH } from '@/lib/settings'
 
 export async function GET() {
   const session = await getServerSession(authOptions)
@@ -30,6 +27,7 @@ export async function POST(req: NextRequest) {
       chatLogsTab: body.chatLogsTab ?? current.chatLogsTab,
       calendlyUrl: body.calendlyUrl ?? current.calendlyUrl,
       adminEmail:  body.adminEmail  ?? current.adminEmail,
+      webhookUrl:  body.webhookUrl  ?? current.webhookUrl ?? '',
     }
     await writeFile(SETTINGS_PATH, JSON.stringify(updated, null, 2), 'utf-8')
     return NextResponse.json({ ok: true, settings: updated })
