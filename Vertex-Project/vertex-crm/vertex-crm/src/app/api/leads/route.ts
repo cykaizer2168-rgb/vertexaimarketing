@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getLeads, updateLeadStatus } from '@/lib/sheets'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { triggerWebhook } from '@/lib/webhook'
 
 /** GET /api/leads — fetch all leads from Google Sheets */
 export async function GET() {
@@ -10,6 +11,9 @@ export async function GET() {
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const leads = await getLeads()
+    if (leads.length > 0) {
+      await triggerWebhook('leads_refreshed', { count: leads.length })
+    }
     return NextResponse.json({ leads })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
@@ -29,6 +33,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     await updateLeadStatus(sheetRow, status)
+    await triggerWebhook('status_changed', { sheetRow, status })
     return NextResponse.json({ success: true })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)

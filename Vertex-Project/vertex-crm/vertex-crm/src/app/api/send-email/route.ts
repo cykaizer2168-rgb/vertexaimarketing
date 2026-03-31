@@ -3,6 +3,7 @@ import { getGmailClient, buildMimeEmail, encodeEmail } from '@/lib/google'
 import { updateLastContacted } from '@/lib/sheets'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { triggerWebhook } from '@/lib/webhook'
 
 /**
  * POST /api/send-email
@@ -63,6 +64,9 @@ export async function POST(req: NextRequest) {
       userId: 'me',
       requestBody: { raw: encodeEmail(rawMime) },
     })
+
+    // Fire n8n webhook
+    await triggerWebhook('email_sent', { leadId: leadId ?? null, to, subject })
 
     // Update Google Sheets CRM
     if (sheetRow) {
