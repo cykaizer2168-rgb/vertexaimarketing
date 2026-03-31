@@ -15,10 +15,11 @@ interface Props {
   onBookingLead:   (lead: Lead) => void
   onSignIn:        () => void
   onStatusChange?: (lead: Lead, status: LeadStatus) => void
+  onAddLead?:      () => void
 }
 
 export default function DashboardView({
-  leads, search, authenticated, onEmailLead, onBookingLead, onSignIn, onStatusChange
+  leads, search, authenticated, onEmailLead, onBookingLead, onSignIn, onStatusChange, onAddLead
 }: Props) {
   const filtered = leads.filter(l =>
     !search || [l.name, l.company, l.industry].some(v =>
@@ -83,7 +84,7 @@ export default function DashboardView({
             <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-400 bg-[#141425] border border-white/[0.06] rounded-lg hover:text-slate-200 hover:bg-[#1a1a2e] transition-colors">
               <TrendingUp className="w-3 h-3" /> Sort <ChevronDown className="w-3 h-3" />
             </button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors">
+            <button onClick={onAddLead} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors">
               + Add Lead
             </button>
           </div>

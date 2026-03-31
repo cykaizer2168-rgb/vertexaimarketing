@@ -11,9 +11,10 @@ interface Props {
   onBookingLead:   (lead: Lead) => void
   onSignIn?:       () => void
   onStatusChange?: (lead: Lead, status: LeadStatus) => void
+  onAddLead?:      () => void
 }
 
-export default function LeadsView({ leads, search, authenticated, onEmailLead, onBookingLead, onStatusChange }: Props) {
+export default function LeadsView({ leads, search, authenticated, onEmailLead, onBookingLead, onStatusChange, onAddLead }: Props) {
   const active = leads.filter(l => l.status !== 'closed')
   const filtered = active.filter(l =>
     !search || [l.name, l.company, l.industry, l.email].some(v =>
@@ -53,7 +54,7 @@ export default function LeadsView({ leads, search, authenticated, onEmailLead, o
             </div>
             <div className="text-[11px] text-slate-500">{filtered.length} of {active.length} shown · closed leads excluded</div>
           </div>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors">
+          <button onClick={onAddLead} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors">
             + Add Lead
           </button>
         </div>

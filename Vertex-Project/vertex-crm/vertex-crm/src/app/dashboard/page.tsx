@@ -9,6 +9,7 @@ import {
 import type { Lead, AILog, LeadStatus } from '@/types'
 import EmailModal         from '@/components/email/EmailModal'
 import BookingModal       from '@/components/calendar/BookingModal'
+import AddLeadModal, { type AddLeadData } from '@/components/views/AddLeadModal'
 import AISidePanel        from '@/components/views/AISidePanel'
 import DashboardView      from '@/components/views/DashboardView'
 import LeadsView          from '@/components/views/LeadsView'
@@ -77,6 +78,7 @@ export default function DashboardPage() {
   const [loading,     setLoading]     = useState(false)
   const [emailLead,   setEmailLead]   = useState<Lead | null>(null)
   const [bookingLead, setBookingLead] = useState<Lead | null>(null)
+  const [showAddLead, setShowAddLead] = useState(false)
   const [search,      setSearch]      = useState('')
   const [activePage,  setActivePage]  = useState<PageName>('Dashboard')
 
@@ -118,6 +120,49 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleAddLead(data: AddLeadData) {
+    const tempId = `temp-${Date.now()}`
+    const optimistic: Lead = {
+      id:                  tempId,
+      sheetRow:            0,
+      name:                data.name,
+      email:               data.email,
+      phone:               data.phone ?? '',
+      company:             data.company,
+      industry:            data.industry,
+      aiScore:             0,
+      aiReadinessScore:    0,
+      suggestedAutomation: '',
+      automationType:      'blue',
+      estimatedValue:      0,
+      status:              'new',
+      source:              'manual',
+      createdAt:           new Date().toISOString().split('T')[0],
+    }
+
+    let snapshot: Lead[] | null = null
+    setLeads(prev => {
+      snapshot = prev
+      return [optimistic, ...prev]
+    })
+
+    try {
+      const res = await fetch('/api/leads', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(data),
+      })
+      if (!res.ok) throw new Error('POST failed')
+      const json = await res.json() as { success: boolean; sheetRow: number }
+      setLeads(prev => prev.map(l => l.id === tempId ? { ...l, sheetRow: json.sheetRow } : l))
+      toast.success('Lead added')
+    } catch {
+      if (snapshot !== null) setLeads(snapshot)
+      toast.error('Failed to add lead')
+      throw new Error('Failed to add lead')
+    }
+  }
+
   // Shared props passed to views that show leads
   const sharedProps = {
     leads,
@@ -127,6 +172,7 @@ export default function DashboardPage() {
     onBookingLead:  setBookingLead,
     onSignIn:       () => signIn('google'),
     onStatusChange: authenticated ? handleStatusChange : undefined,
+    onAddLead:      () => setShowAddLead(true),
   }
 
   function renderContent() {
@@ -265,6 +311,7 @@ export default function DashboardPage() {
       {/* ── Modals ── */}
       {emailLead   && <EmailModal   lead={emailLead}   onClose={() => setEmailLead(null)} />}
       {bookingLead && <BookingModal lead={bookingLead} onClose={() => setBookingLead(null)} />}
+      {showAddLead && <AddLeadModal onClose={() => setShowAddLead(false)} onAdd={handleAddLead} />}
     </div>
   )
 }
