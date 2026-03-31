@@ -154,7 +154,7 @@ export function LeadsTable({ leads, authenticated, onEmailLead, onBookingLead, o
               <td className="px-4 py-3">
                 <div className="relative inline-block">
                   <span
-                    onClick={() => onStatusChange && setOpenId(openId === lead.id ? null : lead.id)}
+                    onMouseDown={e => { e.stopPropagation(); onStatusChange && setOpenId(prev => prev === lead.id ? null : lead.id); }}
                     className={`text-[11px] px-2 py-0.5 rounded border font-medium capitalize ${STATUS_COLORS[lead.status] || STATUS_COLORS.new} ${onStatusChange ? 'cursor-pointer hover:ring-1 hover:ring-white/20' : ''}`}
                   >
                     {lead.status}
