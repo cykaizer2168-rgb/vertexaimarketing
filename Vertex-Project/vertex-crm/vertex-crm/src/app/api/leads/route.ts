@@ -17,6 +17,7 @@ export async function GET() {
     return NextResponse.json({ leads })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
+    console.error('[API /leads GET]', message)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
@@ -37,6 +38,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
+    console.error('[API /leads PATCH]', message)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

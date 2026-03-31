@@ -133,28 +133,31 @@ export async function appendLead(data: {
     valueInputOption: 'RAW',
     insertDataOption: 'INSERT_ROWS',
     requestBody: {
-      values: [[
-        '',                    // row_number (not written — Sheets auto-assigns row)
-        data.name,
-        data.email,
-        data.phone      || '',
-        data.company,
-        data.industry,
-        data.painPoints || '',
-        '0',                   // ai_score
-        '',                    // suggested_automation
-        '',                    // estimated_roi
-        '',                    // outreach_hook
-        'new',                 // status
-        '0',                   // estimated_value
-        'manual',              // source
-        now,                   // created_at
-        '',                    // last_contacted
-      ]],
+      values: [COLS.map(col => {
+        switch (col) {
+          case 'name':            return data.name
+          case 'email':           return data.email
+          case 'phone':           return data.phone      ?? ''
+          case 'company':         return data.company
+          case 'industry':        return data.industry
+          case 'pain_points':     return data.painPoints ?? ''
+          case 'ai_score':        return '0'
+          case 'suggested_automation': return ''
+          case 'estimated_roi':   return ''
+          case 'outreach_hook':   return ''
+          case 'status':          return 'new'
+          case 'estimated_value': return '0'
+          case 'source':          return 'manual'
+          case 'created_at':      return now
+          case 'last_contacted':  return ''
+          default:                return ''
+        }
+      })],
     },
   })
   // Parse row number from updatedRange e.g. "Leads!A25:P25"
   const updatedRange = res.data.updates?.updatedRange || ''
-  const match = updatedRange.match(/(\d+)$/)
-  return match ? parseInt(match[1]) : 0
+  const match = updatedRange.match(/:?[A-Z]+(\d+)$/)
+  if (!match) throw new Error(`appendLead: could not parse sheetRow from updatedRange "${updatedRange}"`)
+  return parseInt(match[1])
 }
