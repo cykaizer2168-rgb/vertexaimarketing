@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       chatLogsTab: body.chatLogsTab ?? current.chatLogsTab,
       calendlyUrl: body.calendlyUrl ?? current.calendlyUrl,
       adminEmail:  body.adminEmail  ?? current.adminEmail,
-      webhookUrl:  body.webhookUrl  ?? current.webhookUrl ?? '',
+      webhookUrl:  body.webhookUrl  ?? current.webhookUrl,
     }
     await writeFile(SETTINGS_PATH, JSON.stringify(updated, null, 2), 'utf-8')
     return NextResponse.json({ ok: true, settings: updated })

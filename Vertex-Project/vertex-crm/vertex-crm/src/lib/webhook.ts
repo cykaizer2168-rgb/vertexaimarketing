@@ -15,6 +15,10 @@ export async function triggerWebhook(
     const settings = await readSettings()
     if (!settings.webhookUrl) return
 
+    // fetch is intentionally not awaited — fire-and-forget.
+    // This function is async only because readSettings() is async.
+    // Callers `await triggerWebhook(...)` ensure settings are read before the
+    // response is sent, but the HTTP POST to n8n completes independently.
     void fetch(settings.webhookUrl, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
