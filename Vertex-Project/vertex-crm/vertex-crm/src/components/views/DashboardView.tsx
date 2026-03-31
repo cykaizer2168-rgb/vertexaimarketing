@@ -8,16 +8,17 @@ import toast from 'react-hot-toast'
 import StatusDropdown from './StatusDropdown'
 
 interface Props {
-  leads:         Lead[]
-  search:        string
-  authenticated: boolean
-  onEmailLead:   (lead: Lead) => void
-  onBookingLead: (lead: Lead) => void
-  onSignIn:      () => void
+  leads:           Lead[]
+  search:          string
+  authenticated:   boolean
+  onEmailLead:     (lead: Lead) => void
+  onBookingLead:   (lead: Lead) => void
+  onSignIn:        () => void
+  onStatusChange?: (lead: Lead, status: LeadStatus) => void
 }
 
 export default function DashboardView({
-  leads, search, authenticated, onEmailLead, onBookingLead, onSignIn
+  leads, search, authenticated, onEmailLead, onBookingLead, onSignIn, onStatusChange
 }: Props) {
   const filtered = leads.filter(l =>
     !search || [l.name, l.company, l.industry].some(v =>
@@ -87,7 +88,7 @@ export default function DashboardView({
             </button>
           </div>
         </div>
-        <LeadsTable leads={filtered} authenticated={authenticated} onEmailLead={onEmailLead} onBookingLead={onBookingLead} />
+        <LeadsTable leads={filtered} authenticated={authenticated} onEmailLead={onEmailLead} onBookingLead={onBookingLead} onStatusChange={onStatusChange} />
       </div>
 
       {/* Outreach Hooks */}

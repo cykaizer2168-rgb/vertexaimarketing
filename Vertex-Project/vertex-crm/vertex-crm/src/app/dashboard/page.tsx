@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, Cpu, Activity, Settings,
   Bell, RefreshCw, LogOut, LogIn, CalendarDays, Layers, Search,
 } from 'lucide-react'
-import type { Lead, AILog } from '@/types'
+import type { Lead, AILog, LeadStatus } from '@/types'
 import EmailModal         from '@/components/email/EmailModal'
 import BookingModal       from '@/components/calendar/BookingModal'
 import AISidePanel        from '@/components/views/AISidePanel'
@@ -98,14 +98,32 @@ export default function DashboardPage() {
   const authenticated = status === 'authenticated'
   const showSidePanel = !FULL_WIDTH_PAGES.has(activePage)
 
+  async function handleStatusChange(lead: Lead, status: LeadStatus) {
+    const prev = leads
+    setLeads(leads.map(l => l.id === lead.id ? { ...l, status } : l))
+    try {
+      const res = await fetch('/api/leads', {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ id: lead.id, sheetRow: lead.sheetRow, status }),
+      })
+      if (!res.ok) throw new Error('Update failed')
+      toast.success('Status updated')
+    } catch {
+      setLeads(prev)
+      toast.error('Failed to update status')
+    }
+  }
+
   // Shared props passed to views that show leads
   const sharedProps = {
     leads,
     search,
     authenticated,
-    onEmailLead:  setEmailLead,
-    onBookingLead: setBookingLead,
-    onSignIn:     () => signIn('google'),
+    onEmailLead:    setEmailLead,
+    onBookingLead:  setBookingLead,
+    onSignIn:       () => signIn('google'),
+    onStatusChange: authenticated ? handleStatusChange : undefined,
   }
 
   function renderContent() {

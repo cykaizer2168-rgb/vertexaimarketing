@@ -1,18 +1,19 @@
 // src/components/views/LeadsView.tsx
 import { Users } from 'lucide-react'
-import type { Lead } from '@/types'
+import type { Lead, LeadStatus } from '@/types'
 import { LeadsTable } from './DashboardView'
 
 interface Props {
-  leads:         Lead[]
-  search:        string
-  authenticated: boolean
-  onEmailLead:   (lead: Lead) => void
-  onBookingLead: (lead: Lead) => void
-  onSignIn:      () => void
+  leads:           Lead[]
+  search:          string
+  authenticated:   boolean
+  onEmailLead:     (lead: Lead) => void
+  onBookingLead:   (lead: Lead) => void
+  onSignIn:        () => void
+  onStatusChange?: (lead: Lead, status: LeadStatus) => void
 }
 
-export default function LeadsView({ leads, search, authenticated, onEmailLead, onBookingLead }: Props) {
+export default function LeadsView({ leads, search, authenticated, onEmailLead, onBookingLead, onStatusChange }: Props) {
   const active = leads.filter(l => l.status !== 'closed')
   const filtered = active.filter(l =>
     !search || [l.name, l.company, l.industry, l.email].some(v =>
@@ -56,7 +57,7 @@ export default function LeadsView({ leads, search, authenticated, onEmailLead, o
             + Add Lead
           </button>
         </div>
-        <LeadsTable leads={filtered} authenticated={authenticated} onEmailLead={onEmailLead} onBookingLead={onBookingLead} />
+        <LeadsTable leads={filtered} authenticated={authenticated} onEmailLead={onEmailLead} onBookingLead={onBookingLead} onStatusChange={onStatusChange} />
       </div>
     </div>
   )
