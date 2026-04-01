@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react'
 import type { AdMetric } from '@/types'
 
@@ -194,10 +194,9 @@ export default function AdPerformanceView({ metrics, thresholds, onSaveThreshold
               </thead>
               <tbody>
                 {campaigns.map(c => (
-                  <>
+                  <Fragment key={c.campaignId}>
                     {/* Campaign row */}
                     <tr
-                      key={c.campaignId}
                       className="border-b border-white/[0.04] hover:bg-blue-500/[0.04] cursor-pointer"
                       onClick={() => toggleExpand(c.campaignId)}
                     >
@@ -243,7 +242,7 @@ export default function AdPerformanceView({ metrics, thresholds, onSaveThreshold
                         <td className={tdClass}><StatusBadge status={m.status} /></td>
                       </tr>
                     ))}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
