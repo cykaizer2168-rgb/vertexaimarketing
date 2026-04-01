@@ -221,7 +221,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { type: 'ad_set_paused', adSetId: $json.adSetId, campaignId: $json.campaignId, reason: $json.reason, timestamp: new Date().toISOString() } }}",
+        "jsonBody": "={{ { type: 'ad_set_paused', adSetId: $('Extract Pause Actions').item.json.adSetId, campaignId: $('Extract Pause Actions').item.json.campaignId, reason: $('Extract Pause Actions').item.json.reason, timestamp: new Date().toISOString() } }}",
         "options": {}
       },
       "id": "node-notify-crm",

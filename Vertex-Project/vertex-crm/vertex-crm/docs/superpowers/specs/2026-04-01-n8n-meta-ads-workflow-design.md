@@ -112,7 +112,7 @@ Column order (A–M):
 
 Add to `.env.local`:
 ```
-N8N_API_KEY=<generate a random 32-char hex string>
+CRM_N8N_SECRET=<generate with: openssl rand -hex 16>
 ```
 
 ### Updated auth check in `src/app/api/ad-metrics/route.ts`
@@ -123,7 +123,7 @@ The GET handler currently requires `getServerSession`. Update to also accept an 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
   const apiKey  = req.headers.get('x-api-key')
-  const validKey = process.env.N8N_API_KEY
+  const validKey = process.env.CRM_N8N_SECRET
 
   if (!session && !(validKey && apiKey === validKey)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -139,9 +139,9 @@ The PATCH handler remains session-only (thresholds are only changed from the bro
 | Variable | Description |
 |----------|-------------|
 | `CRM_URL` | Base URL of the deployed CRM e.g. `https://your-crm.vercel.app` |
-| `N8N_API_KEY` | Same value as `N8N_API_KEY` in CRM `.env.local` |
+| `CRM_N8N_SECRET` | Same value as `CRM_N8N_SECRET` in CRM `.env.local` |
 | `META_ACCESS_TOKEN` | Long-lived token from Meta Business Manager (60-day, refresh before expiry) |
-| `META_AD_ACCOUNT_ID` | Ad account ID in format `act_123456789` |
+| `META_AD_ACCOUNT_ID` | Ad account ID digits only — no `act_` prefix (e.g., `123456789`). The workflow URL already prepends `act_`. |
 | `GOOGLE_SHEETS_ID` | Same Google Sheet ID used by the CRM |
 | `CRM_WEBHOOK_URL` | n8n webhook URL configured in CRM Settings (for ad_set_paused events) |
 

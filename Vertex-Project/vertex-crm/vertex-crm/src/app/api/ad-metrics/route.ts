@@ -13,9 +13,12 @@ export async function GET(req: NextRequest) {
     const apiKey   = req.headers.get('x-api-key')
     const validKey = process.env.CRM_N8N_SECRET
 
-    const apiKeyValid = validKey != null && apiKey != null
-      && apiKey.length === validKey.length
-      && timingSafeEqual(Buffer.from(apiKey), Buffer.from(validKey))
+    let apiKeyValid = false
+    if (validKey != null && apiKey != null) {
+      const keyBuf   = Buffer.from(apiKey,   'utf-8')
+      const validBuf = Buffer.from(validKey, 'utf-8')
+      apiKeyValid = keyBuf.length === validBuf.length && timingSafeEqual(keyBuf, validBuf)
+    }
 
     if (!session && !apiKeyValid) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
