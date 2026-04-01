@@ -89,7 +89,13 @@ function ThresholdInput({ campaignId, value, onSave }: {
     const n = parseFloat(draft)
     if (!isNaN(n) && n > 0) {
       setSaving(true)
-      try { await onSave(campaignId, n) } finally { setSaving(false) }
+      try {
+        await onSave(campaignId, n)
+      } catch {
+        // parent (handleSaveThreshold) already shows toast.error
+      } finally {
+        setSaving(false)
+      }
     }
   }
 

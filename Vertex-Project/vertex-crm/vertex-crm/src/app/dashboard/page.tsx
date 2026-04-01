@@ -41,7 +41,7 @@ const MOCK_LOGS: AILog[] = [
 ]
 
 // Pages that use full width (no AI side panel)
-const FULL_WIDTH_PAGES = new Set(['Calendar', 'Settings'])
+const FULL_WIDTH_PAGES = new Set(['Calendar', 'Settings', 'Ad Performance'])
 
 // Pages that show the search bar
 const SEARCH_PAGES = new Set(['Dashboard', 'Leads (Active)'])
@@ -155,14 +155,19 @@ export default function DashboardPage() {
   }
 
   async function handleSaveThreshold(campaignId: string, threshold: number) {
-    const res = await fetch('/api/ad-metrics', {
-      method:  'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ campaignId, threshold }),
-    })
-    if (!res.ok) throw new Error('Failed to save threshold')
-    setAdThresholds(prev => ({ ...prev, [campaignId]: threshold }))
-    toast.success('Threshold saved')
+    try {
+      const res = await fetch('/api/ad-metrics', {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ campaignId, threshold }),
+      })
+      if (!res.ok) throw new Error('Failed to save threshold')
+      setAdThresholds(prev => ({ ...prev, [campaignId]: threshold }))
+      toast.success('Threshold saved')
+    } catch {
+      toast.error('Failed to save threshold')
+      throw new Error('Failed to save threshold')
+    }
   }
 
   async function handleAddLead(data: AddLeadData) {
@@ -332,7 +337,7 @@ export default function DashboardPage() {
               />
             </div>
           )}
-          <button onClick={fetchLeads}
+          <button onClick={() => { fetchLeads(); fetchAdMetrics() }}
             className={`w-8 h-8 flex items-center justify-center rounded-lg bg-[#141425] border border-white/[0.06] text-slate-500 hover:text-slate-300 transition-colors ${loading ? 'animate-spin' : ''}`}>
             <RefreshCw className="w-3.5 h-3.5" />
           </button>
