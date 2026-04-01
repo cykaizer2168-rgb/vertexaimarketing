@@ -6,10 +6,15 @@ import { getAdMetrics } from '@/lib/sheets'
 import { readSettings, SETTINGS_PATH } from '@/lib/settings'
 
 /** GET /api/ad-metrics — fetch all ad metrics + current thresholds */
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const session  = await getServerSession(authOptions)
+    const apiKey   = req.headers.get('x-api-key')
+    const validKey = process.env.CRM_N8N_SECRET
+
+    if (!session && !(validKey && apiKey === validKey)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
     const [metrics, settings] = await Promise.all([getAdMetrics(), readSettings()])
     return NextResponse.json({ metrics, thresholds: settings.adThresholds })
