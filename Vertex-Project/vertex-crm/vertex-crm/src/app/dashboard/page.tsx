@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import {
   LayoutDashboard, Users, Cpu, Activity, Settings,
-  Bell, RefreshCw, LogOut, LogIn, CalendarDays, Layers, Search,
+  Bell, RefreshCw, LogOut, LogIn, CalendarDays, Layers, Search, BarChart2,
 } from 'lucide-react'
-import type { Lead, AILog, LeadStatus } from '@/types'
+import type { Lead, AILog, LeadStatus, AdMetric } from '@/types'
 import EmailModal         from '@/components/email/EmailModal'
 import BookingModal       from '@/components/calendar/BookingModal'
 import AddLeadModal, { type AddLeadData } from '@/components/views/AddLeadModal'
@@ -17,6 +17,7 @@ import AIInsightsView     from '@/components/views/AIInsightsView'
 import AutomationLogsView from '@/components/views/AutomationLogsView'
 import CalendarView       from '@/components/views/CalendarView'
 import SettingsView       from '@/components/views/SettingsView'
+import AdPerformanceView  from '@/components/views/AdPerformanceView'
 import toast, { Toaster } from 'react-hot-toast'
 
 // ─── Mock fallback data ───────────────────────────────────────────────────────
@@ -45,7 +46,7 @@ const FULL_WIDTH_PAGES = new Set(['Calendar', 'Settings'])
 // Pages that show the search bar
 const SEARCH_PAGES = new Set(['Dashboard', 'Leads (Active)'])
 
-type PageName = 'Dashboard' | 'Leads (Active)' | 'AI Insights' | 'Calendar' | 'Automation Logs' | 'Settings'
+type PageName = 'Dashboard' | 'Leads (Active)' | 'AI Insights' | 'Calendar' | 'Automation Logs' | 'Settings' | 'Ad Performance'
 
 function NavBtn({ label, icon: Icon, badge, badgeAmber, activePage, onNavigate }: {
   label: PageName; icon: React.ElementType; badge?: number; badgeAmber?: boolean
@@ -81,6 +82,10 @@ export default function DashboardPage() {
   const [showAddLead, setShowAddLead] = useState(false)
   const [search,      setSearch]      = useState('')
   const [activePage,  setActivePage]  = useState<PageName>('Dashboard')
+  const [adMetrics,    setAdMetrics]    = useState<AdMetric[]>([])
+  const [adThresholds, setAdThresholds] = useState<Record<string, number>>({})
+  const prevPausedRef      = useRef<Set<string>>(new Set())
+  const isFirstAdFetchRef  = useRef(true)
 
   const fetchLeads = useCallback(async () => {
     if (!session) return
@@ -95,7 +100,36 @@ export default function DashboardPage() {
     finally { setLoading(false) }
   }, [session])
 
-  useEffect(() => { fetchLeads() }, [fetchLeads])
+  const fetchAdMetrics = useCallback(async () => {
+    if (!session) return
+    try {
+      const res = await fetch('/api/ad-metrics')
+      if (!res.ok) return
+      const data = await res.json() as { metrics: AdMetric[]; thresholds: Record<string, number> }
+      const metrics = data.metrics ?? []
+      setAdMetrics(metrics)
+      setAdThresholds(data.thresholds ?? {})
+
+      // Detect newly paused ad sets — skip on first load to avoid false alerts
+      const currentPaused = new Set(
+        metrics.filter(m => m.status === 'paused_auto').map(m => m.adSetId)
+      )
+      if (!isFirstAdFetchRef.current) {
+        for (const id of currentPaused) {
+          if (!prevPausedRef.current.has(id)) {
+            toast.error('Ad set paused — CPL exceeded threshold')
+          }
+        }
+      }
+      prevPausedRef.current     = currentPaused
+      isFirstAdFetchRef.current = false
+    } catch { /* keep empty on network error */ }
+  }, [session])
+
+  useEffect(() => {
+    fetchLeads()
+    fetchAdMetrics()
+  }, [fetchLeads, fetchAdMetrics])
 
   const authenticated = status === 'authenticated'
   const showSidePanel = !FULL_WIDTH_PAGES.has(activePage)
@@ -118,6 +152,17 @@ export default function DashboardPage() {
       if (snapshot !== null) setLeads(snapshot)
       toast.error('Failed to update status')
     }
+  }
+
+  async function handleSaveThreshold(campaignId: string, threshold: number) {
+    const res = await fetch('/api/ad-metrics', {
+      method:  'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ campaignId, threshold }),
+    })
+    if (!res.ok) throw new Error('Failed to save threshold')
+    setAdThresholds(prev => ({ ...prev, [campaignId]: threshold }))
+    toast.success('Threshold saved')
   }
 
   async function handleAddLead(data: AddLeadData) {
@@ -186,16 +231,25 @@ export default function DashboardPage() {
           userImage={session?.user?.image ?? undefined}
         />
       )
+      case 'Ad Performance': return (
+        <AdPerformanceView
+          metrics={adMetrics}
+          thresholds={adThresholds}
+          onSaveThreshold={handleSaveThreshold}
+        />
+      )
       default: return <DashboardView {...sharedProps} />
     }
   }
 
   // Nav computed at render time so badges are live
+  const pausedCount = adMetrics.filter(m => m.status === 'paused_auto').length
   const navMain: { label: PageName; icon: React.ElementType; badge?: number; badgeAmber?: boolean }[] = [
     { label: 'Dashboard',      icon: LayoutDashboard },
     { label: 'Leads (Active)', icon: Users,       badge: leads.filter(l => l.status !== 'closed').length },
     { label: 'AI Insights',    icon: Cpu,          badge: logs.filter(l => l.type === 'alert').length, badgeAmber: true },
     { label: 'Calendar',       icon: CalendarDays },
+    { label: 'Ad Performance', icon: BarChart2,    badge: pausedCount || undefined, badgeAmber: true },
   ]
   const navAuto: { label: PageName; icon: React.ElementType }[] = [
     { label: 'Automation Logs', icon: Activity },
