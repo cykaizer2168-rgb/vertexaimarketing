@@ -1,0 +1,280 @@
+{
+  "name": "Meta Ads Auto-Optimization",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "node-schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.CRM_URL }}/api/ad-metrics",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.CRM_N8N_SECRET }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-get-crm-thresholds",
+      "name": "Get CRM Thresholds",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/act_{{ $env.META_AD_ACCOUNT_ID }}/adsets",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name,campaign_id,campaign{name},daily_budget,status"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.META_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-get-meta-adsets",
+      "name": "Get Meta Ad Sets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/act_{{ $env.META_AD_ACCOUNT_ID }}/insights",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "level",
+              "value": "adset"
+            },
+            {
+              "name": "fields",
+              "value": "adset_id,spend,impressions,clicks,actions"
+            },
+            {
+              "name": "date_preset",
+              "value": "today"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.META_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-get-meta-insights",
+      "name": "Get Meta Insights",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const thresholds = $('Get CRM Thresholds').first().json.thresholds || {};\nconst adSets = $('Get Meta Ad Sets').first().json.data || [];\nconst insightsRaw = $('Get Meta Insights').first().json.data || [];\n\n// Build insights lookup: adSetId → { spend, impressions, clicks, leads }\nconst insightsByAdSetId = {};\nfor (const row of insightsRaw) {\n  const actions = Array.isArray(row.actions) ? row.actions : [];\n  const leads = actions\n    .filter(a => a.action_type === 'lead')\n    .reduce((sum, a) => sum + parseInt(a.value || '0', 10), 0);\n  insightsByAdSetId[row.adset_id] = {\n    spend: parseFloat(row.spend || '0'),\n    impressions: parseInt(row.impressions || '0', 10),\n    clicks: parseInt(row.clicks || '0', 10),\n    leads,\n  };\n}\n\nconst today = new Date().toISOString().split('T')[0];\nconst toAction = [];\n\nconst allMetrics = adSets.map(adSet => {\n  const adSetId = adSet.id;\n  const campaignId = adSet.campaign_id;\n  const ins = insightsByAdSetId[adSetId] || { spend: 0, impressions: 0, clicks: 0, leads: 0 };\n  const { spend, impressions, clicks, leads } = ins;\n\n  // Meta returns daily_budget in cents — divide by 100 for currency amount\n  const dailyBudget = parseFloat(adSet.daily_budget || '0') / 100;\n  const ctr = impressions > 0 ? Math.round(clicks / impressions * 10000) / 100 : 0;\n  const cpl = leads > 0 ? Math.round(spend / leads * 100) / 100 : 0;\n\n  let status = adSet.status === 'PAUSED' ? 'paused' : 'active';\n\n  // Rule 1: CPL exceeded threshold (skipped if no threshold for this campaign)\n  const threshold = thresholds[campaignId];\n  let shouldPause = false;\n  let reason = '';\n  if (typeof threshold === 'number' && cpl > threshold) {\n    shouldPause = true;\n    reason = 'cpl_exceeded';\n  }\n\n  // Rule 2: 80% budget burn with 0 leads (evaluated independently)\n  if (dailyBudget > 0 && spend / dailyBudget >= 0.8 && leads === 0) {\n    if (!shouldPause) {\n      shouldPause = true;\n      reason = 'budget_burn_no_leads';\n    }\n  }\n\n  if (shouldPause) {\n    toAction.push({ adSetId, campaignId, adSetName: adSet.name, reason });\n  }\n\n  return {\n    date: today,\n    campaign_id: campaignId,\n    campaign_name: (adSet.campaign && adSet.campaign.name) || '',\n    ad_set_id: adSetId,\n    ad_set_name: adSet.name || '',\n    spend,\n    leads,\n    impressions,\n    clicks,\n    ctr,\n    cpl,\n    roas: 0,\n    status,\n  };\n});\n\n// Pre-mark paused_auto so Google Sheets gets the correct status in one write\nconst pauseAdSetIds = new Set(toAction.map(a => a.adSetId));\nfor (const m of allMetrics) {\n  if (pauseAdSetIds.has(m.ad_set_id)) m.status = 'paused_auto';\n}\n\nreturn [{ json: { allMetrics, toAction } }];"
+      },
+      "id": "node-merge-evaluate",
+      "name": "Merge + Evaluate Rules",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const { allMetrics } = $input.first().json;\nreturn allMetrics.map(m => ({ json: m }));"
+      },
+      "id": "node-prepare-rows",
+      "name": "Prepare Sheet Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEETS_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ad Metrics",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $json.date }}",
+            "campaign_id": "={{ $json.campaign_id }}",
+            "campaign_name": "={{ $json.campaign_name }}",
+            "ad_set_id": "={{ $json.ad_set_id }}",
+            "ad_set_name": "={{ $json.ad_set_name }}",
+            "spend": "={{ $json.spend }}",
+            "leads": "={{ $json.leads }}",
+            "impressions": "={{ $json.impressions }}",
+            "clicks": "={{ $json.clicks }}",
+            "ctr": "={{ $json.ctr }}",
+            "cpl": "={{ $json.cpl }}",
+            "roas": "={{ $json.roas }}",
+            "status": "={{ $json.status }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "node-append-sheets",
+      "name": "Append to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1560, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const { toAction } = $('Merge + Evaluate Rules').first().json;\nif (!toAction || toAction.length === 0) return [];\nreturn toAction.map(a => ({ json: a }));"
+      },
+      "id": "node-extract-pause",
+      "name": "Extract Pause Actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/{{ $json.adSetId }}",
+        "method": "POST",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "PAUSED"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.META_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-pause-adset",
+      "name": "Pause Ad Set",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.CRM_WEBHOOK_URL }}",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ type: 'ad_set_paused', adSetId: $json.adSetId, campaignId: $json.campaignId, reason: $json.reason, timestamp: new Date().toISOString() }) }}",
+        "options": {}
+      },
+      "id": "node-notify-crm",
+      "name": "Notify CRM Webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2220, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [{ "node": "Get CRM Thresholds", "type": "main", "index": 0 }]
+      ]
+    },
+    "Get CRM Thresholds": {
+      "main": [
+        [{ "node": "Get Meta Ad Sets", "type": "main", "index": 0 }]
+      ]
+    },
+    "Get Meta Ad Sets": {
+      "main": [
+        [{ "node": "Get Meta Insights", "type": "main", "index": 0 }]
+      ]
+    },
+    "Get Meta Insights": {
+      "main": [
+        [{ "node": "Merge + Evaluate Rules", "type": "main", "index": 0 }]
+      ]
+    },
+    "Merge + Evaluate Rules": {
+      "main": [
+        [{ "node": "Prepare Sheet Rows", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prepare Sheet Rows": {
+      "main": [
+        [{ "node": "Append to Google Sheets", "type": "main", "index": 0 }]
+      ]
+    },
+    "Append to Google Sheets": {
+      "main": [
+        [{ "node": "Extract Pause Actions", "type": "main", "index": 0 }]
+      ]
+    },
+    "Extract Pause Actions": {
+      "main": [
+        [{ "node": "Pause Ad Set", "type": "main", "index": 0 }]
+      ]
+    },
+    "Pause Ad Set": {
+      "main": [
+        [{ "node": "Notify CRM Webhook", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "versionId": "1"
+}
