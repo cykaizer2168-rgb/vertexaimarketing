@@ -1,5 +1,6 @@
 import { getSheetsClient } from './google'
-import type { Lead, SheetRow } from '@/types'
+import type { Lead, SheetRow, AdMetric } from '@/types'
+import { readSettings } from './settings'
 
 const SHEET_ID   = process.env.GOOGLE_SHEET_ID!
 const LEADS_TAB  = process.env.GOOGLE_SHEET_LEADS_TAB  || 'Leads'
@@ -160,4 +161,45 @@ export async function appendLead(data: {
   const match = updatedRange.match(/:?[A-Z]+(\d+)$/)
   if (!match) throw new Error(`appendLead: could not parse sheetRow from updatedRange "${updatedRange}"`)
   return parseInt(match[1])
+}
+
+// ─── Read ad performance metrics ─────────────────────────────────────────────
+// Column order in "Ad Metrics" tab (written by n8n):
+// A: date | B: campaign_id | C: campaign_name | D: ad_set_id | E: ad_set_name |
+// F: spend | G: leads | H: impressions | I: clicks | J: ctr | K: cpl | L: roas | M: status
+export async function getAdMetrics(): Promise<AdMetric[]> {
+  try {
+    const settings = await readSettings()
+    const sheets   = await getSheetsClient()
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range:         `${settings.adMetricsTab}!A2:M`,
+    })
+    const rows = res.data.values || []
+    // Deduplicate by adSetId — last occurrence wins (n8n appends newest rows at bottom)
+    const seen = new Map<string, AdMetric>()
+    for (const row of rows) {
+      const adSetId = row[3] || ''
+      if (!adSetId) continue
+      seen.set(adSetId, {
+        date:         row[0]  || '',
+        campaignId:   row[1]  || '',
+        campaignName: row[2]  || '',
+        adSetId:      row[3]  || '',
+        adSetName:    row[4]  || '',
+        spend:        parseFloat(row[5])  || 0,
+        leads:        parseInt(row[6])    || 0,
+        impressions:  parseInt(row[7])    || 0,
+        clicks:       parseInt(row[8])    || 0,
+        ctr:          parseFloat(row[9])  || 0,
+        cpl:          parseFloat(row[10]) || 0,
+        roas:         parseFloat(row[11]) || 0,
+        status:       (row[12] as AdMetric['status']) || 'active',
+      })
+    }
+    return Array.from(seen.values())
+  } catch (err) {
+    console.error('[Sheets] getAdMetrics error:', err)
+    return []
+  }
 }
