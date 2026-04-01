@@ -116,3 +116,20 @@ export interface SheetRow {
   created_at?: string
   last_contacted?: string
 }
+
+// ─── Ad Performance ───────────────────────────────────────────────────────────
+export interface AdMetric {
+  date:         string
+  campaignId:   string
+  campaignName: string
+  adSetId:      string
+  adSetName:    string
+  spend:        number
+  leads:        number
+  impressions:  number
+  clicks:       number
+  ctr:          number   // percentage, e.g. 2.4 = 2.4%
+  cpl:          number
+  roas:         number
+  status:       'active' | 'paused' | 'paused_auto'
+}
