@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { writeFile } from 'fs/promises'
+import { timingSafeEqual } from 'crypto'
 import { getAdMetrics } from '@/lib/sheets'
 import { readSettings, SETTINGS_PATH } from '@/lib/settings'
 
@@ -12,7 +13,11 @@ export async function GET(req: NextRequest) {
     const apiKey   = req.headers.get('x-api-key')
     const validKey = process.env.CRM_N8N_SECRET
 
-    if (!session && !(validKey && apiKey === validKey)) {
+    const apiKeyValid = validKey != null && apiKey != null
+      && apiKey.length === validKey.length
+      && timingSafeEqual(Buffer.from(apiKey), Buffer.from(validKey))
+
+    if (!session && !apiKeyValid) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
