@@ -49,6 +49,10 @@
               "value": "id,name,campaign_id,campaign{name},daily_budget,status"
             },
             {
+              "name": "limit",
+              "value": "200"
+            },
+            {
               "name": "access_token",
               "value": "={{ $env.META_ACCESS_TOKEN }}"
             }
@@ -81,6 +85,10 @@
               "value": "today"
             },
             {
+              "name": "limit",
+              "value": "200"
+            },
+            {
               "name": "access_token",
               "value": "={{ $env.META_ACCESS_TOKEN }}"
             }
@@ -97,7 +105,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const thresholds = $('Get CRM Thresholds').first().json.thresholds || {};\nconst adSets = $('Get Meta Ad Sets').first().json.data || [];\nconst insightsRaw = $('Get Meta Insights').first().json.data || [];\n\n// Build insights lookup: adSetId → { spend, impressions, clicks, leads }\nconst insightsByAdSetId = {};\nfor (const row of insightsRaw) {\n  const actions = Array.isArray(row.actions) ? row.actions : [];\n  const leads = actions\n    .filter(a => a.action_type === 'lead')\n    .reduce((sum, a) => sum + parseInt(a.value || '0', 10), 0);\n  insightsByAdSetId[row.adset_id] = {\n    spend: parseFloat(row.spend || '0'),\n    impressions: parseInt(row.impressions || '0', 10),\n    clicks: parseInt(row.clicks || '0', 10),\n    leads,\n  };\n}\n\nconst today = new Date().toISOString().split('T')[0];\nconst toAction = [];\n\nconst allMetrics = adSets.map(adSet => {\n  const adSetId = adSet.id;\n  const campaignId = adSet.campaign_id;\n  const ins = insightsByAdSetId[adSetId] || { spend: 0, impressions: 0, clicks: 0, leads: 0 };\n  const { spend, impressions, clicks, leads } = ins;\n\n  // Meta returns daily_budget in cents — divide by 100 for currency amount\n  const dailyBudget = parseFloat(adSet.daily_budget || '0') / 100;\n  const ctr = impressions > 0 ? Math.round(clicks / impressions * 10000) / 100 : 0;\n  const cpl = leads > 0 ? Math.round(spend / leads * 100) / 100 : 0;\n\n  let status = adSet.status === 'PAUSED' ? 'paused' : 'active';\n\n  // Rule 1: CPL exceeded threshold (skipped if no threshold for this campaign)\n  const threshold = thresholds[campaignId];\n  let shouldPause = false;\n  let reason = '';\n  if (typeof threshold === 'number' && cpl > threshold) {\n    shouldPause = true;\n    reason = 'cpl_exceeded';\n  }\n\n  // Rule 2: 80% budget burn with 0 leads (evaluated independently)\n  if (dailyBudget > 0 && spend / dailyBudget >= 0.8 && leads === 0) {\n    if (!shouldPause) {\n      shouldPause = true;\n      reason = 'budget_burn_no_leads';\n    }\n  }\n\n  if (shouldPause) {\n    toAction.push({ adSetId, campaignId, adSetName: adSet.name, reason });\n  }\n\n  return {\n    date: today,\n    campaign_id: campaignId,\n    campaign_name: (adSet.campaign && adSet.campaign.name) || '',\n    ad_set_id: adSetId,\n    ad_set_name: adSet.name || '',\n    spend,\n    leads,\n    impressions,\n    clicks,\n    ctr,\n    cpl,\n    roas: 0,\n    status,\n  };\n});\n\n// Pre-mark paused_auto so Google Sheets gets the correct status in one write\nconst pauseAdSetIds = new Set(toAction.map(a => a.adSetId));\nfor (const m of allMetrics) {\n  if (pauseAdSetIds.has(m.ad_set_id)) m.status = 'paused_auto';\n}\n\nreturn [{ json: { allMetrics, toAction } }];"
+        "jsCode": "const thresholds = $('Get CRM Thresholds').first().json.thresholds || {};\nconst adSets = $('Get Meta Ad Sets').first().json.data || [];\nconst insightsRaw = $('Get Meta Insights').first().json.data || [];\n\n// Build insights lookup: adSetId → { spend, impressions, clicks, leads }\nconst insightsByAdSetId = {};\nfor (const row of insightsRaw) {\n  const actions = Array.isArray(row.actions) ? row.actions : [];\n  const leads = actions\n    .filter(a => a.action_type === 'lead')\n    .reduce((sum, a) => sum + parseInt(a.value || '0', 10), 0);\n  insightsByAdSetId[row.adset_id] = {\n    spend: parseFloat(row.spend || '0'),\n    impressions: parseInt(row.impressions || '0', 10),\n    clicks: parseInt(row.clicks || '0', 10),\n    leads,\n  };\n}\n\nconst today = new Date().toISOString().split('T')[0];\nconst toAction = [];\n\nconst allMetrics = adSets.map(adSet => {\n  const adSetId = adSet.id;\n  const campaignId = adSet.campaign_id;\n  const ins = insightsByAdSetId[adSetId] || { spend: 0, impressions: 0, clicks: 0, leads: 0 };\n  const { spend, impressions, clicks, leads } = ins;\n\n  // Meta returns daily_budget in cents — divide by 100 for currency amount\n  const dailyBudget = parseFloat(adSet.daily_budget || '0') / 100;\n  const ctr = impressions > 0 ? Math.round(clicks / impressions * 10000) / 100 : 0;\n  const cpl = leads > 0 ? Math.round(spend / leads * 100) / 100 : 0;\n\n  let status = adSet.status === 'PAUSED' ? 'paused' : 'active';\n\n  // Skip rule evaluation for already-paused ad sets — they are not auto-pauseable\n  if (adSet.status === 'PAUSED') {\n    return { date: today, campaign_id: campaignId, campaign_name: (adSet.campaign && adSet.campaign.name) || '', ad_set_id: adSetId, ad_set_name: adSet.name || '', spend, leads, impressions, clicks, ctr, cpl, roas: 0, status };\n  }\n\n  // Rule 1: CPL exceeded threshold (skipped if no threshold for this campaign)\n  const threshold = thresholds[campaignId];\n  let shouldPause = false;\n  let reason = '';\n  if (typeof threshold === 'number' && cpl > threshold) {\n    shouldPause = true;\n    reason = 'cpl_exceeded';\n  }\n\n  // Rule 2: 80% budget burn with 0 leads (evaluated independently)\n  if (dailyBudget > 0 && spend / dailyBudget >= 0.8 && leads === 0) {\n    if (!shouldPause) {\n      shouldPause = true;\n      reason = 'budget_burn_no_leads';\n    }\n  }\n\n  if (shouldPause) {\n    toAction.push({ adSetId, campaignId, adSetName: adSet.name, reason });\n  }\n\n  return {\n    date: today,\n    campaign_id: campaignId,\n    campaign_name: (adSet.campaign && adSet.campaign.name) || '',\n    ad_set_id: adSetId,\n    ad_set_name: adSet.name || '',\n    spend,\n    leads,\n    impressions,\n    clicks,\n    ctr,\n    cpl,\n    roas: 0,\n    status,\n  };\n});\n\n// Pre-mark paused_auto so Google Sheets gets the correct status in one write\nconst pauseAdSetIds = new Set(toAction.map(a => a.adSetId));\nfor (const m of allMetrics) {\n  if (pauseAdSetIds.has(m.ad_set_id)) m.status = 'paused_auto';\n}\n\nreturn [{ json: { allMetrics, toAction } }];"
       },
       "id": "node-merge-evaluate",
       "name": "Merge + Evaluate Rules",
@@ -213,7 +221,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ type: 'ad_set_paused', adSetId: $json.adSetId, campaignId: $json.campaignId, reason: $json.reason, timestamp: new Date().toISOString() }) }}",
+        "jsonBody": "={{ { type: 'ad_set_paused', adSetId: $json.adSetId, campaignId: $json.campaignId, reason: $json.reason, timestamp: new Date().toISOString() } }}",
         "options": {}
       },
       "id": "node-notify-crm",
