@@ -189,6 +189,7 @@ function SidebarActionBtn({ onClick, active, icon, label, collapsed, title }) {
   return (
     <button
       onClick={onClick}
+      aria-label={title}
       title={collapsed ? title : undefined}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -217,13 +218,21 @@ export default function AppLayout({ children }) {
   const navigate = useNavigate()
 
   const [collapsed, setCollapsed] = useState(
-    () => localStorage.getItem('solar_sidebar_collapsed') === 'true'
+    () => typeof window !== 'undefined'
+      ? localStorage.getItem('solar_sidebar_collapsed') === 'true'
+      : false
   )
   const [mobileOpen, setMobileOpen]         = useState(false)
   const [showApiInput, setShowApiInput]     = useState(false)
-  const [apiKey, setApiKey]                 = useState(() => localStorage.getItem('solar_openai_key') || '')
+  const [apiKey, setApiKey]                 = useState(() => typeof window !== 'undefined'
+    ? localStorage.getItem('solar_openai_key') || ''
+    : ''
+  )
   const [showKey, setShowKey]               = useState(false)
-  const [theme, setTheme]                   = useState(() => localStorage.getItem('solar_theme') || 'dark')
+  const [theme, setTheme]                   = useState(() => typeof window !== 'undefined'
+    ? localStorage.getItem('solar_theme') || 'dark'
+    : 'dark'
+  )
   const [showAvatarMenu, setShowAvatarMenu] = useState(false)
   const avatarMenuRef = useRef(null)
 
@@ -283,7 +292,14 @@ export default function AppLayout({ children }) {
 
       {/* Mobile overlay — tap to close drawer */}
       {mobileOpen && (
-        <div className="sidebar-overlay" onClick={() => setMobileOpen(false)} />
+        <div
+          className="sidebar-overlay"
+          role="button"
+          tabIndex={-1}
+          aria-label="Close menu"
+          onClick={() => setMobileOpen(false)}
+          onKeyDown={e => (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') && setMobileOpen(false)}
+        />
       )}
 
       {/* ── Sidebar ─────────────────────────────────────────────────── */}
@@ -478,6 +494,7 @@ export default function AppLayout({ children }) {
         <div style={{ padding: collapsed ? '0 8px 10px' : '0 14px 10px', flexShrink: 0 }}>
           <button
             onClick={signOut}
+            aria-label="Sign out"
             title={collapsed ? 'Sign out' : undefined}
             style={{
               width: '100%',
@@ -538,7 +555,7 @@ export default function AppLayout({ children }) {
             style={{
               width: 36, height: 36, borderRadius: 8,
               background: 'var(--surface2)', border: 'none', cursor: 'pointer',
-              alignItems: 'center', justifyContent: 'center',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: 'var(--text)', flexShrink: 0,
             }}
           >
@@ -573,7 +590,7 @@ export default function AppLayout({ children }) {
                 width: 34, height: 34, borderRadius: 8, border: 'none', cursor: 'pointer',
                 background: showApiInput ? 'var(--amber-bg)' : 'var(--surface2)',
                 color: showApiInput ? 'var(--amber)' : 'var(--text-muted)',
-                alignItems: 'center', justifyContent: 'center',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             ><KeyIcon /></button>
 
@@ -585,7 +602,7 @@ export default function AppLayout({ children }) {
               style={{
                 width: 34, height: 34, borderRadius: 8, border: 'none', cursor: 'pointer',
                 background: 'var(--surface2)', color: 'var(--text-muted)',
-                alignItems: 'center', justifyContent: 'center',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >{theme === 'dark' ? <SunSmallIcon /> : <MoonIcon />}</button>
 
@@ -593,6 +610,7 @@ export default function AppLayout({ children }) {
             <div ref={avatarMenuRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setShowAvatarMenu(p => !p)}
+                aria-label={profile?.display_name || 'User menu'}
                 style={{
                   background: 'none', border: 'none', cursor: 'pointer',
                   padding: 2, borderRadius: '50%', display: 'flex',
