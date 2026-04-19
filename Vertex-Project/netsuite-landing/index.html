@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vertex Consulting Partner — AI-Powered NetSuite ERP Consulting</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#070E1C;--navy-mid:#0C1A35;--navy-card:#0F2040;
+  --teal:#00C9B1;--teal-dim:#009E8C;--teal-glow:rgba(0,201,177,0.1);
+  --purple:#7B5CF5;--purple-glow:rgba(123,92,245,0.12);
+  --gold:#F0A500;--gold-glow:rgba(240,165,0,0.1);
+  --silver:#7A96B8;--white:#E8F0FF;--off-white:#B8CCDF;
+  --glass:rgba(255,255,255,0.03);--gb:rgba(255,255,255,0.07);
+  --gt:rgba(0,201,177,0.22);--gp:rgba(123,92,245,0.22);
+  --ns-navy:#1F3864;--ns-bg:#F4F6F9;--ns-sidebar:#1a3660;--ns-teal:#009EBB;--ns-border:#dce3ed;--ns-text:#2c3e50;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--navy);color:var(--white);font-family:'Barlow',sans-serif;font-weight:400;line-height:1.6;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,201,177,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,201,177,0.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+.container{max-width:1180px;margin:0 auto;padding:0 28px;position:relative;z-index:1;}
+.tag{display:inline-flex;align-items:center;gap:8px;background:var(--teal-glow);border:1px solid var(--gt);color:var(--teal);font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:6px 16px;border-radius:20px;margin-bottom:20px;}
+.tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);animation:pulse 2s ease-in-out infinite;}
+.tag.ai-tag{background:var(--purple-glow);border-color:var(--gp);color:var(--purple);}
+.tag.ai-tag::before{background:var(--purple);box-shadow:0 0 8px var(--purple);}
+section{padding:6rem 0;position:relative;z-index:1;}
+.sec-hdr{text-align:center;max-width:720px;margin:0 auto 4rem;}
+.sec-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2rem,4vw,3.25rem);font-weight:800;text-transform:uppercase;letter-spacing:-0.5px;line-height:1;color:var(--white);margin-bottom:1rem;}
+.sec-title .hl{color:var(--teal);}
+.sec-title .hlp{color:var(--purple);}
+.sec-sub{font-size:1rem;color:var(--silver);font-weight:300;line-height:1.85;}
+.alt{background:var(--navy-mid);}
+.divider{border:none;border-top:1px solid var(--gb);}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:13px 0;background:rgba(7,14,28,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--gb);}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;max-width:1180px;margin:0 auto;padding:0 28px;}
+.nav-logo{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;letter-spacing:1.5px;text-transform:uppercase;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:10px;}
+.nav-logo-teal{color:var(--teal);}
+.nav-ai-badge{background:linear-gradient(135deg,var(--purple),var(--teal));color:white;font-size:8px;font-weight:800;letter-spacing:1px;padding:2px 8px;border-radius:3px;}
+.nav-links{display:flex;align-items:center;gap:1.75rem;list-style:none;}
+.nav-links a{text-decoration:none;font-size:12px;font-weight:600;color:var(--silver);letter-spacing:1px;text-transform:uppercase;transition:color 0.2s;}
+.nav-links a:hover{color:var(--teal);}
+.nav-cta{background:var(--teal)!important;color:var(--navy)!important;padding:9px 22px!important;border-radius:4px;font-weight:700!important;font-size:11px!important;letter-spacing:1.5px!important;box-shadow:0 0 20px rgba(0,201,177,0.3);transition:all 0.2s!important;}
+.nav-cta:hover{background:#00e8cc!important;box-shadow:0 0 36px rgba(0,201,177,0.5)!important;}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;padding:120px 0 80px;position:relative;overflow:hidden;}
+.hero-glow-1{position:absolute;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(0,201,177,0.06) 0%,transparent 65%);top:-200px;right:-400px;pointer-events:none;}
+.hero-glow-2{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(123,92,245,0.06) 0%,transparent 65%);bottom:-150px;left:-200px;pointer-events:none;}
+.hero-inner{display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:center;position:relative;z-index:1;}
+.hero-left{animation:fadeUp 0.8s ease both;}
+.hero-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--silver);margin-bottom:14px;}
+.hero-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(3rem,5.5vw,5.25rem);font-weight:800;line-height:0.9;text-transform:uppercase;letter-spacing:-1.5px;color:var(--white);margin-bottom:1.5rem;}
+.hero-title .hl{color:var(--teal);display:block;}
+.hero-title .hlp{background:linear-gradient(90deg,var(--purple),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;display:block;}
+.hero-title .ol{-webkit-text-stroke:1.5px rgba(255,255,255,0.2);color:transparent;display:block;}
+.hero-sub{font-size:1.0625rem;color:var(--silver);font-weight:300;line-height:1.85;max-width:460px;margin-bottom:1.75rem;}
+.hero-sub strong{color:var(--white);font-weight:600;}
+.hero-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2rem;}
+.hero-pill{font-size:11px;font-weight:600;letter-spacing:0.5px;padding:5px 12px;border-radius:20px;border:1px solid;}
+.pill-teal{background:var(--teal-glow);border-color:var(--gt);color:var(--teal);}
+.pill-purple{background:var(--purple-glow);border-color:var(--gp);color:var(--purple);}
+.hero-btns{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:3rem;}
+.btn-p{background:var(--teal);color:var(--navy);padding:14px 28px;border-radius:4px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;box-shadow:0 0 28px rgba(0,201,177,0.35);transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-p:hover{background:#00e8cc;box-shadow:0 0 44px rgba(0,201,177,0.55);transform:translateY(-2px);}
+.btn-g{color:var(--teal);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border:1px solid var(--gt);padding:13px 22px;border-radius:4px;transition:all 0.2s;}
+.btn-g:hover{background:var(--teal-glow);border-color:var(--teal);}
+.hero-stats{display:flex;gap:2.5rem;padding-top:2rem;border-top:1px solid var(--gb);}
+.stat-num{font-family:'Barlow Condensed',sans-serif;font-size:2.25rem;font-weight:800;color:var(--teal);line-height:1;letter-spacing:-1px;display:block;}
+.stat-lbl{font-size:10px;font-weight:600;color:var(--silver);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;display:block;}
+
+/* DEVICES */
+.devices-wrap{position:relative;height:540px;animation:fadeIn 1s ease both 0.4s;}
+.laptop{position:absolute;top:20px;left:30px;right:0;z-index:3;}
+.laptop-outer{background:#0d1220;border-radius:12px 12px 0 0;border:2px solid #1a2040;padding:8px 8px 0;box-shadow:0 20px 70px rgba(0,0,0,0.7),0 0 50px rgba(0,201,177,0.06);}
+.laptop-screen{background:var(--ns-bg);border-radius:6px 6px 0 0;overflow:hidden;aspect-ratio:16/10;}
+.laptop-base{background:linear-gradient(180deg,#0d1220 0%,#080e1a 100%);border-radius:0 0 6px 6px;height:14px;border:2px solid #1a2040;border-top:none;position:relative;}
+.laptop-base::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:60px;height:5px;background:#1a2040;border-radius:4px 4px 0 0;}
+.laptop-stand{height:22px;background:#080e1a;border-radius:0 0 12px 12px;border:2px solid #1a2040;border-top:none;clip-path:polygon(8% 0%,92% 0%,100% 100%,0% 100%);margin:0 10%;}
+.tablet{position:absolute;bottom:20px;left:0;width:210px;z-index:5;animation:floatB 5s ease-in-out infinite 0.5s;}
+.tablet-outer{background:#0d1220;border-radius:12px;border:2px solid #1a2040;padding:6px;box-shadow:0 16px 40px rgba(0,0,0,0.6),0 0 20px rgba(123,92,245,0.1);}
+.tablet-screen{background:var(--ns-bg);border-radius:8px;overflow:hidden;aspect-ratio:4/3;}
+.phone{position:absolute;bottom:10px;right:10px;width:110px;z-index:6;animation:floatA 4.5s ease-in-out infinite 1s;}
+.phone-outer{background:#0d1220;border-radius:18px;border:2px solid #1a2040;padding:8px 5px;box-shadow:0 16px 40px rgba(0,0,0,0.6),0 0 20px rgba(0,201,177,0.1);}
+.phone-notch{width:36px;height:8px;background:#0d1220;border-radius:0 0 6px 6px;margin:0 auto 4px;}
+.phone-screen{background:var(--ns-bg);border-radius:12px;overflow:hidden;aspect-ratio:9/19;}
+.ftag{position:absolute;background:rgba(7,14,28,0.95);border:1px solid;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:11px;font-weight:600;color:var(--white);white-space:nowrap;box-shadow:0 8px 28px rgba(0,0,0,0.5);backdrop-filter:blur(16px);z-index:10;}
+.ftag .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ft1{top:0;right:-10px;border-color:var(--gt);animation:floatA 4s ease-in-out infinite;}
+.ft2{top:140px;left:-20px;border-color:var(--gp);animation:floatB 5s ease-in-out infinite 0.7s;}
+.ft3{bottom:100px;right:-15px;border-color:var(--gt);animation:floatA 4.5s ease-in-out infinite 1.2s;}
+
+/* NS LAPTOP UI */
+.ns-l{width:100%;height:100%;display:flex;font-family:'Barlow',Arial,sans-serif;font-size:7px;}
+.ns-sb{width:18%;background:var(--ns-sidebar);padding:5px 4px;flex-shrink:0;}
+.ns-sb-logo{font-size:6px;font-weight:700;color:white;letter-spacing:1px;text-transform:uppercase;padding:3px 2px 5px;border-bottom:1px solid rgba(255,255,255,0.15);margin-bottom:4px;display:flex;align-items:center;gap:2px;}
+.ns-sb-logo span{color:var(--ns-teal);}
+.ns-ni{padding:2.5px 3px;border-radius:2px;color:rgba(255,255,255,0.65);font-size:5.5px;font-weight:500;display:flex;align-items:center;gap:3px;margin-bottom:1px;}
+.ns-ni.a{background:rgba(0,158,187,0.25);color:white;}
+.ns-ni.ai{background:rgba(123,92,245,0.25);color:#c4b5fd;}
+.ns-main{flex:1;background:var(--ns-bg);overflow:hidden;}
+.ns-tb{background:var(--ns-navy);height:14px;display:flex;align-items:center;padding:0 6px;gap:6px;}
+.ns-tb-title{font-size:6px;font-weight:700;color:white;letter-spacing:0.5px;text-transform:uppercase;}
+.ns-tb-ai{background:linear-gradient(135deg,#7B5CF5,#00C9B1);color:white;font-size:4.5px;padding:1px 5px;border-radius:2px;font-weight:700;margin-left:auto;}
+.ns-c{padding:5px;}
+.ns-pt{font-size:7px;font-weight:700;color:var(--ns-navy);margin-bottom:4px;letter-spacing:0.5px;}
+.ns-kr{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:4px;}
+.ns-k{background:white;border:1px solid var(--ns-border);border-radius:2px;padding:3px;border-top:2px solid var(--ns-teal);}
+.ns-k.ai-k{border-top-color:#7B5CF5;}
+.ns-kv{font-size:7px;font-weight:700;color:var(--ns-navy);line-height:1;}
+.ns-kl{font-size:4px;color:#7a8a9a;margin-top:1px;text-transform:uppercase;letter-spacing:0.3px;}
+.ns-kd{font-size:4px;color:#27ae60;font-weight:700;margin-top:1px;}
+.ns-kd.ai{color:#7B5CF5;}
+.ns-cr{display:grid;grid-template-columns:1.5fr 1fr;gap:3px;margin-bottom:3px;}
+.ns-cb{background:white;border:1px solid var(--ns-border);border-radius:2px;padding:3px;}
+.ns-ct{font-size:4.5px;font-weight:700;color:var(--ns-navy);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.3px;}
+.ns-bars{display:flex;align-items:flex-end;gap:2px;height:22px;}
+.ns-bar{flex:1;border-radius:1px 1px 0 0;}
+.ns-donut{width:28px;height:28px;border-radius:50%;background:conic-gradient(var(--ns-teal) 0% 38%,var(--ns-navy) 38% 62%,#F0A500 62% 78%,#e74c3c 78% 100%);margin:0 auto;position:relative;}
+.ns-donut::after{content:'';position:absolute;inset:6px;background:white;border-radius:50%;}
+.ns-tbl{background:white;border:1px solid var(--ns-border);border-radius:2px;overflow:hidden;}
+.ns-th{background:var(--ns-navy);display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2px;padding:2px 3px;}
+.ns-th span{font-size:4px;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.3px;font-weight:600;}
+.ns-tr{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2px;padding:2px 3px;border-bottom:1px solid var(--ns-border);}
+.ns-tr:last-child{border:none;}
+.ns-tr span{font-size:4px;color:var(--ns-text);}
+.bdg{font-size:3.5px;font-weight:700;padding:0.5px 3px;border-radius:10px;display:inline-block;}
+.b1{background:#e8f5e9;color:#2e7d32;}.b2{background:#fff8e1;color:#f57f17;}.b3{background:#e3f2fd;color:#1565c0;}
+/* AI chat overlay on laptop */
+.ai-overlay{position:absolute;bottom:4px;right:4px;width:42%;background:white;border-radius:3px;border:1px solid var(--ns-border);box-shadow:0 2px 8px rgba(0,0,0,0.15);overflow:hidden;z-index:5;}
+.ai-overlay-hdr{background:linear-gradient(135deg,#1F3864,#7B5CF5);padding:3px 5px;display:flex;align-items:center;gap:3px;}
+.ai-overlay-hdr-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.6);}
+.ai-overlay-hdr-title{font-size:4.5px;font-weight:700;color:white;letter-spacing:0.5px;}
+.ai-overlay-body{padding:4px;}
+.ai-bubble{border-radius:3px;padding:3px 4px;margin-bottom:2px;font-size:4px;line-height:1.4;}
+.ai-user{background:#e3f2fd;color:#1565c0;margin-left:20%;text-align:right;}
+.ai-bot{background:#f0fdf4;color:#166534;margin-right:20%;}
+.ai-input-row{display:flex;gap:2px;margin-top:3px;padding-top:3px;border-top:1px solid var(--ns-border);}
+.ai-input{flex:1;background:#f9f9f9;border:1px solid var(--ns-border);border-radius:2px;padding:2px 3px;font-size:3.5px;color:#999;}
+.ai-send{background:#7B5CF5;color:white;border:none;border-radius:2px;padding:2px 4px;font-size:3.5px;font-weight:700;}
+
+/* NS TABLET UI — AI Dashboard */
+.ns-t{width:100%;height:100%;font-family:'Barlow',Arial,sans-serif;font-size:6px;background:var(--ns-bg);overflow:hidden;}
+.ns-t-top{background:linear-gradient(135deg,var(--ns-navy),#3d2d8a);height:12px;display:flex;align-items:center;padding:0 5px;gap:4px;}
+.ns-t-title{font-size:5.5px;font-weight:700;color:white;text-transform:uppercase;letter-spacing:0.5px;}
+.ns-t-ai-badge{background:rgba(255,255,255,0.2);color:white;font-size:3.5px;font-weight:700;padding:0.5px 4px;border-radius:2px;letter-spacing:0.5px;margin-left:auto;}
+.ns-t-body{padding:4px;}
+.ns-t-h{font-size:6px;font-weight:700;color:var(--ns-navy);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px;}
+.ns-t-kpis{display:grid;grid-template-columns:1fr 1fr;gap:2.5px;margin-bottom:3px;}
+.ns-t-k{background:white;border:1px solid var(--ns-border);border-top:2px solid;border-radius:2px;padding:3px;}
+.ns-t-kv{font-size:8px;font-weight:800;line-height:1;}
+.ns-t-kl{font-size:4px;color:#7a8a9a;text-transform:uppercase;letter-spacing:0.3px;margin-top:1px;}
+.ns-t-chart{background:white;border:1px solid var(--ns-border);border-radius:2px;padding:3px;}
+.ns-t-ct{font-size:4.5px;font-weight:700;color:var(--ns-navy);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:3px;}
+.ns-t-bars{display:flex;align-items:flex-end;gap:2px;height:24px;}
+
+/* NS PHONE UI — AI Assistant */
+.ns-p{width:100%;height:100%;font-family:'Barlow',Arial,sans-serif;font-size:5.5px;background:#0F1A2E;overflow:hidden;}
+.ns-p-top{background:linear-gradient(135deg,#1F3864,#5B3DC8);height:14px;display:flex;align-items:center;padding:0 5px;gap:3px;}
+.ns-p-dot{width:6px;height:6px;border-radius:50%;background:rgba(0,201,177,0.8);box-shadow:0 0 4px var(--ns-teal);}
+.ns-p-title{font-size:5.5px;font-weight:700;color:white;text-transform:uppercase;letter-spacing:0.5px;}
+.ns-p-body{padding:3px;background:#0F1A2E;height:calc(100% - 14px);}
+.ns-p-msgs{display:flex;flex-direction:column;gap:2px;margin-bottom:3px;}
+.ns-p-msg{border-radius:3px;padding:3px 4px;font-size:4px;line-height:1.4;max-width:80%;}
+.ns-p-bot{background:rgba(0,201,177,0.15);color:#99f6e4;border:1px solid rgba(0,201,177,0.2);align-self:flex-start;}
+.ns-p-user{background:rgba(123,92,245,0.2);color:#c4b5fd;border:1px solid rgba(123,92,245,0.2);align-self:flex-end;}
+.ns-p-typing{display:flex;gap:2px;align-items:center;padding:3px 5px;background:rgba(0,201,177,0.1);border:1px solid rgba(0,201,177,0.15);border-radius:3px;width:fit-content;}
+.ns-p-typing span{width:3px;height:3px;border-radius:50%;background:var(--ns-teal);animation:blink 1.4s infinite;}
+.ns-p-typing span:nth-child(2){animation-delay:0.2s;}
+.ns-p-typing span:nth-child(3){animation-delay:0.4s;}
+.ns-p-input-row{display:flex;gap:2px;padding:2px;background:rgba(255,255,255,0.05);border-radius:3px;border:1px solid rgba(255,255,255,0.08);}
+.ns-p-input{flex:1;background:transparent;border:none;font-size:3.5px;color:rgba(255,255,255,0.5);outline:none;}
+.ns-p-send{background:var(--ns-teal);color:white;border:none;border-radius:2px;padding:2px 4px;font-size:3.5px;font-weight:700;}
+@keyframes blink{0%,100%{opacity:0.3;}50%{opacity:1;}}
+
+/* COUNTERS */
+.counters{background:var(--navy-mid);border-top:1px solid var(--gb);border-bottom:1px solid var(--gb);}
+.counters-grid{display:grid;grid-template-columns:repeat(4,1fr);}
+.counter-item{text-align:center;padding:2.5rem 2rem;border-right:1px solid var(--gb);}
+.counter-item:last-child{border-right:none;}
+.counter-val{font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:800;color:var(--teal);line-height:1;letter-spacing:-2px;}
+.counter-label{font-size:0.8rem;color:var(--silver);margin-top:0.5rem;font-weight:300;text-transform:uppercase;letter-spacing:1px;}
+
+/* WHAT SETS US APART — AI DIFFERENTIATOR */
+.diff-section{position:relative;overflow:hidden;}
+.diff-glow{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(123,92,245,0.07) 0%,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;}
+.diff-left .sec-title{text-align:left;margin-bottom:1rem;}
+.diff-left .sec-sub{text-align:left;margin-bottom:2rem;}
+.diff-compare{display:flex;flex-direction:column;gap:1rem;}
+.diff-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.diff-bad{background:rgba(255,80,80,0.05);border:1px solid rgba(255,80,80,0.15);border-radius:8px;padding:1rem 1.25rem;}
+.diff-good{background:var(--teal-glow);border:1px solid var(--gt);border-radius:8px;padding:1rem 1.25rem;}
+.diff-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+.diff-bad .diff-label{color:#FF6B6B;}
+.diff-good .diff-label{color:var(--teal);}
+.diff-text{font-size:0.8125rem;color:var(--silver);font-weight:300;line-height:1.65;}
+.diff-right{display:flex;flex-direction:column;gap:1.25rem;}
+.ai-tier-card{background:var(--glass);border:1px solid var(--gb);border-radius:12px;padding:1.5rem;transition:border-color 0.25s,transform 0.25s;position:relative;overflow:hidden;}
+.ai-tier-card:hover{border-color:var(--gp);transform:translateX(4px);}
+.ai-tier-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--purple),var(--teal));}
+.ai-tier-header{display:flex;align-items:center;gap:12px;margin-bottom:0.65rem;}
+.ai-tier-icon{width:36px;height:36px;border-radius:8px;background:var(--purple-glow);border:1px solid var(--gp);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ai-tier-icon svg{width:16px;height:16px;stroke:var(--purple);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.ai-tier-name{font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--white);}
+.ai-tier-badge{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:20px;margin-left:auto;}
+.badge-new{background:var(--purple-glow);border:1px solid var(--gp);color:var(--purple);}
+.badge-hot{background:var(--teal-glow);border:1px solid var(--gt);color:var(--teal);}
+.ai-tier-desc{font-size:0.8rem;color:var(--silver);line-height:1.7;font-weight:300;}
+
+/* AI SERVICES DEEP DIVE */
+.ai-services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;}
+.ai-svc{background:var(--glass);border:1px solid var(--gb);border-radius:12px;padding:2rem;transition:border-color 0.25s,transform 0.25s;position:relative;overflow:hidden;}
+.ai-svc::after{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,var(--purple-glow) 0%,transparent 70%);pointer-events:none;}
+.ai-svc:hover{border-color:var(--gp);transform:translateY(-3px);}
+.ai-svc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;}
+.ai-svc-icon{width:52px;height:52px;border-radius:12px;background:var(--purple-glow);border:1px solid var(--gp);display:flex;align-items:center;justify-content:center;}
+.ai-svc-icon svg{width:24px;height:24px;stroke:var(--purple);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.ai-svc-num{font-family:'Barlow Condensed',sans-serif;font-size:3rem;font-weight:800;color:rgba(123,92,245,0.08);line-height:1;letter-spacing:-2px;}
+.ai-svc-name{font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--white);margin-bottom:0.65rem;line-height:1.2;}
+.ai-svc-desc{font-size:0.8375rem;color:var(--silver);line-height:1.8;font-weight:300;margin-bottom:1.25rem;}
+.ai-svc-features{display:flex;flex-direction:column;gap:6px;}
+.ai-feat{display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--off-white);}
+.ai-feat-dot{width:6px;height:6px;border-radius:50%;background:var(--purple);flex-shrink:0;}
+
+/* NETSUITE SUPPORT SERVICES */
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;}
+.svc-card{background:var(--glass);border:1px solid var(--gb);border-radius:10px;padding:2rem 1.75rem;transition:border-color 0.25s,transform 0.25s;position:relative;overflow:hidden;}
+.svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--teal),transparent);opacity:0;transition:opacity 0.3s;}
+.svc-card:hover{border-color:var(--gt);transform:translateY(-4px);}
+.svc-card:hover::before{opacity:1;}
+.svc-card{display:flex;flex-direction:column;}
+.svc-tags{margin-top:auto;}
+.svc-btn{display:inline-block;margin-top:1.25rem;padding:9px 18px;font-size:0.78rem;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;text-transform:uppercase;color:var(--teal);border:1px solid var(--gt);border-radius:6px;text-decoration:none;transition:background 0.2s,color 0.2s;}
+.svc-btn:hover{background:var(--teal);color:#09090f;}
+.svc-icon{width:48px;height:48px;border-radius:10px;background:var(--teal-glow);border:1px solid var(--gt);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;}
+.svc-icon svg{width:22px;height:22px;stroke:var(--teal);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.svc-name{font-family:'Barlow Condensed',sans-serif;font-size:1.125rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--white);margin-bottom:0.65rem;line-height:1.2;}
+.svc-desc{font-size:0.825rem;color:var(--silver);line-height:1.75;font-weight:300;margin-bottom:1.25rem;}
+.svc-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.stag{background:rgba(0,0,0,0.25);border:1px solid var(--gb);color:var(--silver);font-size:10px;font-weight:600;letter-spacing:0.5px;padding:3px 10px;border-radius:20px;text-transform:uppercase;}
+
+/* TWO-TIER SERVICES */
+.svc-sublabel{font-family:monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;}
+.svc-sublabel-teal{color:var(--teal);}
+.svc-sublabel-silver{color:rgba(180,188,204,0.55);}
+.svc-t1-card{background:#101E38;border-top:2px solid var(--teal);border-left:1px solid rgba(255,255,255,0.07);border-right:1px solid rgba(255,255,255,0.07);border-bottom:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:28px 24px;display:flex;flex-direction:column;transition:border-color 0.2s,transform 0.2s;}
+.svc-t1-card:hover{border-color:rgba(0,201,177,0.4);transform:translateY(-3px);}
+.svc-t1-icon{width:40px;height:40px;background:rgba(0,201,177,0.10);border:1px solid rgba(0,201,177,0.3);clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.svc-t1-icon svg{width:18px;height:18px;stroke:var(--teal);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.svc-t1-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:10px;line-height:1.2;text-transform:uppercase;letter-spacing:0.4px;}
+.svc-t1-desc{font-size:13px;color:var(--silver);line-height:1.6;font-weight:300;margin-bottom:14px;flex:1;}
+.svc-t1-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px;}
+.stag-t1{background:rgba(0,201,177,0.08);border:1px solid rgba(0,201,177,0.25);color:var(--teal);font-family:monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:20px;text-transform:uppercase;}
+.svc-t1-cta{font-size:12px;color:var(--teal);text-decoration:none;font-weight:600;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.3px;}
+.svc-t1-cta:hover{text-decoration:underline;}
+.svc-t1-price{font-size:10px;color:rgba(180,188,204,0.45);margin-top:8px;font-family:monospace;}
+.svc-tier-divider{display:flex;align-items:center;gap:16px;margin:40px 0;color:rgba(180,188,204,0.35);font-size:11px;font-family:'Barlow',sans-serif;}
+.svc-tier-divider::before,.svc-tier-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06);}
+.svc-t2-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:20px;display:flex;flex-direction:column;transition:border-color 0.2s;}
+.svc-t2-card:hover{border-color:rgba(255,255,255,0.14);}
+.svc-t2-icon{width:36px;height:36px;background:rgba(180,188,204,0.06);border:1px solid rgba(180,188,204,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.svc-t2-icon svg{width:16px;height:16px;stroke:rgba(180,188,204,0.55);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.svc-t2-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:rgba(255,255,255,0.75);margin-bottom:8px;line-height:1.2;text-transform:uppercase;letter-spacing:0.4px;}
+.svc-t2-desc{font-size:12px;color:rgba(180,188,204,0.6);line-height:1.65;font-weight:300;margin-bottom:12px;flex:1;}
+.svc-t2-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
+.stag-t2{background:rgba(180,188,204,0.05);border:1px solid rgba(180,188,204,0.15);color:rgba(180,188,204,0.5);font-family:monospace;font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:20px;text-transform:uppercase;}
+.svc-t2-cta{font-size:12px;color:rgba(180,188,204,0.5);text-decoration:none;font-weight:600;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.3px;}
+.svc-t2-cta:hover{color:var(--silver);}
+@media(max-width:768px){.svc-grid{grid-template-columns:1fr;}}
+
+/* UPGRADE JOURNEY */
+.journey-section{position:relative;overflow:hidden;}
+.journey-glow{position:absolute;width:800px;height:400px;border-radius:50%;background:radial-gradient(ellipse,rgba(123,92,245,0.06) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.journey-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative;}
+.journey-steps::before{content:'';position:absolute;top:60px;left:16.7%;right:16.7%;height:2px;background:linear-gradient(90deg,var(--teal),var(--purple));opacity:0.3;}
+.journey-step{padding:0 2rem;text-align:center;position:relative;z-index:1;}
+.journey-circle{width:120px;height:120px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1.75rem;position:relative;}
+.jc-1{background:var(--teal-glow);border:2px solid var(--gt);}
+.jc-2{background:linear-gradient(135deg,rgba(0,201,177,0.1),rgba(123,92,245,0.1));border:2px solid;border-image:linear-gradient(135deg,var(--teal),var(--purple)) 1;}
+.jc-3{background:var(--purple-glow);border:2px solid var(--gp);}
+.journey-circle svg{width:32px;height:32px;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.jc-1 svg{stroke:var(--teal);}
+.jc-2 svg{stroke:url(#grad);}
+.jc-3 svg{stroke:var(--purple);}
+.journey-circle-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+.jc-1 .journey-circle-label{color:var(--teal);}
+.jc-2 .journey-circle-label{color:var(--off-white);}
+.jc-3 .journey-circle-label{color:var(--purple);}
+.journey-title{font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--white);margin-bottom:0.75rem;}
+.journey-desc{font-size:0.8125rem;color:var(--silver);line-height:1.75;font-weight:300;}
+.journey-items{display:flex;flex-direction:column;gap:5px;margin-top:1rem;}
+.j-item{font-size:0.75rem;color:var(--off-white);display:flex;align-items:center;gap:6px;}
+.j-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+
+/* INDUSTRIES */
+.ind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+.ind-card{background:var(--glass);border:1px solid var(--gb);border-radius:8px;padding:1.25rem;display:flex;align-items:center;gap:12px;transition:border-color 0.2s,transform 0.2s;}
+.ind-card:hover{border-color:var(--gt);transform:translateY(-2px);}
+.ind-icon{width:36px;height:36px;border-radius:8px;background:var(--teal-glow);border:1px solid var(--gt);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ind-icon svg{width:16px;height:16px;stroke:var(--teal);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.ind-name{font-size:0.8125rem;font-weight:600;color:var(--white);line-height:1.3;}
+
+/* PILLARS */
+.pillars-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;}
+.pillar-card{background:var(--glass);border:1px solid var(--gb);border-radius:10px;padding:2rem 1.5rem;position:relative;overflow:hidden;transition:border-color 0.25s,transform 0.25s;}
+.pillar-card:hover{border-color:var(--gt);transform:translateY(-3px);}
+.pillar-num{font-family:'Barlow Condensed',sans-serif;font-size:4rem;font-weight:800;color:rgba(0,201,177,0.06);line-height:1;position:absolute;top:1rem;right:1rem;}
+.pillar-icon{width:44px;height:44px;border-radius:10px;background:var(--teal-glow);border:1px solid var(--gt);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;}
+.pillar-icon svg{width:20px;height:20px;stroke:var(--teal);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.pillar-title{font-family:'Barlow Condensed',sans-serif;font-size:1.25rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--white);margin-bottom:0.75rem;}
+.pillar-desc{font-size:0.825rem;color:var(--silver);line-height:1.75;font-weight:300;}
+
+/* CREDENTIALS */
+.creds-wrap{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
+.creds-list{display:flex;flex-direction:column;gap:10px;margin-top:2rem;}
+.cred-item{display:flex;align-items:center;gap:14px;padding:1.1rem 1.25rem;background:var(--glass);border:1px solid var(--gb);border-radius:8px;transition:border-color 0.2s;}
+.cred-item:hover{border-color:var(--gt);}
+.cred-ico{width:40px;height:40px;border-radius:8px;background:var(--teal-glow);border:1px solid var(--gt);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cred-ico svg{width:18px;height:18px;stroke:var(--teal);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.cred-name{font-size:0.875rem;font-weight:600;color:var(--white);line-height:1.3;}
+.cred-issuer{font-size:0.75rem;color:var(--silver);margin-top:2px;font-weight:300;}
+.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.exp-box{background:var(--glass);border:1px solid var(--gb);border-radius:10px;padding:1.75rem 1.5rem;transition:border-color 0.2s,transform 0.2s;}
+.exp-box:hover{border-color:var(--gt);transform:translateY(-2px);}
+.exp-val{font-family:'Barlow Condensed',sans-serif;font-size:2.75rem;font-weight:800;color:var(--teal);line-height:1;letter-spacing:-1px;}
+.exp-lbl{font-size:0.75rem;color:var(--silver);margin-top:6px;font-weight:300;line-height:1.5;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* CONTACT */
+.form-wrap{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+.form-info .sec-title{text-align:left;margin-bottom:0.75rem;}
+.form-info .sec-sub{text-align:left;margin-bottom:2rem;}
+.form-benefits{display:flex;flex-direction:column;gap:1rem;}
+.form-benefit{display:flex;align-items:flex-start;gap:12px;}
+.fb-icon{width:32px;height:32px;border-radius:8px;background:var(--teal-glow);border:1px solid var(--gt);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.fb-icon svg{width:14px;height:14px;stroke:var(--teal);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.fb-text{font-size:0.875rem;color:var(--silver);font-weight:300;line-height:1.65;}
+.fb-text strong{color:var(--white);font-weight:600;}
+.form-card{background:var(--glass);border:1px solid var(--gb);border-radius:12px;padding:2.5rem;}
+.form-title{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--white);margin-bottom:1.75rem;}
+.form-group{margin-bottom:1.25rem;}
+.form-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--silver);display:block;margin-bottom:6px;}
+.form-input{width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--gb);border-radius:6px;padding:12px 16px;color:var(--white);font-size:0.9rem;font-family:'Barlow',sans-serif;outline:none;transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--gt);}
+.form-input::placeholder{color:var(--silver);opacity:0.4;}
+.form-select{appearance:none;cursor:pointer;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-submit{width:100%;background:var(--teal);color:var(--navy);border:none;padding:14px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;box-shadow:0 0 28px rgba(0,201,177,0.35);transition:all 0.2s;margin-top:0.5rem;}
+.form-submit:hover{background:#00e8cc;box-shadow:0 0 44px rgba(0,201,177,0.55);}
+.form-note{font-size:11px;color:var(--silver);text-align:center;margin-top:1rem;font-weight:300;}
+
+/* CTA FINAL */
+.cta-section{background:var(--navy-mid);border-top:1px solid var(--gb);text-align:center;position:relative;overflow:hidden;}
+.cta-glow-1{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(0,201,177,0.07) 0%,transparent 70%);top:50%;left:30%;transform:translate(-50%,-50%);pointer-events:none;}
+.cta-glow-2{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(123,92,245,0.07) 0%,transparent 70%);top:50%;left:70%;transform:translate(-50%,-50%);pointer-events:none;}
+.cta-btns{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:2.5rem;}
+
+/* FOOTER */
+footer{padding:2rem 0;border-top:1px solid var(--gb);position:relative;z-index:1;}
+.footer-inner{max-width:1180px;margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;letter-spacing:1.5px;text-transform:uppercase;color:var(--white);}
+.footer-copy{font-size:12px;color:var(--silver);font-weight:300;}
+.footer-cert{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--silver);font-weight:500;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 6px var(--teal);animation:pulse 2s ease-in-out infinite;}
+
+/* ANIMATIONS */
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 6px var(--teal);}50%{opacity:0.5;box-shadow:0 0 14px var(--teal);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes floatA{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+@keyframes floatB{0%,100%{transform:translateY(0);}50%{transform:translateY(7px);}}
+/* ── DEMO SECTION ── */
+@keyframes demoPanelFade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes bubbleIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes dotBlink{0%,100%{opacity:1;}50%{opacity:0;}}
+.demo-panel{display:none;}
+.demo-panel.active{display:grid;grid-template-columns:3fr 2fr;gap:32px;align-items:start;animation:demoPanelFade 0.3s ease both;}
+.demo-tab{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;padding:10px 24px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:all 0.2s;background:transparent;color:var(--silver);border:1px solid rgba(255,255,255,0.1);}
+.demo-tab:hover{border-color:var(--teal);color:var(--teal);}
+.demo-tab.active{background:var(--teal);color:var(--navy);border:none;}
+.blink-dot{display:inline-block;width:6px;height:6px;border-radius:50%;animation:dotBlink 1.4s ease-in-out infinite;}
+.demo-bubble{opacity:0;transform:translateY(8px);transition:opacity 0.35s ease,transform 0.35s ease;}
+.conv-body{max-height:340px;overflow-y:auto;scroll-behavior:smooth;scrollbar-width:none;}
+.conv-body::-webkit-scrollbar{display:none;}
+.conv-typing-indicator{display:none;align-self:flex-start;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px 8px 8px 0;padding:10px 14px;gap:5px;align-items:center;margin-top:2px;}
+.conv-typing-dot{width:6px;height:6px;border-radius:50%;background:var(--silver);opacity:0.5;animation:convTyping 1.1s ease-in-out infinite;}
+.conv-typing-dot:nth-child(2){animation-delay:0.18s;}
+.conv-typing-dot:nth-child(3){animation-delay:0.36s;}
+@keyframes convTyping{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.demo-bubble-user{background:rgba(0,201,177,0.08);border:1px solid rgba(0,201,177,0.2);border-radius:8px 8px 0 8px;padding:8px 12px;align-self:flex-end;max-width:80%;font-size:12px;color:var(--white);}
+.demo-bubble-agent{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px 8px 8px 0;padding:8px 12px;align-self:flex-start;max-width:85%;font-size:12px;color:var(--white);line-height:1.55;}
+.demo-chip{background:rgba(245,166,35,0.10);border:1px solid rgba(245,166,35,0.25);color:#F5A623;font-family:monospace;font-size:10px;padding:3px 10px;border-radius:4px;display:inline-flex;align-items:center;gap:5px;margin-top:4px;}
+/* DEMO RESPONSIVE */
+@media(max-width:768px){
+  .demo-tabs-wrap{gap:6px!important;}
+  .demo-tab{flex:0 0 calc(50% - 3px);}
+  .demo-panel.active{grid-template-columns:1fr;gap:20px;}
+}
+@media(max-width:375px){
+  #demo-section h2{font-size:28px!important;}
+  #demo-section>div{padding:0 16px!important;}
+  .demo-tab{font-size:11px;padding:8px 10px;}
+  .demo-bubble-user,.demo-bubble-agent{max-width:90%;}
+  .demo-chip{font-size:9px;padding:2px 8px;}
+  .demo-panel.active{gap:12px;}
+}
+
+/* DEVICE CLUSTER */
+.device-cluster{position:relative;display:flex;align-items:flex-end;justify-content:flex-end;gap:0;animation:fadeIn 1s ease both 0.4s;}
+.device-cluster::before{content:'';position:absolute;bottom:-20px;right:-20px;width:300px;height:300px;background:radial-gradient(circle,rgba(0,201,177,0.06) 0%,transparent 70%);pointer-events:none;z-index:0;}
+.device-phone-wrap{position:relative;z-index:1;transform:translateX(20px) translateY(20px);}
+.device-tablet-wrap{position:relative;z-index:2;transform:translateX(10px) translateY(8px);}
+.device-laptop-wrap{position:relative;z-index:3;}
+/* Phone */
+.phone-frame{width:120px;height:220px;background:#0D1A2E;border:2px solid rgba(0,201,177,0.3);border-radius:24px;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,0.05),0 16px 40px rgba(0,0,0,0.5);}
+.phone-notch{width:40px;height:8px;background:#080E1D;border-radius:0 0 8px 8px;margin:0 auto;position:relative;z-index:2;}
+.phone-screen{width:100%;height:100%;background:linear-gradient(160deg,#0D1A2E 0%,#101E38 100%);display:flex;flex-direction:column;padding:12px 8px 8px;gap:5px;box-sizing:border-box;}
+.phone-chat-header{display:flex;align-items:center;gap:5px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.phone-avatar{width:18px;height:18px;background:rgba(0,201,177,0.2);border:1px solid rgba(0,201,177,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.phone-agent-name{font-size:7px;color:var(--white);font-family:'Barlow',sans-serif;font-weight:600;flex:1;}
+.phone-online-dot{width:5px;height:5px;background:#22c55e;border-radius:50%;}
+.phone-bubbles{display:flex;flex-direction:column;gap:4px;flex:1;}
+.pb-right{align-self:flex-end;background:rgba(0,201,177,0.15);border:1px solid rgba(0,201,177,0.2);border-radius:8px 8px 0 8px;padding:4px 7px;font-size:7px;color:var(--white);max-width:80%;font-family:'Barlow',sans-serif;}
+.pb-left{align-self:flex-start;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px 8px 8px 0;padding:4px 7px;font-size:7px;color:var(--silver);max-width:80%;font-family:'Barlow',sans-serif;}
+.pb-chip{display:inline-block;background:rgba(245,166,35,0.12);border:1px solid rgba(245,166,35,0.25);color:#F5A623;font-size:6px;border-radius:4px;padding:2px 5px;margin-top:2px;font-family:monospace;}
+.phone-input-bar{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:4px 8px;font-size:6px;color:rgba(180,188,204,0.4);font-family:'Barlow',sans-serif;}
+.phone-home-bar{width:30px;height:3px;background:rgba(255,255,255,0.2);border-radius:2px;margin:4px auto 0;}
+/* Tablet */
+.tablet-frame{width:200px;height:155px;background:#0D1A2E;border:2px solid rgba(0,201,177,0.2);border-radius:12px;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,0.04),0 16px 40px rgba(0,0,0,0.45);}
+.tablet-screen{width:100%;height:100%;background:#101E38;padding:10px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;}
+.tablet-header{display:flex;align-items:center;gap:5px;}
+.tablet-label{font-family:monospace;font-size:7px;color:var(--teal);letter-spacing:1px;text-transform:uppercase;flex:1;}
+.tablet-dot{width:5px;height:5px;background:#22c55e;border-radius:50%;}
+.tablet-metrics{display:grid;grid-template-columns:1fr 1fr;gap:4px;flex:1;}
+.tmet{background:rgba(0,0,0,0.2);border-radius:4px;padding:4px 6px;display:flex;flex-direction:column;gap:2px;}
+.tmet-label{font-size:6px;color:var(--silver);font-family:monospace;letter-spacing:0.5px;text-transform:uppercase;}
+.tmet-val{font-size:9px;font-weight:700;font-family:'Barlow Condensed',sans-serif;line-height:1;}
+.tmet-teal{color:var(--teal);}
+.tmet-amber{color:#F5A623;}
+.tmet-green{color:#22c55e;}
+/* Responsive */
+@media(max-width:1024px){.device-cluster{transform:scale(0.8);transform-origin:right center;}}
+@media(max-width:768px){.device-phone-wrap,.device-tablet-wrap{display:none;}.device-cluster{transform:none;}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00C9B1"/>
+      <stop offset="100%" style="stop-color:#7B5CF5"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo"><img src="logo.png" alt="Vertex Consulting Partner" style="height:44px;width:auto;display:block;" /></a>
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#ai-erp">AI ERP</a></li>
+      <li><a href="#journey">How It Works</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact" class="nav-cta">Book Free Call</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="tag">AI Agent Builder for Enterprise ERP</div>
+        <div class="hero-eyebrow">Financials · Inventory · Procurement · Sales to Cash</div>
+        <h1 class="hero-title">
+          We Build AI Agents
+          <span class="hl">For Your ERP</span>
+          <span class="hlp">Processes</span>
+        </h1>
+        <p class="hero-sub">Vertex Consulting Partner builds <strong>AI Agents for enterprise ERP workflows</strong> — automating Financials, Inventory Management &amp; Supply Chain, Procurement, and Sales to Cash processes so your team stops chasing data and starts making decisions.</p>
+        <div class="hero-pills">
+          <span class="hero-pill pill-teal">✓ Financials Automation</span>
+          <span class="hero-pill pill-teal">✓ Inventory &amp; Supply Chain</span>
+          <span class="hero-pill pill-teal">✓ Procurement AI</span>
+          <span class="hero-pill pill-purple">✓ Sales to Cash Agent</span>
+        </div>
+        <div class="hero-btns">
+          <a href="#contact" class="btn-p">Book Free Discovery Call →</a>
+          <a href="#services" class="btn-g">See Our Services ↓</a>
+        </div>
+        <div class="hero-stats">
+          <div><span class="stat-num">6+</span><span class="stat-lbl">Years ERP Exp</span></div>
+          <div><span class="stat-num">50+</span><span class="stat-lbl">Agents Built</span></div>
+          <div><span class="stat-num">AI</span><span class="stat-lbl">Powered</span></div>
+          <div><span class="stat-num">ACS</span><span class="stat-lbl">Level</span></div>
+        </div>
+      </div>
+
+      <!-- LAPTOP -->
+      <div style="animation:fadeIn 1s ease both 0.4s;flex:1;display:flex;align-items:center;justify-content:flex-end;background:transparent;isolation:isolate;">
+        <img src="dashboard.png" alt="Vertex Dashboard" style="width:100%;max-width:620px;height:auto;display:block;" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COUNTERS -->
+<div class="counters">
+  <div class="container">
+    <div class="counters-grid">
+      <div class="counter-item"><div class="counter-val">6+</div><div class="counter-label">ERP Implementations</div></div>
+      <div class="counter-item"><div class="counter-val" style="background:linear-gradient(90deg,var(--teal),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">AI</div><div class="counter-label">Agent Builder</div></div>
+      <div class="counter-item"><div class="counter-val">n8n</div><div class="counter-label">Powered Workflows</div></div>
+      <div class="counter-item"><div class="counter-val">24/7</div><div class="counter-label">Agents Running Live</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SEE IT IN ACTION -->
+<section id="demo-section" style="background:var(--navy);padding:80px 0;position:relative;z-index:1;">
+  <div style="max-width:1100px;margin:0 auto;padding:0 48px;">
+    <div style="text-align:center;margin-bottom:0;">
+      <div style="font-family:monospace;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--teal);margin-bottom:16px;">Live Agent Walkthroughs</div>
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:42px;color:var(--white);line-height:1;margin-bottom:20px;">See It <span class="teal" style="color:var(--teal);">In Action.</span></h2>
+      <p style="font-family:'Barlow',sans-serif;font-weight:400;font-size:16px;color:var(--silver);max-width:580px;margin:0 auto 48px;line-height:1.75;">Pick a scenario and watch how your Vertex AI Agent handles a real request — from first message to completed action. No scripts. No staging. These are real deployed flows.</p>
+      <!-- DEMO TABS -->
+      <div class="demo-tabs-wrap" style="display:flex;justify-content:center;gap:8px;margin-bottom:40px;flex-wrap:wrap;">
+        <button id="tab-property" class="demo-tab" data-tab="property">Property Inquiry</button>
+        <button id="tab-erp"      class="demo-tab" data-tab="erp">ERP Query</button>
+        <button id="tab-ecommerce" class="demo-tab" data-tab="ecommerce">E-commerce Support</button>
+        <button id="tab-custom"   class="demo-tab" data-tab="custom">Custom Build</button>
+      </div>
+    </div>
+
+    <!-- DEMO PANELS -->
+    <div id="panel-property" class="demo-panel">
+
+      <!-- ── LEFT COLUMN ── -->
+      <div class="demo-left">
+
+        <!-- AGENT INTRO CARD -->
+        <div style="background:#101E38;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+          <!-- Avatar + label -->
+          <div style="flex-shrink:0;text-align:center;">
+            <div style="width:56px;height:56px;border:2px solid rgba(0,201,177,0.3);border-radius:50%;background:rgba(0,201,177,0.06);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+              <img src="logo.png" alt="Vertex" style="width:48px;height:48px;object-fit:contain;" />
+            </div>
+            <div style="font-family:monospace;font-size:11px;color:var(--teal);margin-top:6px;white-space:nowrap;">Vertex Property Agent</div>
+          </div>
+          <!-- Name + tagline -->
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:var(--white);margin-bottom:4px;">Your Property AI Agent</div>
+            <div style="font-size:11px;color:var(--silver);line-height:1.5;">Checks live inventory · Books viewings · Notifies your team</div>
+          </div>
+          <!-- Avatar cluster + live label -->
+          <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;">
+            <div style="display:flex;align-items:center;">
+              <div style="width:28px;height:28px;border:2px dashed #00C9B1;border-radius:50%;background:rgba(0,201,177,0.04);display:flex;align-items:center;justify-content:center;color:#00C9B1;font-family:monospace;font-size:7px;letter-spacing:1px;position:relative;z-index:3;box-shadow:0 0 0 2px #101E38;">AVA</div>
+              <div style="width:28px;height:28px;border:2px dashed #00C9B1;border-radius:50%;background:rgba(0,201,177,0.04);display:flex;align-items:center;justify-content:center;color:#00C9B1;font-family:monospace;font-size:7px;letter-spacing:1px;margin-left:-8px;position:relative;z-index:2;box-shadow:0 0 0 2px #101E38;">AVA</div>
+              <div style="width:28px;height:28px;border:2px dashed #00C9B1;border-radius:50%;background:rgba(0,201,177,0.04);display:flex;align-items:center;justify-content:center;color:#00C9B1;font-family:monospace;font-size:7px;letter-spacing:1px;margin-left:-8px;position:relative;z-index:1;box-shadow:0 0 0 2px #101E38;">AVA</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span class="blink-dot" style="background:#2ECC71;"></span>
+              <span style="font-size:10px;color:#2ECC71;white-space:nowrap;">Live 24/7</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONVERSATION CARD -->
+        <div style="background:#101E38;border:1px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+          <!-- Topbar -->
+          <div style="background:rgba(0,0,0,0.2);padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#FF5F57;display:inline-block;"></span>
+              <span style="width:8px;height:8px;border-radius:50%;background:#FFBD2E;display:inline-block;"></span>
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;"></span>
+            </div>
+            <span style="font-family:monospace;font-size:10px;color:var(--silver);opacity:0.6;">vertex-property-agent · live</span>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span class="blink-dot" style="background:var(--teal);"></span>
+              <span style="font-size:10px;color:var(--teal);">connected</span>
+            </div>
+          </div>
+          <!-- Bubbles -->
+          <div class="conv-body" style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+            <div class="demo-bubble demo-bubble-user">Hi! Do you have any available 2BR units this December?</div>
+            <div class="demo-bubble" style="align-self:flex-start;"><span class="demo-chip">▶ Checking live unit inventory...</span></div>
+            <div class="demo-bubble demo-bubble-agent">Hello! We have available 2BR units across two properties — G11:11 in Marilao (₱3.2M–₱3.8M) and Joy Residences in Baliwag (₱2.8M–₱3.4M). Which one is closer to you?</div>
+            <div class="demo-bubble demo-bubble-user">G11:11 please. Can we schedule a viewing this Saturday?</div>
+            <div class="demo-bubble" style="align-self:flex-start;"><span class="demo-chip">▶ Checking Saturday availability...</span></div>
+            <div class="demo-bubble demo-bubble-agent">Saturday is open from 10AM–4PM for G11:11. What time works best for you? Could I also get your name and contact number to confirm the slot?</div>
+            <div class="demo-bubble demo-bubble-user">2PM please. Maria Santos, 09171234567</div>
+            <div class="demo-bubble" style="align-self:flex-start;display:flex;flex-direction:column;gap:4px;">
+              <span class="demo-chip">▶ Booking calendar slot...</span>
+              <span class="demo-chip">▶ Notifying property specialist...</span>
+              <span class="demo-chip">▶ Logging lead to CRM...</span>
+            </div>
+            <div class="demo-bubble demo-bubble-agent">Confirmed! Viewing scheduled — Saturday 2PM, G11:11 Cheer Residences, Marilao. You'll receive a confirmation message shortly. See you Saturday! 🏢</div>
+            <div class="conv-typing-indicator"><span class="conv-typing-dot"></span><span class="conv-typing-dot"></span><span class="conv-typing-dot"></span></div>
+          </div>
+          <!-- Footer -->
+          <div style="text-align:center;padding:10px 16px 14px;font-family:monospace;font-size:11px;color:var(--silver);opacity:0.5;border-top:1px solid rgba(255,255,255,0.04);">zero human involvement · response time: 8 seconds</div>
+        </div>
+
+      </div>
+
+      <!-- ── RIGHT COLUMN ── -->
+      <div class="demo-right">
+        <div style="background:#101E38;border:1px solid rgba(0,201,177,0.15);border-radius:8px;padding:24px;">
+          <div style="font-family:monospace;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">What just happened</div>
+          <!-- Outcome list -->
+          <div style="display:flex;flex-direction:column;">
+            <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">Lead qualified</strong> — Name, contact, preferred unit, and timeline captured automatically</div>
+            </div>
+            <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">Viewing booked</strong> — Saturday 2PM slot blocked in Google Calendar, no double booking possible</div>
+            </div>
+            <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">Team notified</strong> — Property specialist received Telegram alert with full lead details</div>
+            </div>
+            <div style="display:flex;gap:10px;padding:10px 0;align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">CRM updated</strong> — Lead logged to Google Sheets with timestamp, source, and status</div>
+            </div>
+          </div>
+          <!-- Divider -->
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:16px 0;">
+          <!-- Time saved -->
+          <div style="margin-bottom:16px;">
+            <div style="font-family:monospace;font-size:10px;color:var(--silver);opacity:0.6;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Time Saved</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:28px;color:var(--teal);line-height:1;">~45 minutes</div>
+            <div style="font-size:11px;color:var(--silver);margin-top:4px;">vs manual phone/email coordination</div>
+          </div>
+          <!-- Proof tag -->
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="blink-dot" style="background:#2ECC71;"></span>
+            <span style="font-size:11px;color:#2ECC71;">Live deployment: G11:11 Cheer Residences, Marilao</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div id="panel-erp" class="demo-panel">
+
+      <!-- ── LEFT COLUMN ── -->
+      <div class="demo-left">
+
+        <!-- AGENT INTRO CARD -->
+        <div style="background:#101E38;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+          <!-- Avatar + label -->
+          <div style="flex-shrink:0;text-align:center;">
+            <div style="width:56px;height:56px;border:2px solid rgba(0,201,177,0.3);border-radius:50%;background:rgba(0,201,177,0.06);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+              <img src="logo.png" alt="Vertex" style="width:48px;height:48px;object-fit:contain;" />
+            </div>
+            <div style="font-family:monospace;font-size:11px;color:var(--teal);margin-top:6px;white-space:nowrap;">Vertex ERP Agent</div>
+          </div>
+          <!-- Name + tagline -->
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:var(--white);margin-bottom:4px;">Your NetSuite AI Agent</div>
+            <div style="font-size:11px;color:var(--silver);line-height:1.5;">Reads live ERP data · Answers in plain language · SOX-ready</div>
+          </div>
+          <!-- Avatar cluster + status -->
+          <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;">
+            <div style="display:flex;align-items:center;">
+              <div style="width:28px;height:28px;border:2px dashed #00C9B1;border-radius:50%;background:rgba(0,201,177,0.04);display:flex;align-items:center;justify-content:center;color:#00C9B1;font-family:monospace;font-size:7px;letter-spacing:1px;position:relative;z-index:3;box-shadow:0 0 0 2px #101E38;">AVA</div>
+              <div style="width:28px;height:28px;border:2px dashed #00C9B1;border-radius:50%;background:rgba(0,201,177,0.04);display:flex;align-items:center;justify-content:center;color:#00C9B1;font-family:monospace;font-size:7px;letter-spacing:1px;margin-left:-8px;position:relative;z-index:2;box-shadow:0 0 0 2px #101E38;">AVA</div>
+              <div style="width:28px;height:28px;border:2px dashed #00C9B1;border-radius:50%;background:rgba(0,201,177,0.04);display:flex;align-items:center;justify-content:center;color:#00C9B1;font-family:monospace;font-size:7px;letter-spacing:1px;margin-left:-8px;position:relative;z-index:1;box-shadow:0 0 0 2px #101E38;">AVA</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span class="blink-dot" style="background:var(--teal);"></span>
+              <span style="font-size:10px;color:var(--teal);white-space:nowrap;">Connected to NetSuite</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONVERSATION CARD -->
+        <div style="background:#101E38;border:1px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+          <!-- Topbar -->
+          <div style="background:rgba(0,0,0,0.2);padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#FF5F57;display:inline-block;"></span>
+              <span style="width:8px;height:8px;border-radius:50%;background:#FFBD2E;display:inline-block;"></span>
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;"></span>
+            </div>
+            <span style="font-family:monospace;font-size:10px;color:var(--silver);opacity:0.6;">vertex-erp-agent · live</span>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span class="blink-dot" style="background:var(--teal);"></span>
+              <span style="font-size:10px;color:var(--teal);">connected</span>
+            </div>
+          </div>
+          <!-- Bubbles -->
+          <div class="conv-body" style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+            <div class="demo-bubble demo-bubble-user">How's our AP aging this month? Any vendors already over 60 days outstanding?</div>
+            <div class="demo-bubble" style="align-self:flex-start;"><span class="demo-chip">▶ Querying ERP AP Aging report...</span></div>
+            <div class="demo-bubble demo-bubble-agent">Yes. 12 vendors have outstanding invoices at 60+ days. Top 3: Vendor A — ₱2.1M, Vendor B — ₱1.4M, Vendor C — ₱890K. Total exposure: ₱8.3M. Would you like me to generate the full list?</div>
+            <div class="demo-bubble demo-bubble-user">Yes, please. Also go ahead and approve Vendor A's PO — the ₱450K one that's stuck in approvals.</div>
+            <div class="demo-bubble" style="align-self:flex-start;display:flex;flex-direction:column;gap:4px;">
+              <span class="demo-chip">▶ Pulling full AP aging list...</span>
+              <span class="demo-chip">▶ Locating PO #10042 in approval queue...</span>
+            </div>
+            <div class="demo-bubble demo-bubble-agent">Full AP aging list attached — 12 vendors, ₱8.3M total. PO #10042 for Vendor A — ₱450,000 — approved and updated in the ERP. Approval timestamp logged for the audit trail.</div>
+            <div class="demo-bubble demo-bubble-user">Thank you. Last one — which open Sales Orders are past their delivery due date?</div>
+            <div class="demo-bubble" style="align-self:flex-start;"><span class="demo-chip">▶ Running Sales Order exception report...</span></div>
+            <div class="demo-bubble demo-bubble-agent">34 open SOs on record. 6 are past their promised ship date — oldest is 14 days overdue (SO #8821, Acme Corp, ₱1.2M). Would you like me to notify the sales team now?</div>
+            <div class="conv-typing-indicator"><span class="conv-typing-dot"></span><span class="conv-typing-dot"></span><span class="conv-typing-dot"></span></div>
+          </div>
+          <!-- Footer -->
+          <div style="text-align:center;padding:10px 16px 14px;font-family:monospace;font-size:11px;color:var(--silver);opacity:0.5;border-top:1px solid rgba(255,255,255,0.04);">SOX-compliant audit trail · response time: 12 seconds</div>
+        </div>
+
+      </div>
+
+      <!-- ── RIGHT COLUMN ── -->
+      <div class="demo-right">
+        <div style="background:#101E38;border:1px solid rgba(0,201,177,0.15);border-radius:8px;padding:24px;">
+          <div style="font-family:monospace;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">What just happened</div>
+          <!-- Outcome list -->
+          <div style="display:flex;flex-direction:column;">
+            <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">Live data pulled</strong> — AP aging queried directly from NetSuite, no manual report generation needed</div>
+            </div>
+            <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">PO approved</strong> — Transaction completed inside NetSuite via chat, full audit log recorded</div>
+            </div>
+            <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">Exception flagged</strong> — 6 overdue SOs identified and surfaced instantly, no report-building required</div>
+            </div>
+            <div style="display:flex;gap:10px;padding:10px 0;align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">Audit trail created</strong> — Every query and action logged with timestamp, user, and record reference</div>
+            </div>
+          </div>
+          <!-- Divider -->
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:16px 0;">
+          <!-- Time saved -->
+          <div style="margin-bottom:16px;">
+            <div style="font-family:monospace;font-size:10px;color:var(--silver);opacity:0.6;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Hours Saved This Week</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:28px;color:var(--teal);line-height:1;">~8 hours</div>
+            <div style="font-size:11px;color:var(--silver);margin-top:4px;">vs manual report pulling and approval chasing</div>
+          </div>
+          <!-- Proof tag -->
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:11px;color:#2ECC71;">✓ Built by 7-yr Oracle NetSuite ACS consultant</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div id="panel-ecommerce" class="demo-panel">
+
+      <!-- ── LEFT COLUMN ── -->
+      <div class="demo-left">
+
+        <!-- AGENT INTRO CARD -->
+        <div style="background:#101E38;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+          <div style="flex-shrink:0;text-align:center;">
+            <div style="width:56px;height:56px;border:2px solid rgba(0,201,177,0.3);border-radius:50%;background:rgba(0,201,177,0.06);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+              <img src="logo.png" alt="Vertex" style="width:48px;height:48px;object-fit:contain;" />
+            </div>
+            <div style="font-family:monospace;font-size:11px;color:var(--teal);margin-top:6px;white-space:nowrap;">Vertex Shop Agent</div>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;color:var(--white);margin-bottom:4px;">Your E-commerce AI Agent</div>
+            <div style="font-size:11px;color:var(--silver);line-height:1.5;">Order support · Returns · Product Q&A · Upsells</div>
+          </div>
+          <!-- Avatar cluster + status -->
+          <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;">
+            <div style="display:flex;align-items:center;">
+              <div style="width:28px;height:28px;border:2px dashed #00C9B1;border-radius:50%;background:rgba(0,201,177,0.04);display:flex;align-items:center;justify-content:center;color:#00C9B1;font-family:monospace;font-size:7px;letter-spacing:1px;position:relative;z-index:3;box-shadow:0 0 0 2px #101E38;">AVA</div>
+              <div style="width:28px;height:28px;border:2px dashed #00C9B1;border-radius:50%;background:rgba(0,201,177,0.04);display:flex;align-items:center;justify-content:center;color:#00C9B1;font-family:monospace;font-size:7px;letter-spacing:1px;margin-left:-8px;position:relative;z-index:2;box-shadow:0 0 0 2px #101E38;">AVA</div>
+              <div style="width:28px;height:28px;border:2px dashed #00C9B1;border-radius:50%;background:rgba(0,201,177,0.04);display:flex;align-items:center;justify-content:center;color:#00C9B1;font-family:monospace;font-size:7px;letter-spacing:1px;margin-left:-8px;position:relative;z-index:1;box-shadow:0 0 0 2px #101E38;">AVA</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span class="blink-dot" style="background:var(--teal);"></span>
+              <span style="font-size:10px;color:var(--teal);white-space:nowrap;">Connected to Shopify · Live</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONVERSATION CARD -->
+        <div style="background:#101E38;border:1px solid rgba(255,255,255,0.07);border-radius:8px;overflow:hidden;">
+          <div style="background:rgba(0,0,0,0.2);padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#FF5F57;display:inline-block;"></span>
+              <span style="width:8px;height:8px;border-radius:50%;background:#FFBD2E;display:inline-block;"></span>
+              <span style="width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;"></span>
+            </div>
+            <span style="font-family:monospace;font-size:10px;color:var(--silver);opacity:0.6;">vertex-ecommerce-agent · live</span>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span class="blink-dot" style="background:var(--teal);"></span>
+              <span style="font-size:10px;color:var(--teal);">connected</span>
+            </div>
+          </div>
+          <div class="conv-body" style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+            <div class="demo-bubble demo-bubble-user">Hi! Where's my order? It's been 3 days and it still hasn't arrived.</div>
+            <div class="demo-bubble" style="align-self:flex-start;"><span class="demo-chip">▶ Looking up order by contact number...</span></div>
+            <div class="demo-bubble demo-bubble-agent">Hi! I found your order — Order #4821. Status: In transit via LBC. Expected delivery: tomorrow before 8PM. Tracking: LBC-2024-88821. Would you like me to monitor it until delivered?</div>
+            <div class="demo-bubble demo-bubble-user">Please do. Also, there's a size issue — I ordered Medium but received Small.</div>
+            <div class="demo-bubble" style="align-self:flex-start;display:flex;flex-direction:column;gap:4px;">
+              <span class="demo-chip">▶ Checking return/exchange policy...</span>
+              <span class="demo-chip">▶ Verifying item availability for Medium...</span>
+            </div>
+            <div class="demo-bubble demo-bubble-agent">No problem! You can return the Small and exchange it for a Medium — exchanges are free within 7 days. Medium is still in stock. Let me schedule a pickup. What day works best for you?</div>
+            <div class="demo-bubble demo-bubble-user">Thursday afternoon works.</div>
+            <div class="demo-bubble" style="align-self:flex-start;display:flex;flex-direction:column;gap:4px;">
+              <span class="demo-chip">▶ Scheduling LBC pickup — Thursday PM...</span>
+              <span class="demo-chip">▶ Sending exchange confirmation...</span>
+              <span class="demo-chip">▶ Reserving Medium stock...</span>
+            </div>
+            <div class="demo-bubble demo-bubble-agent">Done! LBC pickup scheduled for Thursday afternoon. You'll receive an SMS confirmation shortly. Your Medium size is reserved. Is there anything else I can help you with? 😊</div>
+            <div class="conv-typing-indicator"><span class="conv-typing-dot"></span><span class="conv-typing-dot"></span><span class="conv-typing-dot"></span></div>
+          </div>
+          <div style="text-align:center;padding:10px 16px 14px;font-family:monospace;font-size:11px;color:var(--silver);opacity:0.5;border-top:1px solid rgba(255,255,255,0.04);">Handled in Messenger · response time: 6 seconds</div>
+        </div>
+
+      </div>
+
+      <!-- ── RIGHT COLUMN ── -->
+      <div class="demo-right">
+        <div style="background:#101E38;border:1px solid rgba(0,201,177,0.15);border-radius:8px;padding:24px;">
+          <div style="font-family:monospace;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">What just happened</div>
+          <div style="display:flex;flex-direction:column;">
+            <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">Order located</strong> — Retrieved from Shopify by phone number, no order number needed from customer</div>
+            </div>
+            <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">Wrong item flagged</strong> — Size mismatch logged, exchange initiated automatically</div>
+            </div>
+            <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">Pickup scheduled</strong> — LBC collection booked for Thursday, stock reserved in inventory</div>
+            </div>
+            <div style="display:flex;gap:10px;padding:10px 0;align-items:flex-start;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10" stroke="var(--teal)" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="font-size:12px;color:var(--silver);line-height:1.5;"><strong style="color:var(--white);">Customer retained</strong> — Issue resolved in one chat, no escalation to human support needed</div>
+            </div>
+          </div>
+          <hr style="border:none;border-top:1px solid rgba(255,255,255,0.07);margin:16px 0;">
+          <div style="margin-bottom:16px;">
+            <div style="font-family:monospace;font-size:10px;color:var(--silver);opacity:0.6;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Support Cost Per Ticket</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:28px;color:var(--teal);line-height:1;">₱0</div>
+            <div style="font-size:11px;color:var(--silver);margin-top:4px;">vs ₱180–₱350 per ticket with human agent</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:11px;color:#2ECC71;">✓ Integrates with Shopify, WooCommerce, Lazada</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div id="panel-custom" class="demo-panel">
+
+      <!-- ── LEFT COLUMN ── -->
+      <div class="demo-left">
+        <div style="background:#101E38;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:24px 28px;">
+          <!-- Header -->
+          <div style="font-family:monospace;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;">Custom Engagement</div>
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;color:var(--white);margin-bottom:12px;line-height:1.2;">Have a workflow nobody else can solve?</h3>
+          <p style="font-size:13px;color:var(--silver);line-height:1.7;margin-bottom:24px;">We scope, design, and build automation systems for complex business problems — ERP integrations, multi-step approval flows, AI document processing, and anything else that requires enterprise engineering, not a template.</p>
+
+          <!-- Steps -->
+          <div style="display:flex;flex-direction:column;">
+
+            <div style="display:flex;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:var(--teal);width:32px;text-align:center;flex-shrink:0;line-height:1.3;">01</div>
+              <div>
+                <div style="font-size:13px;font-weight:500;color:var(--white);margin-bottom:3px;">Discovery Call <span style="font-size:11px;color:var(--teal);">(Free)</span></div>
+                <div style="font-size:12px;color:var(--silver);line-height:1.5;">We map your workflow, identify pain points, and define what the system needs to do. No commitment required.</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:var(--teal);width:32px;text-align:center;flex-shrink:0;line-height:1.3;">02</div>
+              <div>
+                <div style="font-size:13px;font-weight:500;color:var(--white);margin-bottom:3px;">Custom Blueprint</div>
+                <div style="font-size:12px;color:var(--silver);line-height:1.5;">We design the full architecture — data sources, decision logic, integration points, escalation rules, and delivery format.</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);align-items:flex-start;">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:var(--teal);width:32px;text-align:center;flex-shrink:0;line-height:1.3;">03</div>
+              <div>
+                <div style="font-size:13px;font-weight:500;color:var(--white);margin-bottom:3px;">Build &amp; Test</div>
+                <div style="font-size:12px;color:var(--silver);line-height:1.5;">We build on n8n + Claude AI + your existing tools. End-to-end testing with real data before go-live.</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:16px;padding:12px 0;align-items:flex-start;">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:var(--teal);width:32px;text-align:center;flex-shrink:0;line-height:1.3;">04</div>
+              <div>
+                <div style="font-size:13px;font-weight:500;color:var(--white);margin-bottom:3px;">Deploy &amp; Retainer</div>
+                <div style="font-size:12px;color:var(--silver);line-height:1.5;">Live deployment, 2-week monitoring, full documentation. Optional monthly retainer for ongoing optimization.</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- CTA -->
+          <a href="#contact" style="display:block;margin-top:24px;background:var(--teal);color:var(--navy);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:13px 24px;text-decoration:none;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px));transition:background 0.2s,box-shadow 0.2s;box-shadow:0 0 20px rgba(0,201,177,0.25);" onmouseover="this.style.background='#00e8cc';this.style.boxShadow='0 0 36px rgba(0,201,177,0.45)'" onmouseout="this.style.background='var(--teal)';this.style.boxShadow='0 0 20px rgba(0,201,177,0.25)'">Start with a Free Discovery Call →</a>
+        </div>
+      </div>
+
+      <!-- ── RIGHT COLUMN ── -->
+      <div class="demo-right">
+        <div style="font-family:monospace;font-size:10px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;">Past Custom Builds</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:12px 14px;">
+            <div style="font-family:monospace;font-size:10px;color:#F5A623;margin-bottom:5px;">PROPERTY · MESSENGER</div>
+            <div style="font-size:13px;font-weight:500;color:var(--white);margin-bottom:4px;">G11:11 Booking Agent</div>
+            <div style="font-size:11px;color:var(--silver);line-height:1.5;">GCash payment validation · calendar booking · Telegram approval · CRM logging</div>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:12px 14px;">
+            <div style="font-family:monospace;font-size:10px;color:#F5A623;margin-bottom:5px;">PROPERTY · MESSENGER</div>
+            <div style="font-size:13px;font-weight:500;color:var(--white);margin-bottom:4px;">SMDC Multi-Property Agent</div>
+            <div style="font-size:11px;color:var(--silver);line-height:1.5;">3 properties · lead scoring · price reveal gate · tripping booking · Telegram alerts</div>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:12px 14px;">
+            <div style="font-family:monospace;font-size:10px;color:var(--teal);margin-bottom:5px;">F&amp;B · GOOGLE SHEETS</div>
+            <div style="font-size:13px;font-weight:500;color:var(--white);margin-bottom:4px;">Kambal Burger POS System</div>
+            <div style="font-size:11px;color:var(--silver);line-height:1.5;">Inventory · sales log · stock transfer · purchase tracking · time log</div>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:12px 14px;">
+            <div style="font-family:monospace;font-size:10px;color:var(--teal);margin-bottom:5px;">NETSUITE · FINANCE</div>
+            <div style="font-size:13px;font-weight:500;color:var(--white);margin-bottom:4px;">ERP AI Query Layer</div>
+            <div style="font-size:11px;color:var(--silver);line-height:1.5;">Plain language queries on live NetSuite data · AP aging · PO approvals · SO exceptions</div>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:6px;padding:12px 14px;">
+            <div style="font-family:monospace;font-size:10px;color:var(--purple, #7B5CF5);margin-bottom:5px;">CONTENT · AUTOMATION</div>
+            <div style="font-size:13px;font-weight:500;color:var(--white);margin-bottom:4px;">G11:11 Content Pipeline</div>
+            <div style="font-size:11px;color:var(--silver);line-height:1.5;">Veo3 + Gemini video · MWF scheduled FB posts · Google Sheets content calendar · auto-publish</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- WHAT SETS US APART -->
+<section class="diff-section alt" id="ai-erp">
+  <div class="diff-glow"></div>
+  <div class="container">
+    <div class="diff-grid">
+      <div class="diff-left">
+        <div class="tag">Why Vertex</div>
+        <h2 class="sec-title" style="text-align:left;margin-bottom:1rem;">A Consulting Partner<br>That Stays With You <span class="hl">Long-Term</span></h2>
+        <p class="sec-sub" style="text-align:left;margin-bottom:2rem;">Most NetSuite partners hand you a system and disappear. We build a long-term partnership — from go-live through continuous optimization, support, and AI enhancements that grow with your business.</p>
+        <div class="diff-compare">
+          <div class="diff-row">
+            <div class="diff-bad"><div class="diff-label">❌ Typical Partners</div><div class="diff-text">Implement NetSuite, collect payment, move on. You're left managing a system you barely understand.</div></div>
+            <div class="diff-good"><div class="diff-label">✅ Vertex Consulting Partner</div><div class="diff-text">We stay engaged post-go-live — optimizing, training, and evolving your ERP as your business grows.</div></div>
+          </div>
+          <div class="diff-row">
+            <div class="diff-bad"><div class="diff-label">❌ Generic Configuration</div><div class="diff-text">Cookie-cutter setup that doesn't match your workflows. Users work around the system instead of with it.</div></div>
+            <div class="diff-good"><div class="diff-label">✅ Tailored to Your Business</div><div class="diff-text">Deep discovery of your processes first. Every module, workflow, and script built around how you actually operate.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="diff-right">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--silver);margin-bottom:1rem;">AI ERP Service Tiers</div>
+        <div class="ai-tier-card">
+          <div class="ai-tier-header">
+            <div class="ai-tier-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+            <div><div class="ai-tier-name">AI Virtual Assistant</div></div>
+            <div class="ai-tier-badge badge-new">NEW</div>
+          </div>
+          <div class="ai-tier-desc">RAG-powered chatbot trained on SuiteAnswers, your business processes, and SOPs. Employees get instant, accurate answers — no more support tickets for basic questions.</div>
+        </div>
+        <div class="ai-tier-card">
+          <div class="ai-tier-header">
+            <div class="ai-tier-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+            <div><div class="ai-tier-name">AI Business Intelligence</div></div>
+            <div class="ai-tier-badge badge-hot">HOT</div>
+          </div>
+          <div class="ai-tier-desc">Natural language queries on your live NetSuite data. Ask "What are my top 10 slow-moving items this month?" and get an instant answer — no saved searches needed.</div>
+        </div>
+        <div class="ai-tier-card">
+          <div class="ai-tier-header">
+            <div class="ai-tier-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+            <div><div class="ai-tier-name">Agentic Automation</div></div>
+            <div class="ai-tier-badge badge-new">NEW</div>
+          </div>
+          <div class="ai-tier-desc">AI agents that proactively monitor your NetSuite — flagging anomalies, auto-approving within policy, escalating exceptions, and triggering workflows without human intervention.</div>
+        </div>
+        <div class="ai-tier-card">
+          <div class="ai-tier-header">
+            <div class="ai-tier-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+            <div><div class="ai-tier-name">AI Document Processing</div></div>
+          </div>
+          <div class="ai-tier-desc">Auto-extract and validate data from POs, invoices, receipts, and delivery receipts directly into NetSuite — eliminating manual data entry and reducing errors to near zero.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI SERVICES DEEP DIVE -->
+<section>
+  <div class="container">
+    <div class="sec-hdr">
+      <div class="tag ai-tag">AI-Enhanced ERP</div>
+      <h2 class="sec-title">Beyond Standard NetSuite —<br><span class="hlp">AI Automation Included</span></h2>
+      <p class="sec-sub">As your consulting partner, we don't just configure NetSuite — we extend it with AI capabilities that eliminate manual work, surface insights instantly, and keep your ERP running itself.</p>
+    </div>
+    <div class="ai-services-grid">
+      <div class="ai-svc">
+        <div class="ai-svc-top">
+          <div class="ai-svc-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+          <div class="ai-svc-num">01</div>
+        </div>
+        <div class="ai-svc-name">AI Virtual Assistant<br>(RAG Chatbot)</div>
+        <p class="ai-svc-desc">A retrieval-augmented generation chatbot trained on your company's SuiteAnswers knowledge base, SOPs, business process documentation, and ERP configuration. Your team asks questions in plain language and gets accurate, context-aware answers instantly — available 24/7 on web, mobile, and Messenger.</p>
+        <div class="ai-svc-features">
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Trained on SuiteAnswers + your business processes</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Process guidance: "How do I process a vendor refund?"</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>ERP data queries: "Show me open POs over ₱100K"</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Available on Web, Messenger, and mobile</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Continuously updated as your processes evolve</div>
+        </div>
+      </div>
+      <div class="ai-svc">
+        <div class="ai-svc-top">
+          <div class="ai-svc-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><path d="M22 20H2"/></svg></div>
+          <div class="ai-svc-num">02</div>
+        </div>
+        <div class="ai-svc-name">AI-Powered Dashboards<br>& NL Reporting</div>
+        <p class="ai-svc-desc">Natural language interface on top of your NetSuite data. No more building saved searches or waiting for IT to create reports. Ask business questions in plain Tagalog or English and get instant, accurate insights — charts, tables, and summaries generated on the fly from your live NetSuite data.</p>
+        <div class="ai-svc-features">
+          <div class="ai-feat"><div class="ai-feat-dot"></div>"Anu-ano ang top 10 slow-moving items ngayong buwan?"</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>"Show me overdue invoices older than 60 days"</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>AI-generated executive summaries and anomaly reports</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Predictive analytics on inventory and cash flow</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Auto-sent daily/weekly digests to your inbox</div>
+        </div>
+      </div>
+      <div class="ai-svc">
+        <div class="ai-svc-top">
+          <div class="ai-svc-icon"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+          <div class="ai-svc-num">03</div>
+        </div>
+        <div class="ai-svc-name">Agentic ERP<br>Automation</div>
+        <p class="ai-svc-desc">AI agents built on n8n and OpenAI that monitor your NetSuite continuously — detecting anomalies, auto-approving transactions within policy thresholds, escalating exceptions to the right people, and triggering downstream workflows without human intervention. Your ERP finally runs itself.</p>
+        <div class="ai-svc-features">
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Smart approval routing based on amount + policy rules</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Anomaly detection: duplicate POs, price deviations</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Proactive alerts: low stock, overdue receivables</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Auto-escalation with context via Telegram/email</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Compliance monitoring and audit trail generation</div>
+        </div>
+      </div>
+      <div class="ai-svc">
+        <div class="ai-svc-top">
+          <div class="ai-svc-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+          <div class="ai-svc-num">04</div>
+        </div>
+        <div class="ai-svc-name">AI Document<br>Processing</div>
+        <p class="ai-svc-desc">Eliminate manual data entry from your NetSuite workflow. Our AI vision models extract, validate, and push data from vendor invoices, purchase orders, delivery receipts, and expense documents directly into the correct NetSuite records — with human-level accuracy and zero typing.</p>
+        <div class="ai-svc-features">
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Auto-extract vendor invoice data into NS Bills</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>PO matching and 3-way match validation</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Delivery receipt scanning → inventory receipts</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Expense report photo → NetSuite expense entry</div>
+          <div class="ai-feat"><div class="ai-feat-dot"></div>Exception flagging for manual review only when needed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NETSUITE SUPPORT SERVICES -->
+<section id="services" class="alt">
+  <div class="container">
+    <div class="sec-hdr">
+      <div class="tag">What We Build</div>
+      <h2 class="sec-title" style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:38px;color:var(--white);">Two ways we grow<br><span class="hl">your business.</span></h2>
+    </div>
+
+    <!-- TIER 1: AI AGENT SERVICES -->
+    <div class="svc-sublabel svc-sublabel-teal">AI Agent Services — Primary Offering</div>
+    <div class="svc-grid">
+
+      <div class="svc-t1-card">
+        <div class="svc-t1-icon">
+          <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="svc-t1-name">AI Agent Deployment</div>
+        <p class="svc-t1-desc">Custom AI Agent built on n8n + Claude AI — connected to your live data, deployed on Messenger, WhatsApp, or your website. Qualifies leads, books appointments, validates payments, and notifies your team. Zero human involvement per transaction.</p>
+        <div class="svc-t1-tags">
+          <span class="stag-t1">PROPERTY</span>
+          <span class="stag-t1">E-COMMERCE</span>
+          <span class="stag-t1">F&amp;B</span>
+        </div>
+        <a href="#contact" class="svc-t1-cta">Book a free scoping call →</a>
+        <div class="svc-t1-price">From $1,500 setup + $300/mo retainer</div>
+      </div>
+
+      <div class="svc-t1-card">
+        <div class="svc-t1-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 7h4M6 10h8M6 13h5"/></svg>
+        </div>
+        <div class="svc-t1-name">ERP Intelligence Agent</div>
+        <p class="svc-t1-desc">AI layer over your live NetSuite or SAP data. Your team asks questions in plain Filipino or English — AP aging, open POs, SO exceptions, vendor balances — and gets instant answers. No manual reports. No waiting. SOX-compliant audit trail.</p>
+        <div class="svc-t1-tags">
+          <span class="stag-t1">NETSUITE</span>
+          <span class="stag-t1">FINANCE</span>
+          <span class="stag-t1">OPS</span>
+        </div>
+        <a href="#contact" class="svc-t1-cta">Book a free scoping call →</a>
+        <div class="svc-t1-price">From $5,000 setup + $500/mo retainer</div>
+      </div>
+
+      <div class="svc-t1-card">
+        <div class="svc-t1-icon">
+          <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <div class="svc-t1-name">Custom Automation Build</div>
+        <p class="svc-t1-desc">Complex workflow that no template handles? We scope, architect, and build from scratch — n8n pipelines, SuiteScript integrations, AI document processing, multi-step approvals, and GCash payment validation.</p>
+        <div class="svc-t1-tags">
+          <span class="stag-t1">N8N</span>
+          <span class="stag-t1">SUITESCRIPT</span>
+          <span class="stag-t1">CUSTOM</span>
+        </div>
+        <a href="#contact" class="svc-t1-cta">Book a free scoping call →</a>
+        <div class="svc-t1-price">Custom pricing — scoped per engagement</div>
+      </div>
+
+    </div>
+
+    <!-- TIER DIVIDER -->
+    <div class="svc-tier-divider">— Also available: NetSuite Consulting for existing clients —</div>
+
+    <!-- TIER 2: NETSUITE CONSULTING -->
+    <div class="svc-sublabel svc-sublabel-silver">NetSuite Consulting — Supporting Services</div>
+    <div class="svc-grid">
+
+      <div class="svc-t2-card">
+        <div class="svc-t2-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+        </div>
+        <div class="svc-t2-name">Consulting & Implementation</div>
+        <p class="svc-t2-desc">Full-cycle NetSuite deployments — chart of accounts, subsidiaries, modules, data migration, and go-live.</p>
+        <div class="svc-t2-tags">
+          <span class="stag-t2">MULTI-ENTITY</span>
+          <span class="stag-t2">DATA MIGRATION</span>
+          <span class="stag-t2">GO-LIVE</span>
+        </div>
+        <a href="#contact" class="svc-t2-cta">Book a free call →</a>
+      </div>
+
+      <div class="svc-t2-card">
+        <div class="svc-t2-icon">
+          <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <div class="svc-t2-name">SuiteScript Development</div>
+        <p class="svc-t2-desc">Custom SuiteScript 2.1 — Suitelets, Map/Reduce, User Events, REST integrations, custom forms.</p>
+        <div class="svc-t2-tags">
+          <span class="stag-t2">SUITESCRIPT 2.1</span>
+          <span class="stag-t2">REST APIs</span>
+          <span class="stag-t2">INTEGRATIONS</span>
+        </div>
+        <a href="#contact" class="svc-t2-cta">Book a free call →</a>
+      </div>
+
+      <div class="svc-t2-card">
+        <div class="svc-t2-icon">
+          <svg viewBox="0 0 24 24"><path d="M2 20h20M4 20V10l8-7 8 7v10"/><path d="M9 20v-6h6v6"/></svg>
+        </div>
+        <div class="svc-t2-name">Manufacturing & WMS</div>
+        <p class="svc-t2-desc">Work orders, BOMs, routings, WIP tracking, warehouse barcoding with GS1-128 parsing.</p>
+        <div class="svc-t2-tags">
+          <span class="stag-t2">WIP TRACKING</span>
+          <span class="stag-t2">GS1-128</span>
+          <span class="stag-t2">WMS</span>
+        </div>
+        <a href="#contact" class="svc-t2-cta">Book a free call →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- UPGRADE JOURNEY -->
+<section id="journey" class="journey-section">
+  <div class="journey-glow"></div>
+  <div class="container">
+    <div class="sec-hdr">
+      <div class="tag">Our Approach</div>
+      <h2 class="sec-title">We Meet You<br><span class="hl">Where You Are</span></h2>
+      <p class="sec-sub">Whether you're implementing NetSuite for the first time, cleaning up a messy existing system, or ready to add AI automation on top — we have the right engagement model for your stage.</p>
+    </div>
+    <div class="journey-steps">
+      <div class="journey-step">
+        <div class="journey-circle jc-1">
+          <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+          <div class="journey-circle-label">Phase 1</div>
+        </div>
+        <div class="journey-title">Implementation & Go-Live</div>
+        <p class="journey-desc">A proper NetSuite deployment built around your business processes — not a generic template. Clean chart of accounts, correct module configuration, data migration, and thorough user training.</p>
+        <div class="journey-items">
+          <div class="j-item"><div class="j-dot" style="background:var(--teal)"></div>Implementation & go-live</div>
+          <div class="j-item"><div class="j-dot" style="background:var(--teal)"></div>SuiteFlow & SuiteScript</div>
+          <div class="j-item"><div class="j-dot" style="background:var(--teal)"></div>Manufacturing & WMS</div>
+          <div class="j-item"><div class="j-dot" style="background:var(--teal)"></div>User training & adoption</div>
+        </div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-circle jc-2">
+          <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <div class="journey-circle-label">Phase 2</div>
+        </div>
+        <div class="journey-title">Optimization & Support</div>
+        <p class="journey-desc">Once live, we stay with you — cleaning up misconfigured modules, building custom SuiteScripts, designing SuiteFlow workflows, and providing ACS-level ongoing support for your team.</p>
+        <div class="journey-items">
+          <div class="j-item"><div class="j-dot" style="background:url(#grad)"></div>SuiteScript & SuiteFlow customization</div>
+          <div class="j-item"><div class="j-dot" style="background:url(#grad)"></div>Module optimization & health check</div>
+          <div class="j-item"><div class="j-dot" style="background:url(#grad)"></div>ACS-level remote & on-site support</div>
+          <div class="j-item"><div class="j-dot" style="background:url(#grad)"></div>Ongoing user training & adoption</div>
+        </div>
+      </div>
+      <div class="journey-step">
+        <div class="journey-circle jc-3">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M12 2v2M12 20v2M4.93 4.93l1.41 1.41M18.66 18.66l1.41 1.41M2 12h2M20 12h2"/></svg>
+          <div class="journey-circle-label">Phase 3</div>
+        </div>
+        <div class="journey-title">AI-Enhanced ERP</div>
+        <p class="journey-desc">When your NetSuite is stable and well-configured, we layer on AI — RAG knowledge bots, agentic automation, document processing, and natural language reporting that multiplies your team's productivity.</p>
+        <div class="journey-items">
+          <div class="j-item"><div class="j-dot" style="background:var(--purple)"></div>Autonomous approval agents</div>
+          <div class="j-item"><div class="j-dot" style="background:var(--purple)"></div>Anomaly detection & alerts</div>
+          <div class="j-item"><div class="j-dot" style="background:var(--purple)"></div>Predictive analytics</div>
+          <div class="j-item"><div class="j-dot" style="background:var(--purple)"></div>Continuous AI improvement</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INDUSTRIES -->
+<section id="industries" class="alt">
+  <div class="container">
+    <div class="sec-hdr">
+      <div class="tag">Industries</div>
+      <h2 class="sec-title">Built for Your <span class="hl">Industry</span></h2>
+      <p class="sec-sub">Deep NetSuite expertise across the industries that depend on ERP the most — with AI automation tailored to your specific workflows and compliance requirements.</p>
+    </div>
+    <div class="ind-grid">
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="ind-name">Financial Services</div></div>
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><path d="M2 20h20M4 20V10l8-7 8 7v10"/></svg></div><div class="ind-name">Manufacturing</div></div>
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="ind-name">Wholesale Distribution</div></div>
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg></div><div class="ind-name">Retail & E-commerce</div></div>
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="ind-name">Healthcare & Life Sciences</div></div>
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="ind-name">Professional Services</div></div>
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="ind-name">Transportation & Logistics</div></div>
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><path d="M22 16.74V4a2 2 0 00-2-2H4a2 2 0 00-2 2v12"/><path d="M2 16l5-5 4 4 5-7 5 8"/></svg></div><div class="ind-name">IT Services & SaaS</div></div>
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><div class="ind-name">Education</div></div>
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="ind-name">Food & Beverage</div></div>
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div><div class="ind-name">Health & Beauty</div></div>
+      <div class="ind-card"><div class="ind-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="ind-name">Nonprofit & NGO</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CREDENTIALS -->
+<section id="about">
+  <div class="container">
+    <div class="creds-wrap">
+      <div>
+        <div class="tag">Credentials</div>
+        <h2 class="sec-title" style="text-align:left;margin-bottom:0.75rem;">Oracle-Certified.<br><span class="hl">AI-Native.</span></h2>
+        <p class="sec-sub" style="text-align:left;margin-bottom:0;">The rare combination of deep Oracle NetSuite ACS expertise and hands-on AI automation experience — n8n, OpenAI, RAG, and agentic workflows. No other consultant brings both to the table.</p>
+        <div class="creds-list">
+          <div class="cred-item"><div class="cred-ico"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div><div class="cred-name">NetSuite ERP Professional Certification</div><div class="cred-issuer">Oracle University</div></div></div>
+          <div class="cred-item"><div class="cred-ico"><svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg></div><div><div class="cred-name">Oracle Cloud Infrastructure (OCI) Foundations</div><div class="cred-issuer">Oracle University</div></div></div>
+          <div class="cred-item"><div class="cred-ico"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div><div class="cred-name">NetSuite Financial User Certification</div><div class="cred-issuer">Oracle University</div></div></div>
+          <div class="cred-item" style="border-color:var(--gp);"><div class="cred-ico" style="background:var(--purple-glow);border-color:var(--gp);"><svg viewBox="0 0 24 24" style="stroke:var(--purple)"><path d="M12 2a2 2 0 012 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 017 7h1a1 1 0 010 2h-1v1a2 2 0 01-2 2H5a2 2 0 01-2-2v-1H2a1 1 0 010-2h1a7 7 0 017-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 012-2z"/></svg></div><div><div class="cred-name" style="color:var(--purple);">AI Automation Expert — n8n · OpenAI · RAG · Supabase</div><div class="cred-issuer">Vertex AI Marketing · Hands-on Production Experience</div></div></div>
+        </div>
+      </div>
+      <div class="exp-grid">
+        <div class="exp-box"><div class="exp-val">6+</div><div class="exp-lbl">Years NetSuite Consulting</div></div>
+        <div class="exp-box"><div class="exp-val">ACS</div><div class="exp-lbl">Oracle Advanced Customer Support Level</div></div>
+        <div class="exp-box"><div class="exp-val" style="background:linear-gradient(90deg,var(--teal),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">AI</div><div class="exp-lbl">RAG · n8n · OpenAI · Agentic Workflows</div></div>
+        <div class="exp-box"><div class="exp-val">50+</div><div class="exp-lbl">Projects Successfully Delivered</div></div>
+        <div class="exp-box"><div class="exp-val">5+</div><div class="exp-lbl">Industries: Finance, Mfg, WMS, SC, Compliance</div></div>
+        <div class="exp-box"><div class="exp-val">PH</div><div class="exp-lbl">Based in Bulacan, Serving PH & International</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="alt">
+  <div class="container">
+    <div class="form-wrap">
+      <div class="form-info">
+        <div class="tag">Free Discovery Call</div>
+        <h2 class="sec-title" style="text-align:left;margin-bottom:0.75rem;">Book Your Free<br><span class="hl">Discovery Call</span></h2>
+        <p class="sec-sub" style="text-align:left;margin-bottom:2rem;">30 minutes. No pitch deck. Just an honest conversation about where your NetSuite is today, what's not working, and how we can help as your long-term consulting partner.</p>
+        <div class="form-benefits">
+          <div class="form-benefit"><div class="fb-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="fb-text"><strong>Free ERP health check</strong> — we'll identify exactly what's misconfigured, underutilized, or broken in your current NetSuite setup.</div></div>
+          <div class="form-benefit"><div class="fb-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="fb-text"><strong>AI readiness assessment</strong> — we evaluate which AI automation opportunities in your ERP will deliver the highest ROI fastest.</div></div>
+          <div class="form-benefit"><div class="fb-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="fb-text"><strong>Custom upgrade roadmap</strong> — get a clear 3-phase plan to take your NetSuite from static ERP to AI-powered intelligent system.</div></div>
+          <div class="form-benefit"><div class="fb-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="fb-text"><strong>Zero commitment</strong> — if we're not the right fit, we'll tell you honestly. We only work with clients we can genuinely help.</div></div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-title">Book Free Discovery Call</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">First Name</label><input id="cf-fname" type="text" class="form-input" placeholder="Juan"></div>
+          <div class="form-group"><label class="form-label">Last Name</label><input id="cf-lname" type="text" class="form-input" placeholder="Dela Cruz"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Business Email</label><input id="cf-email" type="email" class="form-input" placeholder="juan@yourcompany.com.ph"></div>
+        <div class="form-group"><label class="form-label">Company Name</label><input id="cf-company" type="text" class="form-input" placeholder="ABC Manufacturing Inc."></div>
+        <div class="form-group"><label class="form-label">Current Situation</label>
+          <select id="cf-situation" class="form-input form-select">
+            <option value="" disabled selected>Select your situation</option>
+            <option>New to NetSuite — need implementation</option>
+            <option>Using NetSuite but it's a mess — need optimization</option>
+            <option>NetSuite is working — want to add AI on top</option>
+            <option>Evaluating NetSuite vs other ERP options</option>
+            <option>Need ongoing ACS-level support</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Industry</label>
+          <select id="cf-industry" class="form-input form-select">
+            <option value="" disabled selected>Your industry</option>
+            <option>Manufacturing</option><option>Wholesale Distribution</option><option>Financial Services</option>
+            <option>Retail & E-commerce</option><option>Professional Services</option><option>Healthcare</option>
+            <option>Transportation & Logistics</option><option>IT Services</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">What's your biggest pain point?</label><textarea id="cf-message" class="form-input" rows="3" placeholder="e.g. Manual data entry is killing us, reports take forever, users hate the system..." style="resize:none;"></textarea></div>
+        <div id="cf-msg" style="display:none;padding:10px 14px;border-radius:6px;font-size:13px;font-weight:600;margin-bottom:8px;"></div>
+        <button class="form-submit" onclick="submitContactForm(event)">Book Free Discovery Call →</button>
+        <p class="form-note">🔒 Private & confidential. We respond within 24 hours. No spam, ever.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="cta-section">
+  <div class="cta-glow-1"></div>
+  <div class="cta-glow-2"></div>
+  <div class="container" style="position:relative;z-index:1;">
+    <div class="tag" style="display:inline-flex;">Ready to Get Started?</div>
+    <h2 class="sec-title">Let's Build Your NetSuite<br><span class="hl">The Right Way</span> — Together.</h2>
+    <p class="sec-sub" style="max-width:560px;margin:0 auto;">Whether you're starting fresh, fixing a broken implementation, or ready to evolve your ERP with AI — we're the consulting partner that stays with you every step of the way.</p>
+    <div class="cta-btns">
+      <a href="#contact" class="btn-p" style="padding:16px 32px;font-size:15px;">Book Free Discovery Call →</a>
+      <a href="#services" class="btn-g" style="padding:15px 28px;font-size:13px;">View All Services ↑</a>
+    </div>
+    <p style="font-size:0.8rem;color:var(--silver);margin-top:1.5rem;font-weight:300;">Free 30-min call · No commitment · Local & international clients welcome</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Vertex <span style="color:var(--teal)">Consulting</span> <span style="background:linear-gradient(90deg,var(--teal),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Partner</span></div>
+    <div class="footer-copy">© 2025 Vertex Consulting Partner · Bulacan · All Rights Reserved</div>
+    <div class="footer-cert"><div class="live-dot"></div>Oracle NetSuite ACS · AI Automation Expert</div>
+  </div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════
+     ALEX — VERTEX CONSULTING PARTNER AI ASSISTANT CHATBOT
+═══════════════════════════════════════ -->
+
+<!-- CHAT BUBBLE BUTTON -->
+<div id="chat-bubble" onclick="toggleChat()" title="Chat with Alex">
+  <div id="chat-bubble-icon">
+    <svg id="icon-chat" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <svg id="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </div>
+  <div id="chat-notif">1</div>
+</div>
+
+<!-- CHAT WIDGET -->
+<div id="chat-widget">
+  <!-- HEADER -->
+  <div id="chat-header">
+    <div id="chat-avatar" style="background:transparent;overflow:visible;">
+      <img src="logo.png" alt="Vertex" style="width:36px;height:36px;object-fit:contain;" />
+    </div>
+    <div id="chat-header-info">
+      <div id="chat-name">Alex</div>
+      <div id="chat-status"><span id="status-dot"></span>Vertex Consulting Partner AI Assistant</div>
+    </div>
+    <div id="chat-header-actions">
+      <div id="chat-minimize" onclick="toggleChat()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- MESSAGES -->
+  <div id="chat-messages"></div>
+
+  <!-- QUICK REPLIES -->
+  <div id="quick-replies"></div>
+
+  <!-- INPUT -->
+  <div id="chat-input-wrap">
+    <input id="chat-input" type="text" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sendUserMessage()" disabled/>
+    <button id="chat-send" onclick="sendUserMessage()" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+  <div id="chat-footer">Powered by AI · Vertex Consulting Partner</div>
+</div>
+
+<style>
+/* ── BUBBLE ── */
+#chat-bubble{
+  position:fixed;bottom:28px;right:28px;z-index:9999;
+  width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,#7B5CF5,#00C9B1);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:0 8px 32px rgba(123,92,245,0.45);
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+#chat-bubble:hover{transform:scale(1.08);box-shadow:0 12px 40px rgba(123,92,245,0.6);}
+#chat-bubble-icon{display:flex;align-items:center;justify-content:center;}
+#chat-notif{
+  position:absolute;top:-4px;right:-4px;
+  width:20px;height:20px;border-radius:50%;
+  background:#FF4757;color:white;
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid #070E1C;animation:notifPulse 2s ease-in-out infinite;
+}
+@keyframes notifPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+
+/* ── WIDGET ── */
+#chat-widget{
+  position:fixed;bottom:100px;right:28px;z-index:9998;
+  width:370px;height:560px;
+  background:#0C1A35;
+  border:1px solid rgba(123,92,245,0.25);
+  border-radius:16px;
+  display:flex;flex-direction:column;
+  box-shadow:0 24px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04);
+  overflow:hidden;
+  transform:scale(0.92) translateY(20px);opacity:0;pointer-events:none;
+  transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),opacity 0.25s ease;
+}
+#chat-widget.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all;}
+
+/* ── HEADER ── */
+#chat-header{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 18px;
+  background:linear-gradient(135deg,#0F2040,#1a1060);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  flex-shrink:0;
+}
+#chat-avatar{
+  width:40px;height:40px;border-radius:50%;
+  background:transparent;
+  display:flex;align-items:center;justify-content:center;overflow:visible;
+  flex-shrink:0;box-shadow:0 0 16px rgba(123,92,245,0.4);
+}
+#chat-header-info{flex:1;}
+#chat-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#EEF3FF;letter-spacing:0.5px;text-transform:uppercase;}
+#chat-status{display:flex;align-items:center;gap:5px;font-size:11px;color:#8DA4C0;font-weight:400;margin-top:2px;}
+#status-dot{width:6px;height:6px;border-radius:50%;background:#00C9B1;box-shadow:0 0 6px #00C9B1;animation:pulse 2s ease-in-out infinite;flex-shrink:0;}
+#chat-minimize{color:#8DA4C0;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background 0.2s;}
+#chat-minimize:hover{background:rgba(255,255,255,0.08);}
+
+/* ── MESSAGES ── */
+#chat-messages{
+  flex:1;overflow-y:auto;padding:16px 14px;
+  display:flex;flex-direction:column;gap:10px;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;
+}
+#chat-messages::-webkit-scrollbar{width:4px;}
+#chat-messages::-webkit-scrollbar-track{background:transparent;}
+#chat-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:4px;}
+
+.msg{display:flex;align-items:flex-end;gap:8px;animation:msgIn 0.3s ease both;}
+.msg.bot{flex-direction:row;}
+.msg.user{flex-direction:row-reverse;}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.msg-avatar{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#7B5CF5,#00C9B1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:white;
+}
+.msg-bubble{
+  max-width:78%;padding:10px 13px;border-radius:12px;
+  font-size:13.5px;line-height:1.6;font-family:'Barlow',sans-serif;
+}
+.msg.bot .msg-bubble{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  color:#D8E6F0;border-radius:4px 12px 12px 12px;
+}
+.msg.user .msg-bubble{
+  background:linear-gradient(135deg,#5B3DC8,#3d7acc);
+  color:white;border-radius:12px 4px 12px 12px;
+}
+.msg-time{font-size:10px;color:rgba(255,255,255,0.25);margin-top:4px;padding:0 2px;}
+
+/* TYPING INDICATOR */
+.typing-bubble{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:4px 12px 12px 12px;
+  padding:12px 16px;
+  display:flex;gap:5px;align-items:center;
+}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:#7B5CF5;animation:typingBounce 1.4s infinite;}
+.typing-dot:nth-child(2){animation-delay:0.2s;}
+.typing-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+/* ── QUICK REPLIES ── */
+#quick-replies{
+  display:flex;flex-wrap:wrap;gap:7px;
+  padding:0 14px 10px;
+  flex-shrink:0;
+}
+.qr-btn{
+  background:rgba(123,92,245,0.12);
+  border:1px solid rgba(123,92,245,0.3);
+  color:#C4B5FD;
+  font-size:12px;font-weight:600;font-family:'Barlow',sans-serif;
+  padding:7px 13px;border-radius:20px;
+  cursor:pointer;transition:all 0.2s;white-space:nowrap;
+}
+.qr-btn:hover{background:rgba(123,92,245,0.25);border-color:rgba(123,92,245,0.6);color:white;}
+
+/* ── INPUT ── */
+#chat-input-wrap{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 14px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  flex-shrink:0;background:#081020;
+}
+#chat-input{
+  flex:1;background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;padding:10px 14px;
+  color:#EEF3FF;font-size:13.5px;font-family:'Barlow',sans-serif;
+  outline:none;transition:border-color 0.2s;
+}
+#chat-input:focus{border-color:rgba(123,92,245,0.5);}
+#chat-input::placeholder{color:rgba(255,255,255,0.25);}
+#chat-input:disabled{opacity:0.4;}
+#chat-send{
+  width:38px;height:38px;border-radius:8px;border:none;
+  background:linear-gradient(135deg,#7B5CF5,#00C9B1);
+  color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;flex-shrink:0;
+}
+#chat-send:hover:not(:disabled){transform:scale(1.08);box-shadow:0 4px 16px rgba(123,92,245,0.4);}
+#chat-send:disabled{opacity:0.4;cursor:not-allowed;}
+#chat-footer{
+  text-align:center;font-size:10px;color:rgba(255,255,255,0.2);
+  padding:6px 0 10px;font-family:'Barlow',sans-serif;flex-shrink:0;
+  background:#081020;letter-spacing:0.5px;
+}
+</style>
+
+<script>
+// ═══════════════════════════════════════
+// GOOGLE APPS SCRIPT URL
+// Paste your deployed GAS Web App URL here after deploying gas-script.gs
+// ═══════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz2iR0J7s-hvvI1NyorDQe4mCh9KxPHwphT6Pn9Kt3XEmYDU2j4KJnhz5MKsAZIcinrgg/exec';
+
+// ── CONTACT FORM SUBMIT ──────────────────────────────────────────
+function submitContactForm(e) {
+  e.preventDefault();
+  const btn = e.currentTarget;
+  const msgEl = document.getElementById('cf-msg');
+
+  const firstName = document.getElementById('cf-fname').value.trim();
+  const lastName  = document.getElementById('cf-lname').value.trim();
+  const email     = document.getElementById('cf-email').value.trim();
+  const company   = document.getElementById('cf-company').value.trim();
+  const situation = document.getElementById('cf-situation').value;
+  const industry  = document.getElementById('cf-industry').value;
+  const message   = document.getElementById('cf-message').value.trim();
+
+  // Basic validation
+  if (!firstName || !email || !company) {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'rgba(239,68,68,0.15)';
+    msgEl.style.color = '#f87171';
+    msgEl.style.border = '1px solid rgba(239,68,68,0.3)';
+    msgEl.textContent = 'Please fill in First Name, Email, and Company.';
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'rgba(239,68,68,0.15)';
+    msgEl.style.color = '#f87171';
+    msgEl.style.border = '1px solid rgba(239,68,68,0.3)';
+    msgEl.textContent = 'Please enter a valid email address.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: 'contact_form',
+      firstName, lastName, email, company, situation, industry, message,
+      source: 'contact_form',
+      timestamp: new Date().toISOString()
+    })
+  })
+  .then(() => {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'rgba(0,201,177,0.12)';
+    msgEl.style.color = '#00C9B1';
+    msgEl.style.border = '1px solid rgba(0,201,177,0.3)';
+    msgEl.textContent = '✓ Received! We\'ll reach out within 24 hours to confirm your discovery call.';
+    btn.textContent = 'Request Sent ✓';
+    // Clear fields
+    ['cf-fname','cf-lname','cf-email','cf-company','cf-message'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('cf-situation').selectedIndex = 0;
+    document.getElementById('cf-industry').selectedIndex = 0;
+  })
+  .catch(() => {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'rgba(239,68,68,0.15)';
+    msgEl.style.color = '#f87171';
+    msgEl.style.border = '1px solid rgba(239,68,68,0.3)';
+    msgEl.textContent = 'Something went wrong. Please try again or email us directly.';
+    btn.disabled = false;
+    btn.textContent = 'Book Free Discovery Call →';
+  });
+}
+
+// ═══════════════════════════════════════
+// ALEX — HYBRID CHATBOT CONFIG
+// ═══════════════════════════════════════
+const N8N_WEBHOOK = GAS_URL;
+const BOT_NAME = 'Alex';
+
+// Lead data collected during qualifying flow
+let leadData = {
+  name: '',
+  email: '',
+  company: '',
+  situation: '',
+  industry: '',
+  timeline: ''
+};
+
+let sessionId = 'ns_' + Date.now() + '_' + Math.random().toString(36).substr(2,9);
+let chatPhase = 'qualify'; // 'qualify' | 'ai'
+let qualifyStep = 0;
+let isTyping = false;
+let chatOpen = false;
+
+// ── QUALIFYING FLOW ──
+const qualifyFlow = [
+  {
+    bot: `Hi! I'm **Alex**, the AI Assistant for Vertex Consulting Partner. 👋\n\nI'm here to help you explore our NetSuite consulting services and find out if we're the right fit for your business.\n\nFirst, may I get your name?`,
+    input: true,
+    field: 'name',
+    placeholder: 'Your full name...',
+    validate: v => v.trim().length > 1
+  },
+  {
+    bot: (data) => `Nice to meet you, **${data.name}**! 🙂\n\nWhat's your current situation with NetSuite?`,
+    quickReplies: [
+      '🆕 New to NetSuite — need implementation',
+      '⚙️ Using NS but it needs fixing',
+      '🤖 Want to add AI to existing NetSuite',
+      '🔍 Just exploring options'
+    ],
+    field: 'situation'
+  },
+  {
+    bot: (data) => `Got it! What industry is your business in?`,
+    quickReplies: [
+      '🏭 Manufacturing',
+      '📦 Wholesale / Distribution',
+      '💰 Financial Services',
+      '🛒 Retail / E-commerce',
+      '🚚 Logistics',
+      '💊 Healthcare',
+      '💻 IT / Tech',
+      '🏢 Professional Services'
+    ],
+    field: 'industry'
+  },
+  {
+    bot: (data) => `Great. And what's your target timeline?`,
+    quickReplies: [
+      '⚡ ASAP — urgent need',
+      '📅 1–3 months',
+      '🗓️ 3–6 months',
+      '🔭 Just planning ahead'
+    ],
+    field: 'timeline'
+  },
+  {
+    bot: (data) => `Almost done! What's your work email so we can send you a summary and book a call?`,
+    input: true,
+    field: 'email',
+    placeholder: 'your@company.com',
+    validate: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
+  },
+  {
+    bot: (data) => `And your company name?`,
+    input: true,
+    field: 'company',
+    placeholder: 'Company name...',
+    validate: v => v.trim().length > 1
+  }
+];
+
+// ── DOM HELPERS ──
+const $msgs = () => document.getElementById('chat-messages');
+const $qr = () => document.getElementById('quick-replies');
+const $input = () => document.getElementById('chat-input');
+const $send = () => document.getElementById('chat-send');
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chat-widget').classList.toggle('open', chatOpen);
+  document.getElementById('icon-chat').style.display = chatOpen ? 'none' : 'block';
+  document.getElementById('icon-close').style.display = chatOpen ? 'block' : 'none';
+  document.getElementById('chat-notif').style.display = 'none';
+  if (chatOpen && $msgs().children.length === 0) {
+    setTimeout(() => startQualifyFlow(), 400);
+  }
+}
+
+function scrollBottom() {
+  const m = $msgs();
+  m.scrollTop = m.scrollHeight;
+}
+
+function now() {
+  return new Date().toLocaleTimeString('en-PH', {hour:'2-digit', minute:'2-digit'});
+}
+
+function addMsg(role, text, showAvatar = true) {
+  const wrap = document.createElement('div');
+  wrap.className = `msg ${role}`;
+
+  if (role === 'bot' && showAvatar) {
+    const av = document.createElement('div');
+    av.className = 'msg-avatar';
+    av.textContent = 'A';
+    wrap.appendChild(av);
+  }
+
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  // parse **bold**
+  bubble.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+
+  const timeEl = document.createElement('div');
+  timeEl.className = 'msg-time';
+  timeEl.textContent = now();
+
+  const col = document.createElement('div');
+  col.style.display = 'flex';
+  col.style.flexDirection = 'column';
+  col.style.alignItems = role === 'user' ? 'flex-end' : 'flex-start';
+  col.appendChild(bubble);
+  col.appendChild(timeEl);
+  wrap.appendChild(col);
+
+  $msgs().appendChild(wrap);
+  scrollBottom();
+}
+
+function showTyping() {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg bot';
+  wrap.id = 'typing-indicator';
+  const av = document.createElement('div');
+  av.className = 'msg-avatar';
+  av.textContent = 'A';
+  wrap.appendChild(av);
+  const bubble = document.createElement('div');
+  bubble.className = 'typing-bubble';
+  bubble.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  wrap.appendChild(bubble);
+  $msgs().appendChild(wrap);
+  scrollBottom();
+  isTyping = true;
+}
+
+function hideTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+  isTyping = false;
+}
+
+function setQuickReplies(options, onSelect) {
+  const qr = $qr();
+  qr.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'qr-btn';
+    btn.textContent = opt;
+    btn.onclick = () => {
+      clearQuickReplies();
+      onSelect(opt);
+    };
+    qr.appendChild(btn);
+  });
+}
+
+function clearQuickReplies() {
+  $qr().innerHTML = '';
+}
+
+function enableInput(placeholder = 'Type your message...') {
+  $input().disabled = false;
+  $input().placeholder = placeholder;
+  $send().disabled = false;
+  $input().focus();
+}
+
+function disableInput() {
+  $input().disabled = true;
+  $send().disabled = true;
+  $input().placeholder = 'Choose an option above...';
+}
+
+// ── QUALIFY FLOW ENGINE ──
+function startQualifyFlow() {
+  qualifyStep = 0;
+  runStep(0);
+}
+
+function runStep(stepIdx) {
+  if (stepIdx >= qualifyFlow.length) {
+    handoffToAI();
+    return;
+  }
+
+  const step = qualifyFlow[stepIdx];
+  const botText = typeof step.bot === 'function' ? step.bot(leadData) : step.bot;
+
+  setTimeout(() => {
+    showTyping();
+    setTimeout(() => {
+      hideTyping();
+      addMsg('bot', botText);
+
+      if (step.quickReplies) {
+        disableInput();
+        setQuickReplies(step.quickReplies, (val) => {
+          addMsg('user', val);
+          leadData[step.field] = val;
+          qualifyStep++;
+          runStep(qualifyStep);
+        });
+      } else if (step.input) {
+        enableInput(step.placeholder || 'Type here...');
+        window._currentStep = step;
+        window._onUserInput = (val) => {
+          if (step.validate && !step.validate(val)) {
+            addMsg('bot', step.field === 'email'
+              ? 'Please enter a valid email address 😊'
+              : 'Please enter a valid response.');
+            enableInput(step.placeholder);
+            return;
+          }
+          leadData[step.field] = val;
+          disableInput();
+          qualifyStep++;
+          runStep(qualifyStep);
+        };
+      }
+    }, 900 + Math.random() * 400);
+  }, 300);
+}
+
+function handoffToAI() {
+  chatPhase = 'ai';
+
+  // Log lead to n8n
+  fetch(N8N_WEBHOOK, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      type: 'lead_capture',
+      source: 'landing_page_chatbot',
+      sessionId,
+      lead: leadData,
+      timestamp: new Date().toISOString()
+    })
+  }).catch(() => {});
+
+  showTyping();
+  setTimeout(() => {
+    hideTyping();
+    addMsg('bot',
+      `Thanks **${leadData.name}**! I've got everything I need. 🎉\n\n` +
+      `Here's a quick summary:\n` +
+      `📋 **Situation:** ${leadData.situation}\n` +
+      `🏭 **Industry:** ${leadData.industry}\n` +
+      `📅 **Timeline:** ${leadData.timeline}\n\n` +
+      `Our team will reach out to **${leadData.email}** within 24 hours to book your free discovery call.\n\n` +
+      `In the meantime — feel free to ask me **anything** about NetSuite, our AI ERP services, pricing, or implementation! I'm fully connected to our knowledge base. 🤖`
+    );
+    enableInput('Ask me anything about NetSuite or AI ERP...');
+  }, 1200);
+}
+
+// ── USER MESSAGE HANDLER ──
+function sendUserMessage() {
+  const val = $input().value.trim();
+  if (!val) return;
+  $input().value = '';
+
+  addMsg('user', val);
+  disableInput();
+
+  if (chatPhase === 'qualify' && window._onUserInput) {
+    const handler = window._onUserInput;
+    window._onUserInput = null;
+    handler(val);
+    return;
+  }
+
+  // AI phase — send to n8n
+  showTyping();
+  fetch(N8N_WEBHOOK, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      type: 'chat_message',
+      sessionId,
+      lead: leadData,
+      message: val,
+      timestamp: new Date().toISOString()
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    hideTyping();
+    // Extract reply from n8n response
+    const reply = data?.reply || data?.message || data?.output || data?.text ||
+      data?.content?.[0]?.text ||
+      "Thanks for your message! Our team will follow up shortly. In the meantime, you can also book a discovery call directly using the button on the page.";
+    addMsg('bot', reply);
+    enableInput('Ask me anything...');
+  })
+  .catch(() => {
+    hideTyping();
+    addMsg('bot',
+      `Thanks for your question! I'll make sure our team follows up on this during your discovery call.\n\nIs there anything else I can help you with?`
+    );
+    enableInput('Ask me anything...');
+  });
+}
+
+// Show notification after 3 seconds on page load
+setTimeout(() => {
+  if (!chatOpen) {
+    document.getElementById('chat-notif').style.display = 'flex';
+  }
+}, 3000);
+</script>
+
+<script>
+/* ── DEMO SECTION — LIVE CHAT SEQUENCER ── */
+document.addEventListener('DOMContentLoaded', function() {
+  var tabs      = document.querySelectorAll('.demo-tab');
+  var panels    = document.querySelectorAll('.demo-panel');
+  var activeTimer = null; // cancel in-progress sequence on tab switch
+
+  /* Timing config (ms) */
+  var T = {
+    userPause:  600,   // pause after user message before next item
+    chipPause:  500,   // pause after action chip
+    typingShow: 1400,  // how long typing indicator is visible
+    agentPause: 700,   // pause after agent message before next item
+    initDelay:  500    // delay before sequence starts
+  };
+
+  function runLiveChat(panel) {
+    var convBody  = panel.querySelector('.conv-body');
+    if (!convBody) return; // custom panel — no conversation
+
+    var indicator = convBody.querySelector('.conv-typing-indicator');
+    var bubbles   = Array.from(convBody.querySelectorAll('.demo-bubble'));
+
+    /* Reset state */
+    bubbles.forEach(function(b) {
+      b.style.opacity   = '0';
+      b.style.transform = 'translateY(8px)';
+      b.style.transition = '';
+    });
+    if (indicator) indicator.style.display = 'none';
+    convBody.scrollTop = 0;
+
+    var delay = T.initDelay;
+    var timers = [];
+
+    function schedule(fn, ms) {
+      var id = setTimeout(fn, ms);
+      timers.push(id);
+      return id;
+    }
+
+    function reveal(bubble) {
+      bubble.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+      void bubble.offsetHeight;
+      bubble.style.opacity   = '1';
+      bubble.style.transform = 'translateY(0)';
+      setTimeout(function() {
+        convBody.scrollTop = convBody.scrollHeight;
+      }, 50);
+    }
+
+    bubbles.forEach(function(bubble) {
+      var isAgent = bubble.classList.contains('demo-bubble-agent');
+      var isUser  = bubble.classList.contains('demo-bubble-user');
+
+      if (isUser) {
+        schedule((function(b) { return function() { reveal(b); }; })(bubble), delay);
+        delay += T.userPause;
+
+      } else if (isAgent) {
+        /* Show typing indicator */
+        schedule((function() { return function() {
+          if (indicator) {
+            indicator.style.display = 'flex';
+            convBody.scrollTop = convBody.scrollHeight;
+          }
+        }; })(), delay);
+        delay += T.typingShow;
+        /* Hide indicator, reveal message */
+        schedule((function(b) { return function() {
+          if (indicator) indicator.style.display = 'none';
+          reveal(b);
+        }; })(bubble), delay);
+        delay += T.agentPause;
+
+      } else {
+        /* Action chip wrapper */
+        schedule((function(b) { return function() { reveal(b); }; })(bubble), delay);
+        delay += T.chipPause;
+      }
+    });
+
+    return timers;
+  }
+
+  function activatePanel(tabName) {
+    /* Cancel any running animation */
+    if (activeTimer) { activeTimer.forEach(clearTimeout); }
+
+    tabs.forEach(function(t)   { t.classList.remove('active'); });
+    panels.forEach(function(p) { p.classList.remove('active'); });
+
+    var activeTab = document.querySelector('[data-tab="' + tabName + '"]');
+    var panel     = document.getElementById('panel-' + tabName);
+    if (!panel || !activeTab) return;
+
+    activeTab.classList.add('active');
+    panel.classList.add('active');
+
+    activeTimer = runLiveChat(panel);
+  }
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      activatePanel(this.dataset.tab);
+    });
+  });
+
+  activatePanel('property');
+});
+</script>
+
+</body>
+</html>
