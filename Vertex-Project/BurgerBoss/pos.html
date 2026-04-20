@@ -3107,6 +3107,55 @@ async function loadAdjLog() {
   }
 }
 
+// ── REPORT HELPERS ────────────────────────────
+function rptDateRange(preset) {
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  if (preset === 'today') {
+    const t = fmt(now);
+    return { from: t, to: t };
+  }
+  if (preset === 'week') {
+    const day = now.getDay(); // 0 = Sunday
+    const mon = new Date(now);
+    mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+    const sun = new Date(mon);
+    sun.setDate(mon.getDate() + 6);
+    return { from: fmt(mon), to: fmt(sun) };
+  }
+  if (preset === 'month') {
+    const from = `${now.getFullYear()}-${pad(now.getMonth()+1)}-01`;
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return { from, to: fmt(lastDay) };
+  }
+  return null;
+}
+
+function onReportPreset(report, preset, btn) {
+  const bar = btn.closest('.rpt-period-bar');
+  bar.querySelectorAll('.rpt-preset').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const customBar = document.getElementById(`${report}-custom-bar`);
+  if (preset === 'custom') {
+    customBar.style.display = 'flex';
+    return;
+  }
+  customBar.style.display = 'none';
+  const range = rptDateRange(preset);
+  if (report === 'sales')    generateSalesReport(range.from, range.to, preset);
+  if (report === 'expenses') generateExpensesReport(range.from, range.to, preset);
+}
+
+function onGenerateCustomReport(report) {
+  const from = document.getElementById(`${report}-from-date`).value;
+  const to   = document.getElementById(`${report}-to-date`).value;
+  if (!from || !to)  { showToast('Please select both From and To dates.'); return; }
+  if (from > to)     { showToast('From date must be before To date.');     return; }
+  if (report === 'sales')    generateSalesReport(from, to, 'custom');
+  if (report === 'expenses') generateExpensesReport(from, to, 'custom');
+}
+
 // ── EXPENSES ───────────────────────────────
 let expensesCache = [];
 let expPhotoBase64 = null;
