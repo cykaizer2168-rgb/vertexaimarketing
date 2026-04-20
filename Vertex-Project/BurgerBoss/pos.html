@@ -819,6 +819,39 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
 .sales-kpi-val.green{color:var(--green)}
 .sales-kpi-val.red{color:var(--red)}
 .sales-kpi-sub{font-size:10px;color:var(--muted);margin-top:2px}
+/* ── REPORT PERIOD SELECTOR ── */
+.rpt-period-bar{
+  display:flex;align-items:center;gap:6px;padding:10px 16px;
+  border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;
+}
+.rpt-preset{
+  font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
+  padding:5px 14px;border-radius:100px;
+  border:1px solid var(--border2);background:transparent;color:var(--muted);
+  cursor:pointer;transition:all .15s;
+}
+.rpt-preset:hover{border-color:var(--amber);color:var(--muted2)}
+.rpt-preset.active{background:var(--amber);color:#0A0700;border-color:var(--amber)}
+.rpt-custom-bar{
+  display:flex;align-items:center;gap:8px;padding:8px 16px;
+  border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;
+}
+.rpt-date-input{width:130px!important;padding:5px 8px!important;font-size:11px!important}
+.rpt-cat-table{width:100%;border-collapse:collapse}
+.rpt-cat-table th{
+  font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);padding:8px 16px;text-align:left;
+  border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);
+}
+.rpt-cat-table td{
+  font-size:11px;padding:9px 16px;border-bottom:1px solid rgba(46,34,0,.4);color:var(--muted2);
+}
+.rpt-cat-table tr:hover td{background:rgba(245,158,11,.03)}
+.rpt-cat-total{font-family:'DM Mono',monospace;color:var(--text);font-weight:500;text-align:right}
+.rpt-period-label{
+  font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);padding:12px 16px 0;
+}
 .sales-section-label{
   padding:10px 16px 6px;font-size:9px;font-weight:800;letter-spacing:.16em;
   text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);flex-shrink:0;
