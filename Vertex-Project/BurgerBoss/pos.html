@@ -1319,18 +1319,25 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
       <button class="inv-refresh-btn" id="report-refresh-btn" onclick="refreshCurrentReport()">🔄 Refresh</button>
     </div>
 
-    <!-- SALES sub-zone -->
+    <!-- SALES REPORT sub-zone -->
     <div id="sales-zone" style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0">
-      <!-- Today's report -->
-      <div class="sales-section-label" style="padding-top:12px">Today's Report — <span id="today-date-lbl" style="color:var(--amber);font-weight:800"></span></div>
-      <div id="today-kpi-bar" class="sales-kpi-bar" style="border-bottom:none;padding-bottom:4px"></div>
-      <!-- All-time summary cards -->
-      <div class="sales-section-label">All-Time Summary</div>
-      <div id="sales-kpi-bar" class="sales-kpi-bar"></div>
-      <!-- History table -->
-      <div class="sales-section-label">Recent Orders</div>
+      <div class="rpt-period-bar">
+        <button class="rpt-preset active" data-report="sales" data-preset="today" onclick="onReportPreset('sales','today',this)">Today</button>
+        <button class="rpt-preset" data-report="sales" data-preset="week" onclick="onReportPreset('sales','week',this)">This Week</button>
+        <button class="rpt-preset" data-report="sales" data-preset="month" onclick="onReportPreset('sales','month',this)">This Month</button>
+        <button class="rpt-preset" data-report="sales" data-preset="custom" onclick="onReportPreset('sales','custom',this)">Custom ▾</button>
+      </div>
+      <div class="rpt-custom-bar" id="sales-custom-bar" style="display:none">
+        <span style="font-size:11px;color:var(--muted)">From</span>
+        <input type="date" class="purch-input rpt-date-input" id="sales-from-date"/>
+        <span style="font-size:11px;color:var(--muted)">To</span>
+        <input type="date" class="purch-input rpt-date-input" id="sales-to-date"/>
+        <button class="inv-refresh-btn" onclick="onGenerateCustomReport('sales')">Generate</button>
+      </div>
       <div style="flex:1;overflow-y:auto;min-height:0">
-        <div id="sales-content"><div class="inv-empty"><div style="font-size:32px;opacity:.3">📊</div><div style="font-size:13px;font-weight:700">Loading…</div></div></div>
+        <div id="sales-report-output">
+          <div class="inv-empty"><div style="font-size:28px;opacity:.3">📊</div><div style="font-size:12px">Select a period above to generate report</div></div>
+        </div>
       </div>
     </div>
 
