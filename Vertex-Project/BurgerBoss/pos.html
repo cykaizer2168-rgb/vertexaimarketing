@@ -3349,7 +3349,12 @@ async function saveExpense() {
     document.getElementById('exp-date').value   = new Date().toISOString().split('T')[0];
     document.getElementById('exp-photo-thumb').innerHTML = `<span style="font-size:22px">🧾</span><span style="font-size:9px;color:var(--muted)">No receipt</span>`;
     expPhotoBase64 = null;
-    setTimeout(loadExpenseHistory, 2000);
+    setTimeout(() => {
+      const _pad = n => String(n).padStart(2,'0');
+      const _now = new Date();
+      const _today = `${_now.getFullYear()}-${_pad(_now.getMonth()+1)}-${_pad(_now.getDate())}`;
+      generateExpensesReport(_today, _today, 'today');
+    }, 2000);
 
   } catch(e) { showToast('Save failed: ' + e.message, '❌', 4000); }
   finally { btn.disabled = false; btn.textContent = '💾 Save Expense'; }
@@ -4290,18 +4295,49 @@ function switchReport(type, updateSel = true) {
   const map = { sales:'sales-zone', purchases:'purchases-zone', expenses:'expenses-zone', stockledger:'stock-ledger-zone' };
   const target = document.getElementById(map[type]);
   if (target) target.style.display = 'flex';
-  // Load data
-  if (type === 'sales')       loadSalesHistory();
   if (type === 'purchases')   loadPurchases();
-  if (type === 'expenses')    loadExpenses();
   if (type === 'stockledger') loadStockLedger();
+  if (type === 'sales') {
+    const activeBtn = document.querySelector('#sales-zone .rpt-preset.active');
+    if (activeBtn && activeBtn.dataset.preset !== 'custom') {
+      const range = rptDateRange(activeBtn.dataset.preset);
+      generateSalesReport(range.from, range.to, activeBtn.dataset.preset);
+    }
+  }
+  if (type === 'expenses') {
+    const activeBtn = document.querySelector('#expenses-zone .rpt-preset.active');
+    if (activeBtn && activeBtn.dataset.preset !== 'custom') {
+      const range = rptDateRange(activeBtn.dataset.preset);
+      generateExpensesReport(range.from, range.to, activeBtn.dataset.preset);
+    }
+  }
 }
 
 function refreshCurrentReport() {
-  if (currentReport === 'sales')       loadSalesHistory();
   if (currentReport === 'purchases')   loadPurchases();
-  if (currentReport === 'expenses')    loadExpenses();
   if (currentReport === 'stockledger') loadStockLedger();
+  if (currentReport === 'sales') {
+    const activeBtn = document.querySelector('#sales-zone .rpt-preset.active');
+    if (activeBtn && activeBtn.dataset.preset !== 'custom') {
+      const range = rptDateRange(activeBtn.dataset.preset);
+      generateSalesReport(range.from, range.to, activeBtn.dataset.preset);
+    } else {
+      const from = document.getElementById('sales-from-date').value;
+      const to   = document.getElementById('sales-to-date').value;
+      if (from && to) generateSalesReport(from, to, 'custom');
+    }
+  }
+  if (currentReport === 'expenses') {
+    const activeBtn = document.querySelector('#expenses-zone .rpt-preset.active');
+    if (activeBtn && activeBtn.dataset.preset !== 'custom') {
+      const range = rptDateRange(activeBtn.dataset.preset);
+      generateExpensesReport(range.from, range.to, activeBtn.dataset.preset);
+    } else {
+      const from = document.getElementById('expenses-from-date').value;
+      const to   = document.getElementById('expenses-to-date').value;
+      if (from && to) generateExpensesReport(from, to, 'custom');
+    }
+  }
 }
 
 async function loadInventory() {
