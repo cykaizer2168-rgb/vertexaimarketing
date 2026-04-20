@@ -1407,9 +1407,8 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
     <div id="expenses-zone" style="flex:1;display:none;flex-direction:column;overflow:hidden;min-height:0">
     <div class="inv-toolbar" style="padding-top:0;border-top:none">
       <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase">Log Expense</span>
-      <div style="flex:1"></div>
-      <button class="inv-refresh-btn" onclick="loadExpenseHistory()">🔄 History</button>
     </div>
+    <div style="overflow-y:auto;flex-shrink:0;max-height:340px">
     <div class="purch-form-wrap">
       <!-- Receipt Photo -->
       <div class="purch-photo-row">
@@ -1457,9 +1456,26 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
       </div>
       <button class="adj-save-btn" id="exp-save-btn" onclick="saveExpense()" style="width:100%;margin-top:16px">💾 Save Expense</button>
     </div>
-    <div class="sales-section-label">Expense History</div>
+    </div>
+    <!-- EXPENSES REPORT -->
+    <div class="sales-section-label">Expenses Report (OPEX)</div>
+    <div class="rpt-period-bar">
+      <button class="rpt-preset active" data-report="expenses" data-preset="today" onclick="onReportPreset('expenses','today',this)">Today</button>
+      <button class="rpt-preset" data-report="expenses" data-preset="week" onclick="onReportPreset('expenses','week',this)">This Week</button>
+      <button class="rpt-preset" data-report="expenses" data-preset="month" onclick="onReportPreset('expenses','month',this)">This Month</button>
+      <button class="rpt-preset" data-report="expenses" data-preset="custom" onclick="onReportPreset('expenses','custom',this)">Custom ▾</button>
+    </div>
+    <div class="rpt-custom-bar" id="expenses-custom-bar" style="display:none">
+      <span style="font-size:11px;color:var(--muted)">From</span>
+      <input type="date" class="purch-input rpt-date-input" id="expenses-from-date"/>
+      <span style="font-size:11px;color:var(--muted)">To</span>
+      <input type="date" class="purch-input rpt-date-input" id="expenses-to-date"/>
+      <button class="inv-refresh-btn" onclick="onGenerateCustomReport('expenses')">Generate</button>
+    </div>
     <div style="flex:1;overflow-y:auto;min-height:0">
-      <div id="exp-history-content"><div class="inv-empty"><div style="font-size:28px;opacity:.3">💸</div><div style="font-size:12px">No expenses yet</div></div></div>
+      <div id="exp-report-output">
+        <div class="inv-empty"><div style="font-size:28px;opacity:.3">💸</div><div style="font-size:12px">Select a period above to generate report</div></div>
+      </div>
     </div>
     </div><!-- /expenses-zone -->
 
