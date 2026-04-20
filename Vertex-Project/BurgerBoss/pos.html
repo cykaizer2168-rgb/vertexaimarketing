@@ -3111,9 +3111,9 @@ async function loadAdjLog() {
 function rptDateRange(preset) {
   const now = new Date();
   const pad = n => String(n).padStart(2, '0');
-  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   if (preset === 'today') {
-    const t = fmt(now);
+    const t = fmtDate(now);
     return { from: t, to: t };
   }
   if (preset === 'week') {
@@ -3122,12 +3122,12 @@ function rptDateRange(preset) {
     mon.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
     const sun = new Date(mon);
     sun.setDate(mon.getDate() + 6);
-    return { from: fmt(mon), to: fmt(sun) };
+    return { from: fmtDate(mon), to: fmtDate(sun) };
   }
   if (preset === 'month') {
     const from = `${now.getFullYear()}-${pad(now.getMonth()+1)}-01`;
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    return { from, to: fmt(lastDay) };
+    return { from, to: fmtDate(lastDay) };
   }
   return null;
 }
@@ -3350,10 +3350,8 @@ async function saveExpense() {
     document.getElementById('exp-photo-thumb').innerHTML = `<span style="font-size:22px">🧾</span><span style="font-size:9px;color:var(--muted)">No receipt</span>`;
     expPhotoBase64 = null;
     setTimeout(() => {
-      const _pad = n => String(n).padStart(2,'0');
-      const _now = new Date();
-      const _today = `${_now.getFullYear()}-${_pad(_now.getMonth()+1)}-${_pad(_now.getDate())}`;
-      generateExpensesReport(_today, _today, 'today');
+      const { from, to } = rptDateRange('today');
+      generateExpensesReport(from, to, 'today');
     }, 2000);
 
   } catch(e) { showToast('Save failed: ' + e.message, '❌', 4000); }
@@ -4509,6 +4507,7 @@ async function loadSalesHistory() {
   const url     = localStorage.getItem(LS.GAS);
   const content = document.getElementById('sales-content');
   const kpiBar  = document.getElementById('sales-kpi-bar');
+  if (!content && !kpiBar) return; // DOM elements removed — function is now dead code
 
   const todayBar = document.getElementById('today-kpi-bar');
   const todayLbl = document.getElementById('today-date-lbl');
