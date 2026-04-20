@@ -3156,6 +3156,98 @@ function onGenerateCustomReport(report) {
   if (report === 'expenses') generateExpensesReport(from, to, 'custom');
 }
 
+async function generateSalesReport(from, to, preset) {
+  const url    = localStorage.getItem(LS.GAS);
+  const output = document.getElementById('sales-report-output');
+  if (!url) {
+    output.innerHTML = `<div class="inv-empty"><div style="font-size:32px">⚠️</div><div style="font-size:13px;font-weight:700">No Sheets connected</div><div style="font-size:11px">Add your Apps Script URL in Settings first</div></div>`;
+    return;
+  }
+  output.innerHTML = `<div class="sh-loading">Generating report…</div>`;
+  try {
+    const [salesRes, invRes, recRes] = await Promise.all([
+      fetch(`${url}?action=sales_report&from=${from}&to=${to}&t=${Date.now()}`),
+      inventoryCache.length ? Promise.resolve(null) : fetch(`${url}?action=inventory&t=${Date.now()}`),
+      recipesCache.length   ? Promise.resolve(null) : fetch(`${url}?action=recipes&t=${Date.now()}`)
+    ]);
+    if (!salesRes.ok) throw new Error('HTTP ' + salesRes.status);
+    const sales = await salesRes.json();
+    if (!Array.isArray(sales)) throw new Error('Invalid response');
+    if (invRes && invRes.ok) { const d = await invRes.json(); if (Array.isArray(d)) inventoryCache = d; }
+    if (recRes && recRes.ok) { const d = await recRes.json(); if (Array.isArray(d)) recipesCache   = d; }
+
+    if (!sales.length) {
+      output.innerHTML = `<div class="inv-empty"><div style="font-size:32px;opacity:.3">📊</div><div style="font-size:13px;font-weight:700">No sales for this period</div></div>`;
+      return;
+    }
+
+    const sample = sales[0];
+    const col = k => {
+      const variants = [k, k.toLowerCase(), k.replace(/ /g,'_'), k.replace(/ /g,'_').toLowerCase()];
+      return variants.find(v => sample[v] !== undefined) || k;
+    };
+
+    const totalRev   = sales.reduce((s,r) => s + (parseFloat(r[col('Total')])||0), 0);
+    const orderCount = sales.length;
+    const avgOrder   = orderCount ? totalRev / orderCount : 0;
+    const cashOrders  = sales.filter(r => String(r[col('Payment Method')]||'').toLowerCase().includes('cash'));
+    const gcashOrders = sales.filter(r => {
+      const pm = String(r[col('Payment Method')]||'').toLowerCase();
+      return pm.includes('gcash') || pm.includes('ewallet') || pm.includes('online');
+    });
+    const cashAmt  = cashOrders.reduce((s,r)  => s + (parseFloat(r[col('Total')])||0), 0);
+    const gcashAmt = gcashOrders.reduce((s,r) => s + (parseFloat(r[col('Total')])||0), 0);
+
+    const costMap = {};
+    inventoryCache.forEach(m => { costMap[m.name] = parseFloat(m.unitCost)||0; });
+    const recipeMap = {};
+    recipesCache.forEach(r => {
+      const key = (r.menuItemName||'').trim();
+      if (!recipeMap[key]) recipeMap[key] = [];
+      recipeMap[key].push({ ingredient: r.ingredient, qtyUsed: parseFloat(r.qtyUsed)||0 });
+    });
+    const parseSaleItems = str => String(str).split(',').map(p => {
+      const m = p.trim().match(/^(.+)\s+x(\d+)$/i);
+      return m ? { name: m[1].trim(), qty: parseInt(m[2]) } : null;
+    }).filter(Boolean);
+
+    let totalCOGS = 0;
+    const itemCount = {};
+    sales.forEach(sale => {
+      parseSaleItems(sale[col('Items')]||sale['items_summary']||'').forEach(({ name, qty }) => {
+        itemCount[name] = (itemCount[name]||0) + qty;
+        (recipeMap[name]||[]).forEach(({ ingredient, qtyUsed }) => {
+          totalCOGS += (costMap[ingredient]||0) * qtyUsed * qty;
+        });
+      });
+    });
+
+    const grossProfit = totalRev - totalCOGS;
+    const marginPct   = totalRev > 0 ? ((grossProfit/totalRev)*100).toFixed(1) : '0.0';
+    const hasRecipes  = recipesCache.length > 0;
+    const topItems    = Object.entries(itemCount).sort((a,b) => b[1]-a[1]).slice(0,10);
+
+    const periodLabel = preset === 'custom' ? `${from} \u2192 ${to}` :
+      preset === 'today' ? 'Today' : preset === 'week' ? 'This Week' : 'This Month';
+
+    output.innerHTML = `
+      <div class="rpt-period-label">Period: <span style="color:var(--amber)">${periodLabel}</span></div>
+      <div class="sales-kpi-bar" style="border-top:none">
+        <div class="sales-kpi-card"><div class="sales-kpi-icon">💰</div><div class="sales-kpi-label">Revenue</div><div class="sales-kpi-val">${fmt(totalRev)}</div><div class="sales-kpi-sub">${orderCount} order${orderCount!==1?'s':''}</div></div>
+        <div class="sales-kpi-card"><div class="sales-kpi-icon">📊</div><div class="sales-kpi-label">Avg Order</div><div class="sales-kpi-val">${fmt(avgOrder)}</div><div class="sales-kpi-sub">per transaction</div></div>
+        <div class="sales-kpi-card"><div class="sales-kpi-icon">💵</div><div class="sales-kpi-label">Cash</div><div class="sales-kpi-val">${fmt(cashAmt)}</div><div class="sales-kpi-sub">${cashOrders.length} order${cashOrders.length!==1?'s':''}</div></div>
+        <div class="sales-kpi-card"><div class="sales-kpi-icon">📱</div><div class="sales-kpi-label">GCash / Online</div><div class="sales-kpi-val">${fmt(gcashAmt)}</div><div class="sales-kpi-sub">${gcashOrders.length} order${gcashOrders.length!==1?'s':''}</div></div>
+        ${hasRecipes ? `<div class="sales-kpi-card"><div class="sales-kpi-icon">📉</div><div class="sales-kpi-label">COGS</div><div class="sales-kpi-val">${fmt(totalCOGS)}</div><div class="sales-kpi-sub">est. cost of goods</div></div><div class="sales-kpi-card"><div class="sales-kpi-icon">📈</div><div class="sales-kpi-label">Gross Profit</div><div class="sales-kpi-val ${grossProfit>=0?'green':'red'}">${fmt(grossProfit)}</div><div class="sales-kpi-sub">${marginPct}% margin</div></div>` : ''}
+      </div>
+      ${topItems.length ? `<div class="sales-section-label">Top Items</div><div style="overflow-x:auto"><table class="rpt-cat-table"><thead><tr><th style="text-align:left">Item</th><th style="text-align:right">Qty Sold</th></tr></thead><tbody>${topItems.map(([name,qty],i) => `<tr><td><span style="color:var(--muted);font-family:'DM Mono',monospace;font-size:10px">#${i+1}</span> ${name}</td><td class="rpt-cat-total">${qty}</td></tr>`).join('')}</tbody></table></div>` : ''}
+      <div class="sales-section-label">Order Detail</div>
+      <div style="overflow-x:auto"><table class="sh-table"><thead><tr><th>Order ID</th><th>Date</th><th>Items</th><th>Payment</th><th style="text-align:right">Total</th></tr></thead><tbody>${sales.map(r => `<tr><td class="sh-oid">${r[col('Order ID')]||'-'}</td><td style="font-family:'DM Mono',monospace;font-size:10px">${r[col('Date')]||'-'}</td><td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r[col('Items')]||r['items_summary']||'-'}</td><td><span class="sh-pay-badge">${r[col('Payment Method')]||'-'}</span></td><td class="sh-total" style="text-align:right">${fmt(parseFloat(r[col('Total')])||0)}</td></tr>`).join('')}</tbody></table></div>
+    `;
+  } catch(err) {
+    output.innerHTML = `<div class="inv-empty"><div style="font-size:32px">❌</div><div style="font-size:13px;font-weight:700">Error loading report</div><div style="font-size:11px;color:var(--muted)">${err.message}</div></div>`;
+  }
+}
+
 // ── EXPENSES ───────────────────────────────
 let expensesCache = [];
 let expPhotoBase64 = null;
