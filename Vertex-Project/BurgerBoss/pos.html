@@ -3248,6 +3248,55 @@ async function generateSalesReport(from, to, preset) {
   }
 }
 
+async function generateExpensesReport(from, to, preset) {
+  const url    = localStorage.getItem(LS.GAS);
+  const output = document.getElementById('exp-report-output');
+  if (!url) {
+    output.innerHTML = `<div class="inv-empty"><div style="font-size:32px">⚠️</div><div style="font-size:13px;font-weight:700">No Sheets connected</div></div>`;
+    return;
+  }
+  output.innerHTML = `<div class="sh-loading">Generating report…</div>`;
+  try {
+    const res = await fetch(`${url}?action=expenses_report&from=${from}&to=${to}&t=${Date.now()}`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const expenses = await res.json();
+    if (!Array.isArray(expenses)) throw new Error('Invalid response');
+
+    if (!expenses.length) {
+      output.innerHTML = `<div class="inv-empty"><div style="font-size:32px;opacity:.3">💸</div><div style="font-size:13px;font-weight:700">No expenses for this period</div></div>`;
+      return;
+    }
+
+    const totalAmt = expenses.reduce((s,r) => s + (parseFloat(r['Amount'])||0), 0);
+    const byCategory = {};
+    expenses.forEach(r => {
+      const cat = r['Category'] || 'Uncategorized';
+      if (!byCategory[cat]) byCategory[cat] = { count: 0, total: 0 };
+      byCategory[cat].count++;
+      byCategory[cat].total += parseFloat(r['Amount'])||0;
+    });
+    const catEntries = Object.entries(byCategory).sort((a,b) => b[1].total - a[1].total);
+    const catIcons   = { Utilities:'\u26a1', Supplies:'\u{1F4E6}', Labor:'\u{1F477}', Rent:'\u{1F3E0}', Marketing:'\u{1F4E3}', Repairs:'\u{1F527}', Miscellaneous:'\u{1F4CE}' };
+
+    const periodLabel = preset === 'custom' ? `${from} \u2192 ${to}` :
+      preset === 'today' ? 'Today' : preset === 'week' ? 'This Week' : 'This Month';
+
+    output.innerHTML = `
+      <div class="rpt-period-label">Period: <span style="color:var(--amber)">${periodLabel}</span></div>
+      <div class="sales-kpi-bar" style="border-top:none">
+        <div class="sales-kpi-card"><div class="sales-kpi-icon">💸</div><div class="sales-kpi-label">Total Expenses</div><div class="sales-kpi-val red">${fmt(totalAmt)}</div><div class="sales-kpi-sub">${expenses.length} item${expenses.length!==1?'s':''}</div></div>
+        ${catEntries.slice(0,3).map(([cat,d]) => `<div class="sales-kpi-card"><div class="sales-kpi-icon">${catIcons[cat]||'\u{1F4CE}'}</div><div class="sales-kpi-label">${cat}</div><div class="sales-kpi-val">${fmt(d.total)}</div><div class="sales-kpi-sub">${d.count} item${d.count!==1?'s':''}</div></div>`).join('')}
+      </div>
+      <div class="sales-section-label">By Category</div>
+      <div style="overflow-x:auto"><table class="rpt-cat-table"><thead><tr><th style="text-align:left">Category</th><th style="text-align:right">Count</th><th style="text-align:right">Total</th><th style="text-align:right">% of Total</th></tr></thead><tbody>${catEntries.map(([cat,d]) => `<tr><td>${catIcons[cat]||'\u{1F4CE}'} ${cat}</td><td style="text-align:right;font-family:'DM Mono',monospace">${d.count}</td><td class="rpt-cat-total">${fmt(d.total)}</td><td style="text-align:right;font-family:'DM Mono',monospace;color:var(--muted)">${totalAmt>0?((d.total/totalAmt)*100).toFixed(1):'0.0'}%</td></tr>`).join('')}</tbody></table></div>
+      <div class="sales-section-label">Itemized List</div>
+      <div style="overflow-x:auto"><table class="sh-table"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Ref #</th><th style="text-align:right">Amount</th></tr></thead><tbody>${expenses.map(r => `<tr><td style="font-family:'DM Mono',monospace;font-size:10px">${r['Date']||'-'}</td><td>${catIcons[r['Category']]||'\u{1F4CE}'} ${r['Category']||'-'}</td><td>${r['Description']||'-'}</td><td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">${r['Ref No']||r['Reference']||'-'}</td><td class="sh-total" style="text-align:right;color:var(--red)">${fmt(parseFloat(r['Amount'])||0)}</td></tr>`).join('')}</tbody></table></div>
+    `;
+  } catch(err) {
+    output.innerHTML = `<div class="inv-empty"><div style="font-size:32px">❌</div><div style="font-size:13px;font-weight:700">Error loading report</div><div style="font-size:11px;color:var(--muted)">${err.message}</div></div>`;
+  }
+}
+
 // ── EXPENSES ───────────────────────────────
 let expensesCache = [];
 let expPhotoBase64 = null;
