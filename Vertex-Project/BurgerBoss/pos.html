@@ -4787,6 +4787,7 @@ function switchView(view) {
   const isDashboard  = view === 'dashboard';
 
   document.getElementById('menu-zone').style.display             = isMenu       ? ''     : 'none';
+  document.getElementById('order-panel').style.display           = isMenu       ? ''     : 'none';
   document.getElementById('right-sidebar').style.display         = isMenu       ? ''     : 'none';
   document.getElementById('search').style.display                = isMenu       ? ''     : 'none';
   document.getElementById('inventory-zone').style.display        = isInventory  ? 'flex' : 'none';
