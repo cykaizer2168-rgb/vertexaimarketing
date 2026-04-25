@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Kambal Burger POS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍔</text></svg>"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -408,6 +409,12 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
 .change-val.pos{color:var(--green)}
 .change-val.neg{color:var(--red)}
 .split-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ── INLINE PAYMENT ── */
+.pay-mth-row{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.pay-mth{padding:7px 4px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);cursor:pointer;font-size:10px;font-weight:700;color:var(--muted2);text-align:center;transition:all .15s;line-height:1.4;display:flex;flex-direction:column;align-items:center;gap:2px}
+.pay-mth .pay-icon{font-size:15px}
+.pay-mth.active{border-color:var(--amber);background:var(--amber-glow);color:var(--amber)}
 
 /* Action buttons */
 .op-actions{padding:10px 14px 14px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
@@ -1071,6 +1078,38 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
 .eod-table .delivery{color:var(--green)}
 .eod-table .ending-low{color:var(--amber)}
 .eod-table .ending-out{color:var(--red)}
+/* ── GENERAL LEDGER ── */
+.gl-table{width:100%;border-collapse:collapse;font-size:11px}
+.gl-table th{padding:7px 10px;background:rgba(0,0,0,.25);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;white-space:nowrap}
+.gl-table td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.gl-table tr:last-child td{border-bottom:none}
+.gl-table tr:hover td{background:rgba(255,255,255,.02)}
+.gl-type-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px}
+.gl-type-sale{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+.gl-type-purchase{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.25)}
+.gl-type-expense{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.gl-type-delivery{background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.25)}
+.gl-type-cogs{background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.25)}
+.gl-debit{font-family:'DM Mono',monospace;font-weight:600;color:var(--red)}
+.gl-credit{font-family:'DM Mono',monospace;font-weight:600;color:var(--green)}
+.gl-balance{font-family:'DM Mono',monospace;font-weight:700;color:var(--amber)}
+.gl-balance.neg{color:var(--red)}
+.gl-desc{max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted2);font-size:10px}
+.gl-summary-row td{background:rgba(245,158,11,.06);font-weight:700}
+.gl-empty{text-align:center;padding:20px;color:var(--muted);font-family:'Syne',sans-serif;font-size:12px}
+/* ── COGS / PROFIT SUMMARY ── */
+.profit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.profit-card{border:1px solid var(--border);background:var(--surface);border-radius:12px;padding:12px 14px}
+.profit-card.highlight{border-color:var(--amber);background:rgba(245,158,11,0.06)}
+.profit-card.green{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.06)}
+.profit-card.red{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.06)}
+.profit-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.profit-val{font-family:'DM Mono',monospace;font-size:17px;font-weight:700;margin-top:4px}
+.profit-val.green{color:var(--green)}
+.profit-val.red{color:var(--red)}
+.profit-val.amber{color:var(--amber)}
+.profit-margin{font-size:10px;color:var(--muted);margin-top:2px}
+@media(max-width:600px){.profit-grid{grid-template-columns:1fr 1fr}}
 .eod-action-row{display:flex;gap:8px;flex-wrap:wrap}
 .eod-start-btn{
   padding:10px 22px;border-radius:10px;border:none;
@@ -1249,6 +1288,47 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
   /* Cart FAB position */
   #mob-cart-btn{bottom:16px;right:16px}
 }
+
+/* ── DASHBOARD ────────────────────────────── */
+#dashboard-zone{flex:1;display:none;flex-direction:column;overflow-y:auto;overflow-x:hidden;order:3;min-width:0;padding:20px;gap:16px;scrollbar-width:none}
+#dashboard-zone::-webkit-scrollbar{display:none}
+.dash-hdr{display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0}
+.dash-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.03em}
+.dash-sub{font-size:10px;color:var(--muted);margin-top:3px;font-family:'DM Mono',monospace}
+.dash-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex-shrink:0}
+.dash-kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;transition:border-color .15s}
+.dash-kpi-card:hover{border-color:var(--border2)}
+.dash-kpi-glow{position:absolute;top:-24px;right:-24px;width:80px;height:80px;border-radius:50%;opacity:.07;pointer-events:none}
+.dash-kpi-icon{font-size:18px;margin-bottom:2px;line-height:1}
+.dash-kpi-lbl{font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.dash-kpi-num{font-size:20px;font-weight:800;letter-spacing:-.03em;line-height:1.1;color:var(--text)}
+.dash-kpi-num.kpi-green{color:var(--green)}.dash-kpi-num.kpi-red{color:var(--red)}.dash-kpi-num.kpi-amber{color:var(--amber)}
+.dash-kpi-hint{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
+.dash-row2{display:grid;grid-template-columns:1fr 268px;gap:10px}
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 16px;display:flex;flex-direction:column;gap:12px}
+.dash-card-hdr{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.dash-card-title{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2)}
+.dash-card-meta{font-size:9px;font-family:'DM Mono',monospace;color:var(--muted)}
+.dash-bar-row{display:flex;align-items:center;gap:8px;padding:3px 0}
+.dash-bar-rank{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);width:14px;flex-shrink:0;text-align:right}
+.dash-bar-name{font-size:11px;font-weight:700;color:var(--text);width:108px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash-bar-track{flex:1;height:7px;background:var(--card);border-radius:4px;overflow:hidden}
+.dash-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#78350F,#F59E0B);width:0;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.dash-bar-qty{font-family:'DM Mono',monospace;font-size:10px;color:var(--amber);width:28px;text-align:right;flex-shrink:0}
+.dash-pl-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
+.dash-pl-row:last-of-type{border-bottom:none}
+.dash-pl-lbl{font-size:11px;color:var(--muted2)}
+.dash-pl-val{font-size:13px;font-weight:700;font-family:'DM Mono',monospace}
+.dash-pl-total{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:10px;border-top:1px solid var(--border2)}
+.dash-pl-total-lbl{font-size:12px;font-weight:800;color:var(--text)}
+.dash-pl-total-val{font-size:22px;font-weight:800;letter-spacing:-.04em}
+.dash-spark-wrap{display:flex;align-items:flex-end;gap:6px;height:72px;padding-bottom:1px}
+.dash-spark-col{display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end}
+.dash-spark-bar{width:100%;border-radius:4px 4px 0 0;min-height:3px}
+.dash-spark-lbl{font-size:8px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace}
+.dash-spark-amt{font-size:8px;color:var(--muted);margin-bottom:3px;font-family:'DM Mono',monospace;white-space:nowrap}
+@media(max-width:900px){.dash-kpi-row{grid-template-columns:repeat(2,1fr)}.dash-row2{grid-template-columns:1fr}}
+@media(max-width:500px){#dashboard-zone{padding:12px;gap:12px}.dash-kpi-num{font-size:17px}.dash-bar-name{width:80px}}
 </style>
 </head>
 <body>
@@ -1286,9 +1366,12 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
     </div>
     <nav class="nsb-nav">
       <button class="view-tab active" data-view="menu"><span class="tab-icon">🍔</span><span class="tab-label">Menu</span></button>
+      <button class="view-tab" data-view="dashboard"><span class="tab-icon">📈</span><span class="tab-label">Dashboard</span></button>
       <button class="view-tab" data-view="inventory"><span class="tab-icon">📦</span><span class="tab-label">Inventory</span></button>
       <button class="view-tab" data-view="reports"><span class="tab-icon">📊</span><span class="tab-label">Reports</span></button>
       <button class="view-tab" data-view="adjust"><span class="tab-icon">📥</span><span class="tab-label">Stock In</span></button>
+      <button class="view-tab" data-view="purchases-entry"><span class="tab-icon">🛒</span><span class="tab-label">Purchases</span></button>
+      <button class="view-tab" data-view="expenses-entry"><span class="tab-icon">💸</span><span class="tab-label">Expenses</span></button>
       <button class="view-tab" data-view="eod"><span class="tab-icon">📋</span><span class="tab-label">EOD</span></button>
       <button class="view-tab" data-view="bom"><span class="tab-icon">🧪</span><span class="tab-label">Recipes</span></button>
     </nav>
@@ -1311,8 +1394,8 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
     <div class="inv-toolbar">
       <select class="inv-cat-filter" id="report-type-sel" onchange="switchReport(this.value)" style="font-weight:700;min-width:150px">
         <option value="sales">📊 Sales</option>
-        <option value="purchases">🛒 Purchases</option>
-        <option value="expenses">💸 Expenses</option>
+        <option value="purchases">🛒 Purchase History</option>
+        <option value="expenses">💸 Expense History</option>
         <option value="stockledger">📦 Stock Ledger</option>
       </select>
       <div style="flex:1"></div>
@@ -1341,16 +1424,56 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
       </div>
     </div>
 
-    <!-- PURCHASES sub-zone -->
+    <!-- PURCHASES sub-zone (history only) -->
     <div id="purchases-zone" style="flex:1;display:none;flex-direction:column;overflow:hidden;min-height:0">
-    <div class="inv-toolbar" style="padding-top:0;border-top:none">
-      <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase">New Purchase</span>
-      <div style="flex:1"></div>
-      <button class="inv-refresh-btn" onclick="loadPurchaseHistory()">🔄 History</button>
+      <div class="inv-toolbar" style="padding-top:0;border-top:none">
+        <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase">Purchase History</span>
+        <div style="flex:1"></div>
+        <button class="inv-refresh-btn" onclick="loadPurchaseHistory()">🔄 Refresh</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;min-height:0">
+        <div id="purch-history-content"><div class="inv-empty"><div style="font-size:28px;opacity:.3">🛒</div><div style="font-size:12px">No purchases yet</div></div></div>
+      </div>
     </div>
-    <!-- Form -->
+
+    <!-- EXPENSES sub-zone (report only) -->
+    <div id="expenses-zone" style="flex:1;display:none;flex-direction:column;overflow:hidden;min-height:0">
+      <div class="rpt-period-bar">
+        <button class="rpt-preset active" data-report="expenses" data-preset="today" onclick="onReportPreset('expenses','today',this)">Today</button>
+        <button class="rpt-preset" data-report="expenses" data-preset="week" onclick="onReportPreset('expenses','week',this)">This Week</button>
+        <button class="rpt-preset" data-report="expenses" data-preset="month" onclick="onReportPreset('expenses','month',this)">This Month</button>
+        <button class="rpt-preset" data-report="expenses" data-preset="custom" onclick="onReportPreset('expenses','custom',this)">Custom ▾</button>
+      </div>
+      <div class="rpt-custom-bar" id="expenses-custom-bar" style="display:none">
+        <span style="font-size:11px;color:var(--muted)">From</span>
+        <input type="date" class="purch-input rpt-date-input" id="expenses-from-date"/>
+        <span style="font-size:11px;color:var(--muted)">To</span>
+        <input type="date" class="purch-input rpt-date-input" id="expenses-to-date"/>
+        <button class="inv-refresh-btn" onclick="onGenerateCustomReport('expenses')">Generate</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;min-height:0">
+        <div id="exp-report-output">
+          <div class="inv-empty"><div style="font-size:28px;opacity:.3">💸</div><div style="font-size:12px">Select a period above to generate report</div></div>
+        </div>
+      </div>
+    </div><!-- /expenses-zone -->
+
+    <!-- STOCK LEDGER sub-zone -->
+    <div id="stock-ledger-zone" style="flex:1;display:none;flex-direction:column;overflow:hidden;min-height:0">
+      <div style="flex:1;overflow-y:auto;min-height:0;padding:12px">
+        <div id="stock-ledger-content"><div class="inv-empty"><div style="font-size:28px;opacity:.3">📦</div><div style="font-size:12px">Loading stock ledger…</div></div></div>
+      </div>
+    </div><!-- /stock-ledger-zone -->
+
+  </div><!-- /reports-zone -->
+
+  <!-- PURCHASE ENTRY ZONE -->
+  <div id="purchases-entry-zone" style="flex:1;display:none;flex-direction:column;overflow:hidden;order:3;min-width:0">
+    <div class="inv-toolbar">
+      <span style="font-size:13px;font-weight:700">🛒 New Purchase</span>
+    </div>
+    <div style="flex:1;overflow-y:auto;min-height:0">
     <div class="purch-form-wrap">
-      <!-- Photo -->
       <div class="purch-photo-row">
         <div class="purch-photo-thumb" id="purch-photo-thumb">
           <span style="font-size:22px">📄</span>
@@ -1361,7 +1484,6 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
           <input type="file" accept="image/*" capture="environment" id="purch-photo-input" style="display:none" onchange="onPurchPhotoChange(this)"/>
         </label>
       </div>
-      <!-- Header fields -->
       <div class="purch-header-fields">
         <div class="purch-field">
           <label class="purch-label">Supplier</label>
@@ -1376,7 +1498,6 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
           <input class="purch-input" id="purch-receipt" placeholder="e.g. OR-12345"/>
         </div>
       </div>
-      <!-- Item rows -->
       <div class="purch-items-wrap">
         <div class="purch-items-header">
           <span style="flex:2">Item</span>
@@ -1389,28 +1510,22 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
         <div id="purch-rows"><div style="font-size:11px;color:var(--muted);text-align:center;padding:12px">Click "+ Add Item" to start</div></div>
         <button class="purch-add-row-btn" onclick="addPurchaseRow()">+ Add Item</button>
       </div>
-      <!-- Grand total + save -->
       <div class="purch-grand-total">
         <span style="font-size:12px;font-weight:700;color:var(--muted2)">Grand Total</span>
         <span class="purch-grand-val" id="purch-grand-total">₱0.00</span>
       </div>
       <button class="adj-save-btn" id="purch-save-btn" onclick="savePurchase()" style="width:100%">💾 Save Purchase</button>
     </div>
-    <!-- History -->
-    <div class="sales-section-label">Purchase History</div>
-    <div style="flex:1;overflow-y:auto;min-height:0">
-      <div id="purch-history-content"><div class="inv-empty"><div style="font-size:28px;opacity:.3">🛒</div><div style="font-size:12px">No purchases yet</div></div></div>
     </div>
-  </div>
+  </div><!-- /purchases-entry-zone -->
 
-    <!-- EXPENSES sub-zone -->
-    <div id="expenses-zone" style="flex:1;display:none;flex-direction:column;overflow:hidden;min-height:0">
-    <div class="inv-toolbar" style="padding-top:0;border-top:none">
-      <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase">Log Expense</span>
+  <!-- EXPENSE ENTRY ZONE -->
+  <div id="expenses-entry-zone" style="flex:1;display:none;flex-direction:column;overflow:hidden;order:3;min-width:0">
+    <div class="inv-toolbar">
+      <span style="font-size:13px;font-weight:700">💸 Log Expense</span>
     </div>
-    <div style="overflow-y:auto;flex-shrink:0;max-height:340px">
+    <div style="flex:1;overflow-y:auto;min-height:0">
     <div class="purch-form-wrap">
-      <!-- Receipt Photo -->
       <div class="purch-photo-row">
         <div class="purch-photo-thumb" id="exp-photo-thumb">
           <span style="font-size:22px">🧾</span>
@@ -1421,7 +1536,6 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
           <input type="file" accept="image/*" capture="environment" id="exp-photo-input" style="display:none" onchange="onExpPhotoChange(this)"/>
         </label>
       </div>
-      <!-- Fields -->
       <div class="purch-header-fields">
         <div class="purch-field">
           <label class="purch-label">Category</label>
@@ -1457,36 +1571,45 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
       <button class="adj-save-btn" id="exp-save-btn" onclick="saveExpense()" style="width:100%;margin-top:16px">💾 Save Expense</button>
     </div>
     </div>
-    <!-- EXPENSES REPORT -->
-    <div class="sales-section-label">Expenses Report (OPEX)</div>
-    <div class="rpt-period-bar">
-      <button class="rpt-preset active" data-report="expenses" data-preset="today" onclick="onReportPreset('expenses','today',this)">Today</button>
-      <button class="rpt-preset" data-report="expenses" data-preset="week" onclick="onReportPreset('expenses','week',this)">This Week</button>
-      <button class="rpt-preset" data-report="expenses" data-preset="month" onclick="onReportPreset('expenses','month',this)">This Month</button>
-      <button class="rpt-preset" data-report="expenses" data-preset="custom" onclick="onReportPreset('expenses','custom',this)">Custom ▾</button>
+  </div><!-- /expenses-entry-zone -->
+
+  <!-- DASHBOARD ZONE -->
+  <div id="dashboard-zone">
+    <!-- Header -->
+    <div class="dash-hdr">
+      <div>
+        <div class="dash-title">Dashboard</div>
+        <div class="dash-sub" id="dash-sub"></div>
+      </div>
+      <button class="inv-refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
     </div>
-    <div class="rpt-custom-bar" id="expenses-custom-bar" style="display:none">
-      <span style="font-size:11px;color:var(--muted)">From</span>
-      <input type="date" class="purch-input rpt-date-input" id="expenses-from-date"/>
-      <span style="font-size:11px;color:var(--muted)">To</span>
-      <input type="date" class="purch-input rpt-date-input" id="expenses-to-date"/>
-      <button class="inv-refresh-btn" onclick="onGenerateCustomReport('expenses')">Generate</button>
+    <!-- KPI Cards -->
+    <div class="dash-kpi-row" id="dash-kpis">
+      <div class="dash-kpi-card"><div class="dash-kpi-lbl" style="opacity:.35">Loading…</div></div>
+      <div class="dash-kpi-card"></div><div class="dash-kpi-card"></div><div class="dash-kpi-card"></div>
     </div>
-    <div style="flex:1;overflow-y:auto;min-height:0">
-      <div id="exp-report-output">
-        <div class="inv-empty"><div style="font-size:28px;opacity:.3">💸</div><div style="font-size:12px">Select a period above to generate report</div></div>
+    <!-- Chart row: top items + P&L -->
+    <div class="dash-row2">
+      <div class="dash-card">
+        <div class="dash-card-hdr">
+          <span class="dash-card-title">Top Items · This Week</span>
+          <span class="dash-card-meta" id="dash-chart-period"></span>
+        </div>
+        <div id="dash-top-items"><div style="font-size:11px;color:var(--muted);padding:8px 0">Loading…</div></div>
+      </div>
+      <div class="dash-card">
+        <span class="dash-card-title">Today's P&amp;L</span>
+        <div id="dash-pl"><div style="font-size:11px;color:var(--muted);padding:8px 0">Loading…</div></div>
       </div>
     </div>
-    </div><!-- /expenses-zone -->
-
-    <!-- STOCK LEDGER sub-zone -->
-    <div id="stock-ledger-zone" style="flex:1;display:none;flex-direction:column;overflow:hidden;min-height:0">
-      <div style="flex:1;overflow-y:auto;min-height:0;padding:12px">
-        <div id="stock-ledger-content"><div class="inv-empty"><div style="font-size:28px;opacity:.3">📦</div><div style="font-size:12px">Loading stock ledger…</div></div></div>
+    <!-- 7-day revenue sparkline -->
+    <div class="dash-card" style="flex-shrink:0">
+      <span class="dash-card-title">7-Day Revenue Trend</span>
+      <div id="dash-sparkline">
+        <div style="font-size:11px;color:var(--muted);padding:8px 0">Loading…</div>
       </div>
-    </div><!-- /stock-ledger-zone -->
-
-  </div><!-- /reports-zone -->
+    </div>
+  </div><!-- /dashboard-zone -->
 
   <!-- EOD ZONE -->
   <div id="eod-zone" style="flex:1;display:none;flex-direction:column;overflow:hidden;order:3;min-width:0">
@@ -1572,63 +1695,35 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
         <input class="f-input" id="f-name" type="text" placeholder="Walk-in"/>
       </div>
       <div>
-        <div class="f-lbl">Payment Method</div>
-        <select class="f-select" id="f-method">
-          <option value="Cash">💵 Cash</option>
-          <option value="GCash">📱 GCash</option>
-          <option value="Maya">🔵 Maya</option>
-          <option value="Card">💳 Card</option>
-          <option value="Split">⚡ Split Payment</option>
-        </select>
-      </div>
-
-      <!-- Split fields -->
-      <div id="split-wrap" style="display:none">
-        <div class="split-grid">
-          <div>
-            <div class="f-lbl">Method 1</div>
-            <select class="f-select" id="split-m1">
-              <option>💵 Cash</option><option>📱 GCash</option>
-              <option>🔵 Maya</option><option>💳 Card</option>
-            </select>
-          </div>
-          <div>
-            <div class="f-lbl">Amount (₱)</div>
-            <input class="f-input" id="split-a1" type="number" placeholder="0.00" min="0" step="0.01"/>
-          </div>
-        </div>
-        <div class="split-grid" style="margin-top:6px">
-          <div>
-            <div class="f-lbl">Method 2</div>
-            <select class="f-select" id="split-m2">
-              <option>📱 GCash</option><option>💵 Cash</option>
-              <option>🔵 Maya</option><option>💳 Card</option>
-            </select>
-          </div>
-          <div>
-            <div class="f-lbl">Amount (₱)</div>
-            <input class="f-input" id="split-a2" type="number" placeholder="0.00" min="0" step="0.01"/>
-          </div>
+        <div class="f-lbl" style="margin-bottom:5px">Payment Method</div>
+        <div class="pay-mth-row">
+          <button class="pay-mth active" data-pm="Cash" onclick="selectPayMethod(this)"><span class="pay-icon">💵</span>Cash</button>
+          <button class="pay-mth" data-pm="GCash" onclick="selectPayMethod(this)"><span class="pay-icon">📱</span>GCash</button>
+          <button class="pay-mth" data-pm="Maya" onclick="selectPayMethod(this)"><span class="pay-icon">🔵</span>Maya</button>
+          <button class="pay-mth" data-pm="Card" onclick="selectPayMethod(this)"><span class="pay-icon">💳</span>Card</button>
         </div>
       </div>
-
-      <!-- Cash fields -->
-      <div id="cash-wrap">
-        <div class="f-lbl">Amount Received (₱)</div>
-        <input class="f-input" id="f-received" type="number" placeholder="0.00" min="0" step="0.01"/>
-        <div class="quick-row">
-          <button class="q-amt" data-v="50">₱50</button>
-          <button class="q-amt" data-v="100">₱100</button>
-          <button class="q-amt" data-v="200">₱200</button>
-          <button class="q-amt" data-v="500">₱500</button>
-          <button class="q-amt" data-v="1000">₱1000</button>
+      <div id="cash-section">
+        <div class="f-lbl">Cash Received</div>
+        <input class="f-input" id="f-received" type="number" placeholder="0.00" min="0" step="0.01"
+          oninput="syncReceived('f-received','mob-received'); updateChange();"/>
+        <div class="quick-row" style="margin-top:5px">
+          <button class="q-amt" onclick="addQuickAmt(50)">+50</button>
+          <button class="q-amt" onclick="addQuickAmt(100)">+100</button>
+          <button class="q-amt" onclick="addQuickAmt(200)">+200</button>
+          <button class="q-amt" onclick="addQuickAmt(500)">+500</button>
+          <button class="q-amt" onclick="addQuickAmt(1000)">+1k</button>
+        </div>
+        <div class="change-box" style="margin-top:6px">
+          <span class="change-lbl">Change</span>
+          <span class="change-val" id="change-val">₱0.00</span>
         </div>
       </div>
-
-      <div class="change-box" id="change-box">
-        <span class="change-lbl">Change</span>
-        <span class="change-val pos" id="change-val">₱0.00</span>
-      </div>
+      <input type="hidden" id="f-method" value="Cash"/>
+      <input type="hidden" id="split-a1" value="0"/>
+      <input type="hidden" id="split-a2" value="0"/>
+      <input type="hidden" id="split-m1" value="Cash"/>
+      <input type="hidden" id="split-m2" value="GCash"/>
     </div>
 
     <div class="op-actions">
@@ -1682,9 +1777,33 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);displa
       <span class="mob-total-lbl">TOTAL</span>
       <span class="mob-total-val" id="mob-total">₱0.00</span>
     </div>
+    <div style="display:flex;flex-direction:column;gap:8px;padding-bottom:4px">
+      <div class="pay-mth-row">
+        <button class="pay-mth active" data-pm="Cash" onclick="selectPayMethod(this)"><span class="pay-icon">💵</span>Cash</button>
+        <button class="pay-mth" data-pm="GCash" onclick="selectPayMethod(this)"><span class="pay-icon">📱</span>GCash</button>
+        <button class="pay-mth" data-pm="Maya" onclick="selectPayMethod(this)"><span class="pay-icon">🔵</span>Maya</button>
+        <button class="pay-mth" data-pm="Card" onclick="selectPayMethod(this)"><span class="pay-icon">💳</span>Card</button>
+      </div>
+      <div id="mob-cash-section">
+        <input class="f-input" id="mob-received" type="number" placeholder="Cash received…" min="0" step="0.01"
+          oninput="syncReceived('mob-received','f-received'); updateChange();" style="margin-bottom:5px"/>
+        <div class="quick-row">
+          <button class="q-amt" onclick="addQuickAmt(50)">+50</button>
+          <button class="q-amt" onclick="addQuickAmt(100)">+100</button>
+          <button class="q-amt" onclick="addQuickAmt(200)">+200</button>
+          <button class="q-amt" onclick="addQuickAmt(500)">+500</button>
+          <button class="q-amt" onclick="addQuickAmt(1000)">+1k</button>
+        </div>
+        <div class="change-box" style="margin-top:6px">
+          <span class="change-lbl">Change</span>
+          <span class="change-val" id="mob-change-val">₱0.00</span>
+        </div>
+      </div>
+    </div>
     <button id="mob-process">✅ Process Order</button>
   </div>
 </div>
+
 
 <!-- ADD MENU ITEM MODAL -->
 <div id="add-item-bg" onclick="closeAddItemModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;backdrop-filter:blur(3px)"></div>
@@ -1872,6 +1991,17 @@ const SPREADSHEET_ID = '1bw9L53ncmbBeyY8ua3oVQCI5B9cO77mAssgnXk-rD9c';
 const MENU_SHEET_GID  = 631965176;
 const SALES_SHEET_NAME = 'Sales';
 
+const PH_TZ = 'Asia/Manila'; // GMT+8
+
+// Formats a GSheet cell value: Date→'yyyy-MM-dd', time-only (epoch 1899-12-30)→'HH:mm', else passthrough
+function fmtVal(val) {
+  if (!(val instanceof Date)) return val;
+  const dateStr = Utilities.formatDate(val, PH_TZ, 'yyyy-MM-dd');
+  return dateStr === '1899-12-30'
+    ? Utilities.formatDate(val, PH_TZ, 'HH:mm')
+    : dateStr;
+}
+
 function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) || '';
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
@@ -1906,19 +2036,15 @@ function doGet(e) {
       const o = {};
       h.forEach((k, i) => o[k] = r[i]);
       return {
-        name:              String(o['Item']                  || '').trim(),
-        emoji:             String(o['Emoji']                 || '📦').trim(),
-        category:          String(o['Category']              || '').trim(),
-        unit:              String(o['Unit']                  || 'pcs').trim(),
-        purchaseUnit:      String(o['Purchase Unit']         || '').trim(),
-        pcsPerPurchaseUnit:parseFloat(o['Pcs Per Purchase Unit']) || 1,
-        stock:             parseFloat(o['Stock'])            || 0,
-        minStock:          parseFloat(o['Min Stock'])        || 0,
-        unitCost:          parseFloat(o['Unit Cost'])        || 0,
-        supplier:          String(o['Supplier']              || '').trim(),
-        lastRestocked:     String(o['Last Restocked']        || '').trim(),
-        lastUpdated:       String(o['Last Updated']          || '').trim(),
-        notes:             String(o['Notes']                 || '').trim()
+        name:       String(o['Item Name']            || '').trim(),
+        category:   String(o['Category']             || '').trim(),
+        stock:      parseFloat(o['Stock (Base Unit)'])          || 0,
+        unit:       String(o['Unit of Measure']      || 'pcs').trim(),
+        conversion: parseFloat(o['Conversion (Pcs/Pack)'])      || 1,
+        bulkStock:  parseFloat(o['Stock (Bulk/Packs)'])         || 0,
+        minStock:   parseFloat(o['Min Stock (Alert)'])          || 0,
+        unitCost:   parseFloat(o['Unit Cost (Base)'])           || 0,
+        totalValue: parseFloat(o['Total Value'])                || 0
       };
     });
     return json(items);
@@ -1964,7 +2090,6 @@ function doGet(e) {
     const sheet = ss.getSheetByName(SALES_SHEET_NAME);
     if (!sheet || sheet.getLastRow() < 2) return json([]);
     const [headers, ...rows] = sheet.getDataRange().getValues();
-    const tz = Session.getScriptTimeZone();
     const sales = rows
       .filter(r => r[0])
       .slice(-100)
@@ -1973,9 +2098,7 @@ function doGet(e) {
         const obj = {};
         headers.forEach((h, i) => {
           const val = r[i];
-          obj[String(h).trim()] = (val instanceof Date)
-            ? Utilities.formatDate(val, tz, 'yyyy-MM-dd')
-            : val;
+          obj[String(h).trim()] = fmtVal(val);
         });
         return obj;
       });
@@ -1988,7 +2111,6 @@ function doGet(e) {
     if (!sheet || sheet.getLastRow() < 2) return json([]);
     const [headers, ...rows] = sheet.getDataRange().getValues();
     const h = headers.map(x => String(x).trim());
-    const tz = Session.getScriptTimeZone();
     const purchases = rows
       .filter(r => r[0])
       .slice(-100)
@@ -1997,9 +2119,7 @@ function doGet(e) {
         const o = {};
         h.forEach((k, i) => {
           const val = r[i];
-          o[k] = (val instanceof Date)
-            ? Utilities.formatDate(val, tz, 'yyyy-MM-dd')
-            : val;
+          o[k] = fmtVal(val);
         });
         // Normalise alternate column names from older sheet versions
         if (o['Line Total'] === undefined && o['Total'] !== undefined) o['Line Total'] = o['Total'];
@@ -2033,7 +2153,6 @@ function doGet(e) {
     if (!sheet || sheet.getLastRow() < 2) return json([]);
     const [headers, ...rows] = sheet.getDataRange().getValues();
     const h = headers.map(x => String(x).trim());
-    const tz = Session.getScriptTimeZone();
     const expenses = rows
       .filter(r => r[0])
       .slice(-100)
@@ -2042,9 +2161,7 @@ function doGet(e) {
         const o = {};
         h.forEach((k, i) => {
           const val = r[i];
-          o[k] = (val instanceof Date)
-            ? Utilities.formatDate(val, tz, 'yyyy-MM-dd')
-            : val;
+          o[k] = fmtVal(val);
         });
         return o;
       });
@@ -2058,16 +2175,13 @@ function doGet(e) {
     const sheet = ss.getSheetByName(SALES_SHEET_NAME);
     if (!sheet || sheet.getLastRow() < 2) return json([]);
     const [headers, ...rows] = sheet.getDataRange().getValues();
-    const tz = Session.getScriptTimeZone();
     const sales = rows
       .filter(r => r[0])
       .map(r => {
         const obj = {};
         headers.forEach((h, i) => {
           const val = r[i];
-          obj[String(h).trim()] = (val instanceof Date)
-            ? Utilities.formatDate(val, tz, 'yyyy-MM-dd')
-            : val;
+          obj[String(h).trim()] = fmtVal(val);
         });
         return obj;
       })
@@ -2089,16 +2203,13 @@ function doGet(e) {
     if (!sheet || sheet.getLastRow() < 2) return json([]);
     const [headers, ...rows] = sheet.getDataRange().getValues();
     const h = headers.map(x => String(x).trim());
-    const tz = Session.getScriptTimeZone();
     const expenses = rows
       .filter(r => r[0])
       .map(r => {
         const o = {};
         h.forEach((k, i) => {
           const val = r[i];
-          o[k] = (val instanceof Date)
-            ? Utilities.formatDate(val, tz, 'yyyy-MM-dd')
-            : val;
+          o[k] = fmtVal(val);
         });
         return o;
       })
@@ -2125,9 +2236,10 @@ function doGet(e) {
 function doPost(e) {
   try {
     const data = JSON.parse(e && e.postData ? e.postData.contents : '{}');
-    if (data.action === 'log_sale')     logSale(data);
-    if (data.action === 'deduct_stock') deductStock(data.items || []);
-    if (data.action === 'adjust_stock') adjustStock(data.items || [], data.reason || '', data.doneBy || 'POS');
+    if (data.action === 'log_sale')       logSale(data);
+    if (data.action === 'deduct_stock')   deductStock(data.items || []);
+    if (data.action === 'adjust_stock')   adjustStock(data.items || [], data.reason || '', data.doneBy || 'POS');
+    if (data.action === 'reconcile_stock') reconcileStock(data.deductions || []);
     if (data.action === 'log_purchase')  logPurchase(data);
     if (data.action === 'log_eod')       logEOD(data);
     if (data.action === 'log_expense')   logExpense(data);
@@ -2236,8 +2348,8 @@ function logPurchase(d) {
 
   const invData    = invSheet.getDataRange().getValues();
   const invHeaders = invData[0].map(h => String(h).trim());
-  const itemCol    = invHeaders.indexOf('Item');
-  const stockCol   = invHeaders.indexOf('Stock');
+  const itemCol    = invHeaders.indexOf('Item Name') >= 0 ? invHeaders.indexOf('Item Name') : invHeaders.indexOf('Item');
+  const stockCol   = invHeaders.indexOf('Stock (Base Unit)') >= 0 ? invHeaders.indexOf('Stock (Base Unit)') : invHeaders.indexOf('Stock');
   const updatedCol = invHeaders.indexOf('Last Updated');
   const restockCol = invHeaders.indexOf('Last Restocked');
   const rstQtyCol  = invHeaders.indexOf('Last Restock Qty');
@@ -2486,8 +2598,8 @@ function deductStock(orderItems) {
 
   const invData    = invSheet.getDataRange().getValues();
   const invHeaders = invData[0].map(h => String(h).trim());
-  const itemCol    = invHeaders.indexOf('Item');
-  const stockCol   = invHeaders.indexOf('Stock');
+  const itemCol    = invHeaders.indexOf('Item Name') >= 0 ? invHeaders.indexOf('Item Name') : invHeaders.indexOf('Item');
+  const stockCol   = invHeaders.indexOf('Stock (Base Unit)') >= 0 ? invHeaders.indexOf('Stock (Base Unit)') : invHeaders.indexOf('Stock');
   const updatedCol = invHeaders.indexOf('Last Updated');
   const now        = new Date().toLocaleString('en-PH');
 
@@ -2530,6 +2642,33 @@ function deductStock(orderItems) {
     if (deduct[name] === undefined) continue;
     const current  = parseFloat(invData[i][stockCol]) || 0;
     const newStock = Math.max(0, current - deduct[name]);
+    invSheet.getRange(i + 1, stockCol + 1).setValue(newStock);
+    if (updatedCol >= 0) invSheet.getRange(i + 1, updatedCol + 1).setValue(now);
+  }
+}
+
+// Direct ingredient deduction — used for reconciliation
+// deductions: [{ ingredient: 'burger buns', qty: 20 }, ...]
+function reconcileStock(deductions) {
+  const ss       = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const invSheet = ss.getSheetByName('Inventory');
+  if (!invSheet || !deductions.length) return;
+
+  const invData    = invSheet.getDataRange().getValues();
+  const invHeaders = invData[0].map(h => String(h).trim());
+  const itemCol    = invHeaders.indexOf('Item Name') >= 0 ? invHeaders.indexOf('Item Name') : invHeaders.indexOf('Item');
+  const stockCol   = invHeaders.indexOf('Stock (Base Unit)') >= 0 ? invHeaders.indexOf('Stock (Base Unit)') : invHeaders.indexOf('Stock');
+  const updatedCol = invHeaders.indexOf('Last Updated');
+  const now        = new Date().toLocaleString('en-PH');
+
+  const deductMap = {};
+  deductions.forEach(d => { deductMap[String(d.ingredient).trim().toLowerCase()] = parseFloat(d.qty) || 0; });
+
+  for (let i = 1; i < invData.length; i++) {
+    const name = String(invData[i][itemCol]).trim().toLowerCase();
+    if (deductMap[name] === undefined) continue;
+    const current  = parseFloat(invData[i][stockCol]) || 0;
+    const newStock = Math.max(0, current - deductMap[name]);
     invSheet.getRange(i + 1, stockCol + 1).setValue(newStock);
     if (updatedCol >= 0) invSheet.getRange(i + 1, updatedCol + 1).setValue(now);
   }
@@ -2579,7 +2718,7 @@ const LS = {
   MENU:'bb_menu', GAS:'bb_gas_url'
 };
 const DEFAULT_WEBHOOK = 'https://n8n.srv1356414.hstgr.cloud/webhook/kambalburger';
-const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzAFMktpO3DNj7WXjXaBiekv2f3bcS2DSZVEWMIfAlW3gJYmr4lrWtYaJqBgiixOK4ekw/exec';
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzDPjSQ-JdJBH0JrkWMJG4Z8RzaSUrPgkVQHvNZqfezTEADjKtb9t3TCD3kigXib_DF8g/exec';
 // Always sync DEFAULT_GAS_URL — paste new URL here to update all devices via Vercel
 if (DEFAULT_GAS_URL) localStorage.setItem(LS.GAS, DEFAULT_GAS_URL);
 
@@ -2821,8 +2960,19 @@ async function postSaleToSheets(payload) {
     await fetch(url, {
       method:'POST', mode:'no-cors',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({...payload, action:'log_sale'})
+      body: JSON.stringify({...payload, action:'log_sale', items: payload.items_summary})
     });
+    // GAS logSale doesn't call deductStock — fire separately with item array format
+    const cartItems = Array.isArray(payload.items)
+      ? payload.items.map(i => ({id: i.id, name: i.name, qty: i.qty}))
+      : [];
+    if (cartItems.length) {
+      fetch(url, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({action:'deduct_stock', items: cartItems})
+      }).catch(()=>{});
+    }
   } catch {}
 }
 
@@ -2936,7 +3086,8 @@ function renderStockAdjust() {
   }
 
   document.getElementById('adj-body').innerHTML = items.map(m => {
-    const hasPU   = m.purchaseUnit && m.pcsPerPurchaseUnit > 1;
+    const hasPU   = (m.conversion || 1) > 1;
+    const ppu     = m.conversion || 1;
     const delta   = adjDeltas[m.name] || 0;
     const newStock = Math.max(0, m.stock + delta);
     const previewClass = delta > 0 ? 'up' : delta < 0 ? 'down' : 'same';
@@ -2944,27 +3095,27 @@ function renderStockAdjust() {
       ? `${m.stock} ${m.unit||'pcs'}`
       : `${newStock} ${m.unit||'pcs'} (${delta>0?'+':''}${delta})`;
     const stockLabel = hasPU
-      ? `${m.stock} ${m.unit||'pcs'} · ${(m.stock/m.pcsPerPurchaseUnit).toFixed(1)} ${m.purchaseUnit}`
+      ? `${m.stock} ${m.unit||'pcs'} · ${(m.stock/ppu).toFixed(1)} Pack`
       : `${m.stock} ${m.unit||'pcs'}`;
 
     return `<div class="adj-row${delta!==0?' changed':''}" id="arow-${m.name.replace(/\s+/g,'_')}">
-      <span class="adj-emoji">${m.emoji||'📦'}</span>
+      <span class="adj-emoji">📦</span>
       <div class="adj-info">
         <div class="adj-name">${m.name}</div>
         <div class="adj-cur">Current: ${stockLabel}</div>
       </div>
       <div class="adj-ctrl">
-        <button class="adj-btn" onclick="stepAdj('${m.name.replace(/'/g,"\\'")}',${hasPU?m.pcsPerPurchaseUnit:1},-1)">−</button>
+        <button class="adj-btn" onclick="stepAdj('${m.name.replace(/'/g,"\\'")}',${ppu},-1)">−</button>
         <input class="adj-qty-input" type="number" value="0" min="-9999" step="1"
           id="adjinp-${m.name.replace(/\s+/g,'_')}"
-          data-name="${m.name}" data-ppu="${hasPU?m.pcsPerPurchaseUnit:1}"
+          data-name="${m.name}" data-ppu="${ppu}"
           oninput="onAdjInput(this)"/>
-        <button class="adj-btn" onclick="stepAdj('${m.name.replace(/'/g,"\\'")}',${hasPU?m.pcsPerPurchaseUnit:1},1)">+</button>
+        <button class="adj-btn" onclick="stepAdj('${m.name.replace(/'/g,"\\'")}',${ppu},1)">+</button>
         ${hasPU ? `<select class="adj-unit-sel" id="adjunit-${m.name.replace(/\s+/g,'_')}"
-          data-name="${m.name}" data-ppu="${m.pcsPerPurchaseUnit}" data-base="${m.unit||'pcs'}" data-pu="${m.purchaseUnit}"
+          data-name="${m.name}" data-ppu="${ppu}" data-base="${m.unit||'pcs'}" data-pu="Pack"
           onchange="onAdjUnitChange(this)">
           <option value="base">${m.unit||'pcs'}</option>
-          <option value="purchase">${m.purchaseUnit}</option>
+          <option value="purchase">Pack</option>
         </select>` : `<span style="font-size:10px;color:var(--muted)">${m.unit||'pcs'}</span>`}
       </div>
       <div class="adj-preview ${previewClass}" id="adjprev-${m.name.replace(/\s+/g,'_')}">${previewTxt}</div>
@@ -3202,9 +3353,16 @@ async function generateSalesReport(from, to, preset) {
     inventoryCache.forEach(m => { costMap[m.name] = parseFloat(m.unitCost)||0; });
     const recipeMap = {};
     recipesCache.forEach(r => {
-      const key = (r.menuItemName||'').trim();
+      const key = (r.menuItemName || r['Menu Item Name'] || '').trim();
       if (!recipeMap[key]) recipeMap[key] = [];
-      recipeMap[key].push({ ingredient: r.ingredient, qtyUsed: parseFloat(r.qtyUsed)||0 });
+      const _qty = parseFloat(r.qtyUsed || r['Qty Used']) || 1;
+      const _colF = parseFloat(r['Unit Cost'] ?? r.unitCost);
+      recipeMap[key].push({
+        ingredient: (r.ingredient || r['Ingredient'] || ''),
+        qtyUsed:    _qty,
+        unitCost:   isNaN(_colF) ? null : _colF / _qty, // col F = total per serving; derive per-unit
+        unit:       (r.unit || r['Unit'] || '')
+      });
     });
     const parseSaleItems = str => String(str).split(',').map(p => {
       const m = p.trim().match(/^(.+)\s+x(\d+)$/i);
@@ -3216,8 +3374,9 @@ async function generateSalesReport(from, to, preset) {
     sales.forEach(sale => {
       parseSaleItems(sale[col('Items')]||sale['items_summary']||'').forEach(({ name, qty }) => {
         itemCount[name] = (itemCount[name]||0) + qty;
-        (recipeMap[name]||[]).forEach(({ ingredient, qtyUsed }) => {
-          totalCOGS += (costMap[ingredient]||0) * qtyUsed * qty;
+        (recipeMap[name]||[]).forEach(({ ingredient, qtyUsed, unitCost }) => {
+          const uc = unitCost !== null ? unitCost : (costMap[ingredient.trim().toLowerCase()]||0);
+          totalCOGS += uc * qtyUsed * qty;
         });
       });
     });
@@ -3320,7 +3479,7 @@ async function saveExpense() {
   const category    = document.getElementById('exp-category')?.value || 'Miscellaneous';
   const description = (document.getElementById('exp-desc')?.value || '').trim();
   const amount      = parseFloat(document.getElementById('exp-amount')?.value) || 0;
-  const date        = document.getElementById('exp-date')?.value || new Date().toISOString().split('T')[0];
+  const date        = document.getElementById('exp-date')?.value || todayManila();
   const refNo       = (document.getElementById('exp-ref')?.value || '').trim();
 
   if (!description) { showToast('Enter a description','⚠️'); return; }
@@ -3346,7 +3505,7 @@ async function saveExpense() {
     document.getElementById('exp-desc').value   = '';
     document.getElementById('exp-amount').value = '';
     document.getElementById('exp-ref').value    = '';
-    document.getElementById('exp-date').value   = new Date().toISOString().split('T')[0];
+    document.getElementById('exp-date').value   = todayManila();
     document.getElementById('exp-photo-thumb').innerHTML = `<span style="font-size:22px">🧾</span><span style="font-size:9px;color:var(--muted)">No receipt</span>`;
     expPhotoBase64 = null;
     setTimeout(() => {
@@ -3366,7 +3525,7 @@ async function loadExpenseHistory() {
   try {
     const res  = await fetch(url + '?action=expenses&t=' + Date.now());
     const data = await res.json();
-    expensesCache = Array.isArray(data) ? data : [];
+    expensesCache = Array.isArray(data) ? data.filter(r => { const c = String(r['Date']||r['Category']||r['category']||'').trim(); return c !== '__EOD__' && c !== 'Shift Log'; }) : [];
     if (!expensesCache.length) {
       content.innerHTML = `<div class="inv-empty"><div style="font-size:28px">💸</div><div style="font-size:13px;font-weight:700">No expenses yet</div></div>`;
       return;
@@ -3394,7 +3553,7 @@ async function loadExpenseHistory() {
 }
 
 function loadExpenses() {
-  document.getElementById('exp-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('exp-date').value = todayManila();
   loadExpenseHistory();
 }
 
@@ -3489,7 +3648,7 @@ function loadPurchases() {
   const url = localStorage.getItem(LS.GAS);
   // Set today's date
   const dateInput = document.getElementById('purch-date');
-  if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().split('T')[0];
+  if (dateInput && !dateInput.value) dateInput.value = todayManila();
   // Start with one empty row
   if (!purchaseRows.length) addPurchaseRow();
   // Load inventory for suggestions
@@ -3509,7 +3668,7 @@ async function savePurchase() {
   if (!items.length) { showToast('Add at least one item with qty','⚠️'); return; }
 
   const supplier   = (document.getElementById('purch-supplier')?.value || '').trim();
-  const date       = document.getElementById('purch-date')?.value || new Date().toISOString().split('T')[0];
+  const date       = document.getElementById('purch-date')?.value || todayManila();
   const receiptNo  = (document.getElementById('purch-receipt')?.value || '').trim();
   const grandTotal = purchaseRows.reduce((s, r) => s + (r.lineTotal || 0), 0);
 
@@ -3544,7 +3703,7 @@ async function savePurchase() {
     document.getElementById('purch-photo-thumb').innerHTML = `<span style="font-size:22px">📄</span><span style="font-size:9px;color:var(--muted)">No photo</span>`;
     document.getElementById('purch-supplier').value = '';
     document.getElementById('purch-receipt').value  = '';
-    document.getElementById('purch-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('purch-date').value = todayManila();
     renderPurchaseRows(); updatePurchGrandTotal(); addPurchaseRow();
     setTimeout(loadPurchaseHistory, 2000);
 
@@ -3823,9 +3982,14 @@ const EOD_LS = {
   STATUS:  'bb_eod_status'   // 'started' | 'ended' | ''
 };
 
+// Always use Manila timezone so dates match the GAS server
+function todayManila() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }); // "YYYY-MM-DD"
+}
+
 // Robust date-match helper — handles ISO, MM/DD/YYYY, DD/MM/YYYY, Date objects, and parsed timestamps
 function dateMatchesToday(val) {
-  const todayISO = new Date().toLocaleDateString('en-CA'); // "2026-04-15" always
+  const todayISO = todayManila();
   if (!val) return false;
   const s = String(val).trim();
   if (!s) return false;
@@ -3835,7 +3999,7 @@ function dateMatchesToday(val) {
   try {
     const parsed = new Date(s);
     if (!isNaN(parsed.getTime())) {
-      if (parsed.toLocaleDateString('en-CA') === todayISO) return true;
+      if (parsed.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }) === todayISO) return true;
     }
   } catch {}
   // en-PH MM/DD/YYYY fallback
@@ -3844,26 +4008,69 @@ function dateMatchesToday(val) {
 }
 
 function getEODState() {
-  const today  = new Date().toISOString().split('T')[0];
+  const today  = todayManila();
   const stored = localStorage.getItem(EOD_LS.DATE);
   if (stored !== today) return 'none'; // new day, reset
   return localStorage.getItem(EOD_LS.STATUS) || 'none';
 }
 
-function startDay() {
+async function startDay() {
   const inp = document.getElementById('eod-beg-cash-inp');
   const begCash = parseFloat(inp?.value) || 0;
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayManila();
 
   // Snapshot current inventory
   if (!inventoryCache.length) { showToast('Load inventory first — go to 📦 Inventory tab','⚠️',3000); return; }
 
+  const begInvJSON = JSON.stringify(inventoryCache.map(m => ({ name:m.name, unit:m.unit||'pcs', stock:m.stock, minStock:m.minStock||0 })));
+
+  // Save to localStorage first (instant feedback)
   localStorage.setItem(EOD_LS.DATE,     today);
   localStorage.setItem(EOD_LS.BEG_CASH, begCash);
-  localStorage.setItem(EOD_LS.BEG_INV,  JSON.stringify(inventoryCache.map(m => ({ name:m.name, unit:m.unit||'pcs', stock:m.stock, minStock:m.minStock||0 }))));
+  localStorage.setItem(EOD_LS.BEG_INV,  begInvJSON);
   localStorage.setItem(EOD_LS.STATUS,   'started');
 
+  // Sync to GAS via existing log_expense — works with old GAS, no new actions needed
+  const url = localStorage.getItem(LS.GAS);
+  if (url) {
+    try {
+      await fetch(url, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'log_expense',
+          date: today,
+          category: '__EOD__',
+          description: begInvJSON,
+          amount: begCash,
+          paidBy: 'started',
+          notes: 'EOD day start — do not delete'
+        })
+      });
+    } catch {}
+  }
+
   const startTime = new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+
+  // Write human-readable Shift Log entry to GSheet
+  if (url) {
+    try {
+      await fetch(url, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'log_expense',
+          date: today,
+          category: 'Shift Log',
+          description: `Day Started · ${startTime}`,
+          amount: begCash,
+          paidBy: 'System',
+          notes: 'Auto-logged by POS'
+        })
+      });
+    } catch {}
+  }
+
   showToast(`Day started at ${startTime} · Beginning cash ₱${fmt(begCash).replace('₱','')}`, '▶️');
   loadEOD();
 }
@@ -3876,7 +4083,7 @@ async function endDay() {
   const { cashRow, stockRows } = computeEODData();
   if (!stockRows) { showToast('Could not compute EOD data','❌'); return; }
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayManila();
   const payload = {
     action: 'log_eod',
     date: today,
@@ -3897,8 +4104,114 @@ async function endDay() {
   }
 
   localStorage.setItem(EOD_LS.STATUS, 'ended');
+
+  // Sync ended status via existing log_expense sentinel
+  if (url) {
+    try {
+      await fetch(url, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'log_expense',
+          date: today,
+          category: '__EOD__',
+          description: '[]',
+          amount: 0,
+          paidBy: 'ended',
+          notes: 'EOD day end — do not delete'
+        })
+      });
+    } catch {}
+  }
+
+  // Write human-readable Shift Log — End Day entry
+  const endTime = new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'});
+  const endingCash = cashRow.ending ?? 0;
+  if (url) {
+    try {
+      await fetch(url, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'log_expense',
+          date: today,
+          category: 'Shift Log',
+          description: `Day Ended · ${endTime}`,
+          amount: endingCash,
+          paidBy: 'System',
+          notes: 'Auto-logged by POS'
+        })
+      });
+    } catch {}
+  }
+
   showToast('EOD report saved!', '✅');
   loadEOD();
+}
+
+function computeCOGS() {
+  const rawSales = window._eodTodaySalesRaw || [];
+  if (!rawSales.length || !recipesCache.length) return { breakdown: [], totalCOGS: 0, hasRecipes: false };
+
+  // Inventory cost map as fallback only
+  const costMap = {};
+  inventoryCache.forEach(m => {
+    if (m.name) costMap[m.name.trim().toLowerCase()] = parseFloat(m.unitCost) || 0;
+  });
+
+  // Recipe map: menu item → [{ ingredient, qtyUsed, unitCost, unit }]
+  // unitCost from recipe takes priority over inventory
+  const recipeMap = {};
+  recipesCache.forEach(r => {
+    const key = (r.menuItemName || r['Menu Item Name'] || '').trim().toLowerCase();
+    if (!key) return;
+    if (!recipeMap[key]) recipeMap[key] = [];
+    const _qty2 = parseFloat(r.qtyUsed || r['Qty Used']) || 1;
+    const _colF2 = parseFloat(r['Unit Cost'] ?? r.unitCost);
+    recipeMap[key].push({
+      ingredient: (r.ingredient || r['Ingredient'] || '').trim().toLowerCase(),
+      qtyUsed:    _qty2,
+      unitCost:   isNaN(_colF2) ? null : _colF2 / _qty2, // col F = total per serving; derive per-unit
+      unit:       (r.unit || r['Unit'] || '')
+    });
+  });
+
+  const hasRecipes = Object.keys(recipeMap).length > 0;
+
+  // Accumulate ingredient usage + carry recipe unit cost
+  const ingUsage = {};
+  rawSales.forEach(sale => {
+    const itemsStr = String(sale['Items'] || sale['items_summary'] || '');
+    itemsStr.split(',').forEach(part => {
+      const m = part.trim().match(/^(.+)\s+x(\d+)$/i);
+      if (!m) return;
+      const menuKey = m[1].trim().toLowerCase();
+      const qty = parseInt(m[2]) || 0;
+      (recipeMap[menuKey] || []).forEach(({ ingredient, qtyUsed, unitCost, unit }) => {
+        if (!ingUsage[ingredient]) ingUsage[ingredient] = { qty: 0, unitCost, unit };
+        ingUsage[ingredient].qty += qtyUsed * qty;
+      });
+    });
+  });
+
+  const breakdown = Object.entries(ingUsage)
+    .map(([ing, info]) => {
+      const uc = info.unitCost !== null ? info.unitCost : (costMap[ing] || 0);
+      const unit = info.unit || (inventoryCache.find(m => m.name.trim().toLowerCase() === ing)?.unit) || 'pcs';
+      const invMatch = inventoryCache.find(m => m.name.trim().toLowerCase() === ing);
+      return {
+        name: invMatch ? invMatch.name : ing,
+        unit,
+        qtyUsed: info.qty,
+        unitCost: uc,
+        totalCost: info.qty * uc
+      };
+    })
+    .filter(r => r.qtyUsed > 0)
+    .sort((a, b) => b.totalCost - a.totalCost);
+
+  const totalCOGS = breakdown.reduce((s, r) => s + r.totalCost, 0);
+  return { breakdown, totalCOGS, hasRecipes };
 }
 
 function computeEODData() {
@@ -3965,12 +4278,18 @@ function computeEODData() {
   const sampleCols = recipesCache[0]?._cols || {};
   const sampleIng  = recipesCache.slice(0,3).map(r=>`${r.menuItemName}→${r.ingredient}(${r.qtyUsed})`).join(', ');
   const rawItems   = rawSales.slice(0,3).map(r => JSON.stringify(r['Items'] || r['items_summary'] || '')).join(' | ');
+  const invCostSample = inventoryCache.slice(0,5).map(m=>`${m.name}=₱${m.unitCost}`).join(', ');
+  const recipeIngSample = recipesCache.slice(0,3).map(r=>`"${r.ingredient}"`).join(', ');
+  const invNameSample   = inventoryCache.slice(0,5).map(m=>`"${m.name}"`).join(', ');
   const debugInfo = [
     `Recipes: ${recipesCache.length} rows | cols detected: ${JSON.stringify(sampleCols)}`,
     `Sample ingredients: ${sampleIng || '(none)'}`,
     `Sales: ${rawSales.length} orders | raw Items: ${rawItems || '(none)'}`,
     `Offtake map: ${JSON.stringify(salesOfftake)}`,
-    `BegInv: ${begInv.map(b=>b.name).join(', ') || '(none)'}`
+    `BegInv: ${begInv.map(b=>b.name).join(', ') || '(none)'}`,
+    `Inv unit costs (first 5): ${invCostSample || '(none)'}`,
+    `Recipe ingredient names: ${recipeIngSample || '(none)'}`,
+    `Inventory item names: ${invNameSample || '(none)'}`
   ].join('\n');
 
   // Cash summary from today's sales
@@ -3989,6 +4308,43 @@ async function loadEOD() {
   const wrap  = document.getElementById('eod-wrap');
   const dot   = document.getElementById('eod-status-dot');
   const lbl   = document.getElementById('eod-status-lbl');
+
+  // Sync EOD state from expenses sheet sentinels — works with existing GAS, no new actions needed
+  if (url) {
+    try {
+      const res = await fetch(url + '?action=expenses&t=' + Date.now());
+      if (res.ok) {
+        const allExp = await res.json();
+        if (Array.isArray(allExp)) {
+          const today = todayManila();
+          // Column names are shifted in this sheet: Record ID=date, Date=category, Category=desc, Description=amount, Amount=paidBy
+          const sentinels = allExp.filter(e => {
+            // Category value is stored in the 'Date' key due to column misalignment
+            const cat = String(e['Date'] || e['Category'] || e['category'] || '').trim();
+            // Date value is stored in 'Record ID' key
+            const dt  = String(e['Record ID'] || e['Date'] || e['date'] || '').trim();
+            return cat === '__EOD__' && (dt === today || dt.startsWith(today));
+          });
+          if (sentinels.length) {
+            // GAS overwrites paidBy with shop name in Amount — can't rely on Amount for start/end detection.
+            // Start sentinel: Category = non-empty inventory JSON array. End sentinel: Category = '[]'.
+            const startSen    = sentinels.find(s => { const inv = String(s['Category'] || '').trim(); return inv.startsWith('[') && inv !== '[]'; });
+            const endSen      = sentinels.find(s => String(s['Category'] || '').trim() === '[]');
+            const status      = endSen ? 'ended' : 'started';
+            // begCash is in 'Description' column (stores amount value)
+            const begCash     = startSen ? parseFloat(startSen['Description'] || 0) : 0;
+            // begInv is in 'Category' column (stores inventory JSON snapshot)
+            const begInv      = startSen ? String(startSen['Category'] || '[]') : '[]';
+            localStorage.setItem(EOD_LS.DATE,     today);
+            localStorage.setItem(EOD_LS.STATUS,   status);
+            localStorage.setItem(EOD_LS.BEG_CASH, begCash);
+            localStorage.setItem(EOD_LS.BEG_INV,  begInv);
+          }
+        }
+      }
+    } catch {}
+  }
+
   const state = getEODState();
   const today = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
 
@@ -4026,16 +4382,18 @@ async function loadEOD() {
   // Always fetch fresh data — ignore caches for EOD accuracy
   if (url) {
     try {
-      const [invRes, purchRes, salesRes, recRes] = await Promise.all([
+      const [invRes, purchRes, salesRes, recRes, expRes] = await Promise.all([
         fetch(url + '?action=inventory&t=' + Date.now()),
         fetch(url + '?action=purchases&t=' + Date.now()),
         fetch(url + '?action=sales&t='     + Date.now()),
-        fetch(url + '?action=recipes&t='   + Date.now())
+        fetch(url + '?action=recipes&t='   + Date.now()),
+        fetch(url + '?action=expenses&t='  + Date.now())
       ]);
 
       if (invRes.ok)  { const d = await invRes.json();  if (Array.isArray(d)) inventoryCache  = d; }
       if (purchRes.ok){ const d = await purchRes.json(); if (Array.isArray(d)) purchasesCache  = d; }
       if (recRes && recRes.ok){ const d = await recRes.json(); if (Array.isArray(d)) recipesCache = d; }
+      if (expRes.ok)  { const d = await expRes.json();  if (Array.isArray(d)) expensesCache   = d.filter(r => String(r['Category']||r['category']||'').trim() !== '__EOD__'); }
       if (salesRes.ok){
         const sales = await salesRes.json();
         if (Array.isArray(sales)) {
@@ -4045,7 +4403,6 @@ async function loadEOD() {
           window._eodCashSales     = todaySales
             .filter(r => String(r['Payment Method']||'').toLowerCase().includes('cash'))
             .reduce((s,r) => s + (parseFloat(r['Total'])||0), 0);
-          // Store raw today sales for offtake computation
           window._eodTodaySalesRaw = todaySales;
         }
       }
@@ -4095,30 +4452,193 @@ async function loadEOD() {
           <div class="eod-cash-val">${fmt(cashRow.ending)}</div>
           <div class="eod-cash-sub">Beg + Cash Sales − Purchases</div>
         </div>
+        ${(() => {
+          const { breakdown, totalCOGS } = computeCOGS();
+          const totalSales = window._eodTodaySales || 0;
+          const grossProfit = totalSales - totalCOGS;
+          const margin = totalSales > 0 ? ((grossProfit / totalSales) * 100).toFixed(1) : '0.0';
+          const profitColor = grossProfit >= 0 ? 'var(--green)' : 'var(--red)';
+          return `
+        <div class="eod-cash-card" style="border-color:rgba(168,85,247,.35)">
+          <div class="eod-cash-label">Total COGS</div>
+          <div class="eod-cash-val" style="color:#c084fc">${fmt(totalCOGS)}</div>
+          <div class="eod-cash-sub">${breakdown.length} ingredient${breakdown.length !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="eod-cash-card" style="border-color:${grossProfit >= 0 ? 'rgba(16,185,129,.35)' : 'rgba(239,68,68,.3)'}">
+          <div class="eod-cash-label">Gross Profit</div>
+          <div class="eod-cash-val" style="color:${profitColor}">${fmt(grossProfit)}</div>
+          <div class="eod-cash-sub">Margin: ${margin}%</div>
+        </div>`;
+        })()}
       </div>
     </div>
 
-    <div>
-      <div class="eod-section-title">📦 Stock Ledger</div>
-      <div style="overflow-x:auto;margin-top:10px">
-      <table class="eod-table">
-        <thead><tr>
-          <th>Item</th><th>Unit</th><th>Beginning</th><th>Delivery</th><th>Offtake</th><th>Ending</th>
-        </tr></thead>
-        <tbody>${stockRows.length ? stockRows.map(r => {
-          const endCls = r.ending <= 0 ? 'ending-out' : r.ending < r.minStock ? 'ending-low' : '';
-          return `<tr>
-            <td>${r.name}</td>
-            <td style="font-size:10px;color:var(--muted)">${r.unit}</td>
-            <td>${r.beginning}</td>
-            <td class="${r.delivery>0?'delivery':''}">${r.delivery>0?'+'+r.delivery:r.delivery}</td>
-            <td class="${r.offtake>0?'offtake':''}">${r.offtake>0?'-'+r.offtake:r.offtake}</td>
-            <td class="${endCls}" style="font-weight:700">${r.ending}</td>
+    ${(() => {
+      // ── GENERAL LEDGER (Compound Journal Entries) ──
+      const todayStr = todayManila();
+      const groups = [];
+      const rawSales = window._eodTodaySalesRaw || [];
+
+      // ── Per-order compound entry: DR Cash + DR COGS / CR Sales Revenue + CR Raw Materials
+      // Build lookup maps once for COGS computation
+      // Inventory cost map as fallback only
+      const _costMap = {};
+      inventoryCache.forEach(m => { if (m.name) _costMap[m.name.trim().toLowerCase()] = parseFloat(m.unitCost) || 0; });
+      const _recipeMap = {};
+      recipesCache.forEach(r => {
+        const key = (r.menuItemName || r['Menu Item Name'] || '').trim().toLowerCase();
+        if (!key) return;
+        if (!_recipeMap[key]) _recipeMap[key] = [];
+        const _qty3 = parseFloat(r.qtyUsed || r['Qty Used']) || 1;
+        const _colF3 = parseFloat(r['Unit Cost'] ?? r.unitCost);
+        _recipeMap[key].push({
+          ingredient: (r.ingredient || r['Ingredient'] || '').trim().toLowerCase(),
+          qtyUsed:    _qty3,
+          unitCost:   isNaN(_colF3) ? null : _colF3 / _qty3, // col F = total per serving; derive per-unit
+          unit:       (r.unit || r['Unit'] || '')
+        });
+      });
+
+      rawSales.forEach(r => {
+        const amt      = parseFloat(r['Total']) || 0;
+        const orderId  = r['Order ID'] || '—';
+        const time     = r['Time'] || r['Timestamp'] || '';
+        const pm       = r['Payment Method'] || 'Cash';
+        const itemsStr = r['Items'] || r['items_summary'] || '—';
+
+        // Compute per-order ingredient usage
+        const ingUsage = {};
+        String(itemsStr).split(',').forEach(part => {
+          const m = part.trim().match(/^(.+)\s+x(\d+)$/i);
+          if (!m) return;
+          const menuKey = m[1].trim().toLowerCase();
+          const qty = parseInt(m[2]) || 0;
+          (_recipeMap[menuKey] || []).forEach(({ ingredient, qtyUsed, unitCost, unit }) => {
+            if (!ingUsage[ingredient]) ingUsage[ingredient] = { qty: 0, unitCost, unit };
+            ingUsage[ingredient].qty += qtyUsed * qty;
+          });
+        });
+        const orderCOGS = Object.entries(ingUsage).map(([ing, info]) => {
+          // Use recipe unitCost first, fall back to inventory costMap
+          const uc   = info.unitCost !== null ? info.unitCost : (_costMap[ing] || 0);
+          const unit = info.unit || (inventoryCache.find(m => m.name.trim().toLowerCase() === ing)?.unit) || 'pcs';
+          const inv  = inventoryCache.find(m => m.name.trim().toLowerCase() === ing);
+          return { name: inv ? inv.name : ing, unit, qtyUsed: info.qty, unitCost: uc, totalCost: info.qty * uc };
+        }).filter(x => x.qtyUsed > 0);
+        const orderTotalCOGS = orderCOGS.reduce((s, x) => s + x.totalCost, 0);
+
+        // Single balanced entry: DR Cash = CR Raw Materials + CR Sales Revenue (Profit)
+        const profit = amt - orderTotalCOGS;
+        const lines = [];
+        lines.push({ isDebit: true, account: 'Cash on Hand', debit: amt, credit: 0,
+          memo: `Total received from customer · ${pm} · Ref #${orderId}` });
+        if (orderTotalCOGS > 0) {
+          // CR Raw Materials — one line per ingredient
+          orderCOGS.forEach(x => lines.push({
+            isDebit: false, account: 'Raw Materials', debit: 0, credit: x.totalCost,
+            memo: `${x.name}: ${x.qtyUsed % 1 === 0 ? x.qtyUsed : x.qtyUsed.toFixed(2)} ${x.unit} × ₱${x.unitCost.toFixed(2)} — credit to reduce inventory at cost`
+          }));
+          // CR Sales Revenue (Profit) — the markup
+          lines.push({ isDebit: false, account: 'Sales Revenue (Profit)', debit: 0, credit: profit,
+            memo: `Net Gain / Markup realized · ${itemsStr}` });
+        } else {
+          // No recipe — full amount is revenue
+          lines.push({ isDebit: false, account: 'Sales Revenue', debit: 0, credit: amt, memo: itemsStr });
+        }
+        groups.push({ sortKey: time, lines });
+      });
+
+      // ── INDIVIDUAL: Purchases → DR Purchases / CR Cash (one per receipt)
+      purchasesCache.filter(r => dateMatchesToday(r['Date'] || r['Timestamp'])).forEach(r => {
+        const amt = parseFloat(r['Line Total'] || r['Total']) || 0;
+        groups.push({
+          sortKey: r['Time'] || r['Date'] || '55-purch',
+          lines: [
+            { isDebit: true,  account: 'Purchases',    debit: amt, credit: 0,   memo: `${r['Item'] || '—'} · ${r['Supplier'] || '—'}` },
+            { isDebit: false, account: 'Cash on Hand', debit: 0,   credit: amt, memo: `Ref #${r['Receipt No'] || r['Receipt #'] || '—'}` }
+          ]
+        });
+      });
+
+      // ── INDIVIDUAL: Expenses → DR Expense / CR Cash (one per expense)
+      expensesCache.filter(r => dateMatchesToday(r['Date'] || r['Timestamp'])).forEach(r => {
+        const amt = parseFloat(r['Amount']) || 0;
+        groups.push({
+          sortKey: r['Time'] || r['Date'] || '66-exp',
+          lines: [
+            { isDebit: true,  account: `${r['Category'] || 'Expense'} Expense`, debit: amt, credit: 0,   memo: r['Description'] || '—' },
+            { isDebit: false, account: 'Cash on Hand',                           debit: 0,   credit: amt, memo: `Ref #${r['Ref No'] || r['Reference'] || '—'}` }
+          ]
+        });
+      });
+
+      groups.sort((a, b) => String(a.sortKey).localeCompare(String(b.sortKey)));
+
+      if (!groups.length) {
+        return `<div>
+          <div class="eod-section-title">📒 General Ledger</div>
+          <div class="gl-empty" style="margin-top:10px">No transactions logged today</div>
+        </div>`;
+      }
+
+      let totalDebit = 0, totalCredit = 0;
+      groups.forEach(g => g.lines.forEach(l => { totalDebit += (l.debit||0); totalCredit += (l.credit||0); }));
+
+      const rows = groups.map((g, gi) => {
+        const altBg = gi % 2 !== 0 ? 'background:rgba(255,255,255,.018)' : '';
+        return g.lines.map((l, li) => {
+          const isLast = li === g.lines.length - 1;
+          // Gross Profit row
+          if (l.isGP) {
+            const gpPos = l.gp >= 0;
+            const gpColor = gpPos ? 'var(--green)' : 'var(--red)';
+            return `<tr style="${altBg};border-bottom:1px solid var(--border)">
+              <td></td>
+              <td colspan="3" style="font-size:10px;font-weight:700;color:${gpColor};padding:4px 0 6px 0;letter-spacing:.04em">
+                Gross Profit: ${gpPos ? '+' : '−'}₱${Math.abs(l.gp).toFixed(2)}
+              </td>
+              <td style="font-size:10px;color:var(--muted)">${gpPos ? 'margin ✓' : 'negative margin ⚠️'}</td>
+            </tr>`;
+          }
+          return `<tr style="${altBg}${isLast ? ';border-bottom:1px solid var(--border)' : ''}">
+            <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap;vertical-align:top;padding-top:7px">${li === 0 ? todayStr : ''}</td>
+            <td style="padding-left:${l.isDebit ? '0' : '20'}px;font-weight:${l.isDebit ? '600' : '400'};font-size:11px">${l.account}</td>
+            <td style="font-family:'DM Mono',monospace;font-weight:600;color:var(--green);text-align:right;white-space:nowrap">${l.debit > 0 ? '₱' + l.debit.toFixed(2) : ''}</td>
+            <td style="font-family:'DM Mono',monospace;font-weight:600;color:var(--red);text-align:right;white-space:nowrap">${l.credit > 0 ? '₱' + l.credit.toFixed(2) : ''}</td>
+            <td style="font-size:10px;color:var(--muted)">${l.memo}</td>
           </tr>`;
-        }).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--muted);font-family:'Syne',sans-serif">No inventory snapshot — Start Day to begin tracking</td></tr>`}
-        </tbody>
-      </table></div>
-    </div>`;
+        }).join('');
+      }).join('');
+
+      return `<div>
+        <div class="eod-section-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+          <span>📒 General Ledger</span>
+          <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${groups.length} entries</span>
+        </div>
+        <div style="overflow-x:auto;margin-top:10px">
+          <table class="gl-table">
+            <thead><tr>
+              <th>Date</th>
+              <th>Account</th>
+              <th style="text-align:right">Debit (DR)</th>
+              <th style="text-align:right">Credit (CR)</th>
+              <th>Memo / Context</th>
+            </tr></thead>
+            <tbody>
+              ${rows}
+              <tr class="gl-summary-row">
+                <td colspan="2" style="font-family:'Syne',sans-serif;font-size:11px;color:var(--muted)">TOTALS</td>
+                <td style="font-family:'DM Mono',monospace;font-weight:700;text-align:right;color:var(--green)">₱${totalDebit.toFixed(2)}</td>
+                <td style="font-family:'DM Mono',monospace;font-weight:700;text-align:right;color:var(--red)">₱${totalCredit.toFixed(2)}</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+    })()}
+
+    `;
 }
 
 // ── STOCK LEDGER (Reports tab) ─────────────
@@ -4133,7 +4653,7 @@ async function loadStockLedger() {
   content.innerHTML = `<div class="inv-empty"><div style="font-size:28px;opacity:.3">📦</div><div style="font-size:12px">Loading…</div></div>`;
   try {
     // Need inventory + today's purchases + sales for stock computation
-    const todayStr = new Date().toLocaleDateString('en-CA');
+    const todayStr = todayManila();
     const [invRes, salesRes, purchRes] = await Promise.all([
       fetch(url + '?action=inventory&t=' + Date.now()),
       fetch(url + '?action=sales&t='     + Date.now()),
@@ -4196,21 +4716,21 @@ async function loadStockLedger() {
     begInv.forEach(b => { begMap[String(b.name || '').trim().toLowerCase()] = parseFloat(b.stock) || 0; });
     const hasBeg = begInv.length > 0;
 
-    // Build rows
+    // Build rows — use current GSheet stock as beginning if no EOD snapshot
     const rows = invData.map(item => {
       const key      = String(item.name || '').trim().toLowerCase();
       const begStock = hasBeg ? (begMap[key] ?? (parseFloat(item.stock) || 0)) : (parseFloat(item.stock) || 0);
       const delivery = deliveryMap[key] || 0;
       const offtake  = salesOfftake[key] || 0;
-      const ending   = hasBeg ? Math.max(0, begStock + delivery - offtake) : parseFloat(item.stock) || 0;
+      const ending   = Math.max(0, begStock + delivery - offtake);
       const minStock = parseFloat(item.minStock) || 0;
-      return { name: item.name, unit: item.unit || '', beginning: hasBeg ? begStock : '—', delivery, offtake, ending, minStock };
+      return { name: item.name, unit: item.unit || '', beginning: begStock, delivery, offtake, ending, minStock };
     });
 
     const dateLabel = new Date().toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' });
     content.innerHTML = `
       <div class="eod-section-title" style="margin-bottom:10px">📦 Stock Ledger — ${dateLabel}</div>
-      ${!hasBeg ? `<div style="font-size:10px;color:var(--amber);margin-bottom:8px;padding:6px 8px;background:rgba(255,200,0,.08);border-radius:6px;border:1px solid rgba(255,200,0,.2)">⚠️ No EOD day started — showing current stock only. Start a day from the EOD tab to track Beginning/Ending stock.</div>` : ''}
+      ${!hasBeg ? `<div style="font-size:10px;color:var(--muted);margin-bottom:8px;padding:5px 8px;background:rgba(255,255,255,.04);border-radius:6px;border:1px solid var(--border)">ℹ️ No shift started — using current GSheet stock as beginning. Start a shift in EOD tab for accurate tracking.</div>` : ''}
       <div style="overflow-x:auto">
       <table class="eod-table">
         <thead><tr>
@@ -4263,15 +4783,21 @@ function switchView(view) {
   const isAdjust    = view === 'adjust';
   const isEOD       = view === 'eod';
   const isBOM       = view === 'bom';
+  const isPurchEntry = view === 'purchases-entry';
+  const isExpEntry   = view === 'expenses-entry';
+  const isDashboard  = view === 'dashboard';
 
-  document.getElementById('menu-zone').style.display        = isMenu      ? ''     : 'none';
-  document.getElementById('right-sidebar').style.display    = isMenu      ? ''     : 'none';
-  document.getElementById('search').style.display           = isMenu      ? ''     : 'none';
-  document.getElementById('inventory-zone').style.display   = isInventory ? 'flex' : 'none';
-  document.getElementById('reports-zone').style.display     = isReports   ? 'flex' : 'none';
-  document.getElementById('adjust-zone').style.display      = isAdjust    ? 'flex' : 'none';
-  document.getElementById('eod-zone').style.display         = isEOD       ? 'flex' : 'none';
-  document.getElementById('bom-zone').style.display         = isBOM       ? 'flex' : 'none';
+  document.getElementById('menu-zone').style.display             = isMenu       ? ''     : 'none';
+  document.getElementById('right-sidebar').style.display         = isMenu       ? ''     : 'none';
+  document.getElementById('search').style.display                = isMenu       ? ''     : 'none';
+  document.getElementById('inventory-zone').style.display        = isInventory  ? 'flex' : 'none';
+  document.getElementById('reports-zone').style.display          = isReports    ? 'flex' : 'none';
+  document.getElementById('adjust-zone').style.display           = isAdjust     ? 'flex' : 'none';
+  document.getElementById('eod-zone').style.display              = isEOD        ? 'flex' : 'none';
+  document.getElementById('bom-zone').style.display              = isBOM        ? 'flex' : 'none';
+  document.getElementById('purchases-entry-zone').style.display  = isPurchEntry ? 'flex' : 'none';
+  document.getElementById('expenses-entry-zone').style.display   = isExpEntry   ? 'flex' : 'none';
+  document.getElementById('dashboard-zone').style.display        = isDashboard  ? 'flex' : 'none';
   const cartBtn = document.getElementById('mob-cart-btn');
   if (cartBtn) cartBtn.style.display = isMenu ? 'flex' : 'none';
 
@@ -4280,6 +4806,12 @@ function switchView(view) {
   if (isAdjust)     { loadStockAdjust(); loadAdjLog(); }
   if (isEOD)        loadEOD();
   if (isBOM)        loadBOM();
+  if (isPurchEntry) loadPurchases();
+  if (isExpEntry)   {
+    const expDate = document.getElementById('exp-date');
+    if (expDate && !expDate.value) expDate.value = todayManila();
+  }
+  if (isDashboard)  loadDashboard();
 }
 
 function switchReport(type, updateSel = true) {
@@ -4358,6 +4890,13 @@ async function loadInventory() {
   }
 }
 
+function calcBulkStock(baseStock, conversion) {
+  const conv = parseFloat(conversion) || 1;
+  if (conv <= 1) return null; // no bulk unit configured
+  const bulk = baseStock / conv;
+  return Number.isInteger(bulk) ? bulk : parseFloat(bulk.toFixed(2));
+}
+
 function changeInvUnit(sel) {
   const wrap   = sel.closest('.inv-uom-wrap');
   const valEl  = wrap.querySelector('.inv-stock-val');
@@ -4411,94 +4950,95 @@ function renderInventory() {
 
   content.innerHTML = `<table class="inv-table">
     <thead><tr>
-      <th>Ingredient</th><th>Category</th>
-      <th>Stock</th><th>Unit</th><th>Min Stock</th>
-      <th>Status</th><th>Supplier</th><th>Last Updated</th>
+      <th>Item Name</th><th>Category</th>
+      <th>Stock (Base Unit)</th><th>Unit of Measure</th>
+      <th>Conversion (Pcs/Pack)</th><th>Stock (Bulk/Packs)</th>
+      <th>Min Stock (Alert)</th><th>Unit Cost (Base)</th>
+      <th>Total Value</th><th>Status</th>
     </tr></thead>
     <tbody>${items.map(m => {
       const status = m.stock <= 0 ? 'out' : m.stock < m.minStock ? (m.stock < m.minStock * 0.5 ? 'critical' : 'low') : 'ok';
       const statusLabel = {out:'OUT',critical:'CRITICAL',low:'LOW',ok:'OK'}[status];
       const stockClass = m.stock <= 0 ? 'out' : m.stock < m.minStock ? 'low' : 'ok';
-      const hasPurchaseUnit = m.purchaseUnit && m.pcsPerPurchaseUnit > 1;
-      // Stock cell: value + unit dropdown if purchase unit configured
-      const stockCell = hasPurchaseUnit
-        ? `<div class="inv-uom-wrap">
-             <span class="inv-stock-val ${stockClass}">${m.stock}</span>
-             <select class="inv-unit-sel"
-               data-stock="${m.stock}" data-ppu="${m.pcsPerPurchaseUnit}"
-               onchange="changeInvUnit(this)" title="Switch display unit">
-               <option value="base">${m.unit||'pcs'}</option>
-               <option value="purchase">${m.purchaseUnit}</option>
-             </select>
-           </div>`
-        : `<span class="inv-stock-val ${stockClass}">${m.stock} ${m.unit||'pcs'}</span>`;
-      // Min stock
-      const minPurchase = hasPurchaseUnit ? ` (${Math.ceil(m.minStock/m.pcsPerPurchaseUnit)} ${m.purchaseUnit})` : '';
+      const totalVal = m.totalValue || (m.stock * m.unitCost);
+      const bulkCalc = calcBulkStock(m.stock, m.conversion);
+      const bulkDisplay = bulkCalc !== null
+        ? `<div style="font-size:9px;color:var(--muted);margin-top:2px">${bulkCalc} Pack${bulkCalc!==1?'s':''}</div>`
+        : '';
       return `<tr id="inv-row-${m.name.replace(/\s+/g,'_')}">
-        <td><div class="inv-item-name"><span style="font-size:18px">${m.emoji||'📦'}</span>${m.name}</div></td>
+        <td><div class="inv-item-name"><span style="font-size:18px">📦</span>${m.name}</div></td>
         <td>${m.category||'—'}</td>
-        <td>${stockCell}</td>
-        <td style="color:var(--muted)">${m.unit||'pcs'}${hasPurchaseUnit?` / ${m.purchaseUnit}`:''}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px">${m.minStock}${minPurchase}</td>
+        <td>
+          <span class="inv-stock-val ${stockClass}">${m.stock} <span style="font-size:10px;font-weight:400">${m.unit||'pcs'}</span></span>
+          ${bulkDisplay}
+        </td>
+        <td style="color:var(--muted)">${m.unit||'pcs'}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;text-align:center">${m.conversion||1}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:12px">${m.bulkStock||bulkCalc||0}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px">${m.minStock}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:12px">₱${m.unitCost.toFixed(2)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600">₱${totalVal.toFixed(2)}</td>
         <td><span class="inv-badge ${status}">${statusLabel}</span></td>
-        <td style="font-size:11px">${m.supplier||'—'}</td>
-        <td style="font-size:10px;color:var(--muted)">${m.lastUpdated||'—'}</td>
       </tr>`;
     }).join('')}</tbody>
   </table>`;
 }
 
 async function deductInventory(orderItems) {
+  // Inventory deduction is handled server-side by GAS logSale → deductStock (recipe-based).
+  // Client-side: update cache optimistically for immediate UI feedback, then refresh from GAS.
   const url = localStorage.getItem(LS.GAS);
   if (!url) return;
 
-  // Optimistic client-side deduction using recipesCache
-  if (recipesCache.length && inventoryCache.length) {
-    orderItems.forEach(item => {
-      const matchName = String(item.name || '').trim().toLowerCase();
-      const matchId   = String(item.id   || '').trim();
-      const bom = recipesCache.filter(r => {
-        const rName = String(r.menuItemName || '').trim().toLowerCase();
-        const rId   = String(r.menuItemId  || '').trim();
-        return rId === matchId || rName === matchName;
-      });
-      bom.forEach(row => {
-        const ingName = String(row.ingredient || '').trim().toLowerCase();
-        const ingQty  = (parseFloat(row.qtyUsed) || 0) * (item.qty || 1);
-        const inv = inventoryCache.find(m => String(m.name || '').trim().toLowerCase() === ingName);
-        if (inv) inv.stock = Math.max(0, (parseFloat(inv.stock) || 0) - ingQty);
-      });
-    });
-    if (document.getElementById('inventory-zone').style.display !== 'none') renderInventory();
-  }
-
+  // Ensure caches loaded
   try {
-    await fetch(url, {
-      method:'POST', mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        action: 'deduct_stock',
-        items: orderItems.map(i => ({ id: i.id, name: i.name, qty: i.qty }))
-      })
-    });
-    // Refresh inventory cache after deduction
-    setTimeout(async () => {
-      const res2 = await fetch(url + '?action=inventory&t=' + Date.now());
-      if (res2.ok) {
-        const data = await res2.json();
-        if (Array.isArray(data)) {
-          inventoryCache = data;
-          // If inventory tab is open, re-render
-          if (document.getElementById('inventory-zone').style.display !== 'none') renderInventory();
-          // Low stock toast
-          const lowItems = data.filter(m => m.stock < m.minStock && m.stock > 0);
-          const outItems = data.filter(m => m.stock <= 0);
-          if (outItems.length) showToast(`${outItems.map(m=>m.name).slice(0,2).join(', ')} OUT OF STOCK`, '🔴', 4000);
-          else if (lowItems.length) showToast(`Low stock: ${lowItems.map(m=>m.name).slice(0,2).join(', ')}`, '⚠️', 3500);
-        }
-      }
-    }, 1500);
+    const fetches = [];
+    if (!inventoryCache.length) fetches.push(fetch(url + '?action=inventory&t=' + Date.now()).then(r=>r.json()).then(d=>{ if(Array.isArray(d)) inventoryCache=d; }).catch(()=>{}));
+    if (!recipesCache.length)   fetches.push(fetch(url + '?action=recipes&t='   + Date.now()).then(r=>r.json()).then(d=>{ if(Array.isArray(d)) recipesCache=d;   }).catch(()=>{}));
+    if (fetches.length) await Promise.all(fetches);
   } catch {}
+
+  // Build ingredient deduction map from recipes (same logic GAS deductStock uses)
+  const deductions = {};
+  orderItems.forEach(item => {
+    const matchName = String(item.name || '').trim().toLowerCase();
+    const bom = recipesCache.filter(r =>
+      String(r.menuItemName || r['Menu Item Name'] || '').trim().toLowerCase() === matchName
+    );
+    if (bom.length) {
+      bom.forEach(row => {
+        const ing = String(row.ingredient || row['Ingredient'] || '').trim().toLowerCase();
+        const qty = (parseFloat(row.qtyUsed || row['Qty Used']) || 0) * (item.qty || 1);
+        if (ing && qty > 0) deductions[ing] = (deductions[ing] || 0) + qty;
+      });
+    } else {
+      // No recipe: deduct item itself (user must add 1:1 recipe row in GSheet for this to work server-side)
+      deductions[matchName] = (deductions[matchName] || 0) + (item.qty || 1);
+    }
+  });
+
+  // Optimistic client-side update
+  Object.entries(deductions).forEach(([ing, qty]) => {
+    const inv = inventoryCache.find(m => String(m.name || '').trim().toLowerCase() === ing);
+    if (inv) inv.stock = Math.max(0, (parseFloat(inv.stock) || 0) - qty);
+  });
+  if (Object.keys(deductions).length && document.getElementById('inventory-zone').style.display !== 'none') renderInventory();
+
+  // Refresh from GAS after 3s to reflect server-side deduction and check low stock
+  setTimeout(async () => {
+    try {
+      const res = await fetch(url + '?action=inventory&t=' + Date.now());
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!Array.isArray(data)) return;
+      inventoryCache = data;
+      if (document.getElementById('inventory-zone').style.display !== 'none') renderInventory();
+      const low = data.filter(m => parseFloat(m.stock) > 0 && parseFloat(m.stock) < parseFloat(m.minStock));
+      const out = data.filter(m => parseFloat(m.stock) <= 0);
+      if (out.length)  showToast(`OUT OF STOCK: ${out.map(m=>m.name).slice(0,2).join(', ')}`, '🔴', 4000);
+      else if (low.length) showToast(`Low stock: ${low.map(m=>m.name).slice(0,2).join(', ')}`, '⚠️', 3500);
+    } catch {}
+  }, 3000);
 }
 
 // ── SALES HISTORY ──────────────────────────
@@ -4840,10 +5380,13 @@ function changeQty(id, delta) {
 
 function clearCart() {
   cart = [];
-  document.getElementById('f-received').value = '';
+  ['f-received','mob-received'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   document.getElementById('f-name').value = '';
+  document.getElementById('f-method').value = 'Cash';
   document.getElementById('split-a1').value = '';
   document.getElementById('split-a2').value = '';
+  document.querySelectorAll('.pay-mth').forEach(b => b.classList.toggle('active', b.dataset.pm === 'Cash'));
+  ['cash-section','mob-cash-section'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ''; });
   saveCart(); renderAll();
 }
 
@@ -4899,18 +5442,21 @@ function renderSummary() {
 
 function updateChange() {
   const {total} = calcTotals();
-  const method = document.getElementById('f-method').value;
+  const method = document.getElementById('f-method')?.value || 'Cash';
   let received = 0;
   if (method === 'Split') {
-    received = (parseFloat(document.getElementById('split-a1').value)||0)
-             + (parseFloat(document.getElementById('split-a2').value)||0);
+    received = (parseFloat(document.getElementById('split-a1')?.value)||0)
+             + (parseFloat(document.getElementById('split-a2')?.value)||0);
   } else {
-    received = parseFloat(document.getElementById('f-received').value)||0;
+    received = parseFloat(document.getElementById('f-received')?.value)||0;
   }
   const change = received - total;
-  const el = document.getElementById('change-val');
-  el.textContent = fmt(Math.abs(change));
-  el.className = 'change-val ' + (change >= 0 ? 'pos' : 'neg');
+  const cls = 'change-val ' + (change >= 0 ? 'pos' : 'neg');
+  const txt = fmt(Math.abs(change));
+  ['change-val','mob-change-val'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = txt; el.className = cls; }
+  });
 }
 
 // ── RENDER: RIGHT SIDEBAR ──────────────────
@@ -4993,7 +5539,7 @@ async function processOrder() {
   const payload = {
     action: 'pos_order',
     order_id: oid,
-    date: now.toLocaleDateString('en-CA'),  // always YYYY-MM-DD — unambiguous for GSheet filtering
+    date: todayManila(),  // Manila timezone, YYYY-MM-DD — unambiguous for GSheet filtering
     time: now.toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'}),
     timestamp: now.toISOString(),
     customer_name: name,
@@ -5170,16 +5716,39 @@ function saveSettings() {
   showToast('Settings saved!');
 }
 
-// ── PAYMENT METHOD SWITCH ──────────────────
-function onMethodChange() {
-  const m = document.getElementById('f-method').value;
-  const isSplit = m === 'Split';
-  const isCash = m === 'Cash';
-  document.getElementById('split-wrap').style.display = isSplit ? 'block' : 'none';
-  document.getElementById('cash-wrap').style.display = isSplit ? 'none' : 'block';
-  document.getElementById('change-box').style.display = (isCash || isSplit) ? 'flex' : 'none';
+// ── INLINE PAYMENT ─────────────────────────
+function selectPayMethod(btn) {
+  const pm = btn.dataset.pm;
+  document.querySelectorAll('.pay-mth').forEach(b => b.classList.toggle('active', b.dataset.pm === pm));
+  document.getElementById('f-method').value = pm;
+  const isCash = pm === 'Cash';
+  ['cash-section','mob-cash-section'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isCash ? '' : 'none';
+  });
+  if (!isCash) {
+    const fr = document.getElementById('f-received');
+    const mr = document.getElementById('mob-received');
+    if (fr) fr.value = '';
+    if (mr) mr.value = '';
+  }
   updateChange();
 }
+function syncReceived(srcId, destId) {
+  const src = document.getElementById(srcId);
+  const dest = document.getElementById(destId);
+  if (src && dest) dest.value = src.value;
+}
+function addQuickAmt(v) {
+  const inp = document.getElementById('f-received');
+  const mob = document.getElementById('mob-received');
+  const cur = parseFloat(inp?.value || 0) || 0;
+  const val = (cur + v).toFixed(2);
+  if (inp) inp.value = val;
+  if (mob) mob.value = val;
+  updateChange();
+}
+
 
 // ── KEYBOARD SHORTCUTS ─────────────────────
 document.addEventListener('keydown', e => {
@@ -5223,15 +5792,8 @@ document.getElementById('mob-btn-clear').addEventListener('click', () => { clear
 document.getElementById('btn-process').addEventListener('click', processOrder);
 document.getElementById('mob-process').addEventListener('click', processOrder);
 document.getElementById('btn-print').addEventListener('click', printReceipt);
-document.getElementById('f-method').addEventListener('change', onMethodChange);
-document.getElementById('f-received').addEventListener('input', updateChange);
-document.getElementById('split-a1').addEventListener('input', updateChange);
-document.getElementById('split-a2').addEventListener('input', updateChange);
-document.querySelectorAll('.q-amt').forEach(b => b.addEventListener('click', () => {
-  const inp = document.getElementById('f-received');
-  inp.value = ((parseFloat(inp.value)||0) + parseFloat(b.dataset.v)).toFixed(2);
-  updateChange();
-}));
+document.getElementById('split-a1')?.addEventListener('input', updateChange);
+document.getElementById('split-a2')?.addEventListener('input', updateChange);
 document.getElementById('mob-cart-btn').addEventListener('click', () =>
   document.getElementById('cart-sheet').classList.toggle('open')
 );
@@ -5242,6 +5804,226 @@ document.getElementById('overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('overlay')) newOrder();
 });
 
+// ── DASHBOARD ──────────────────────────────
+let _dashLoading = false;
+
+async function loadDashboard() {
+  if (_dashLoading) return;
+  _dashLoading = true;
+
+  const url   = localStorage.getItem(LS.GAS);
+  const today = todayManila();
+
+  const subEl = document.getElementById('dash-sub');
+  if (subEl) subEl.textContent = new Date().toLocaleDateString('en-PH', {
+    weekday:'long', year:'numeric', month:'long', day:'numeric', timeZone:'Asia/Manila'
+  });
+
+  if (!url) {
+    document.getElementById('dash-kpis').innerHTML =
+      `<div style="grid-column:1/-1;text-align:center;padding:24px;font-size:12px;color:var(--muted)">
+        ⚠️ No Sheets connected — add your Apps Script URL in Settings first
+      </div>`;
+    _dashLoading = false;
+    return;
+  }
+
+  const { from: weekFrom } = rptDateRange('week');
+  const needInv = !inventoryCache.length;
+  const needRec = !recipesCache.length;
+
+  try {
+    const fetches = [
+      fetch(`${url}?action=sales_report&from=${today}&to=${today}&t=${Date.now()}`),
+      fetch(`${url}?action=expenses_report&from=${today}&to=${today}&t=${Date.now()}`),
+      fetch(`${url}?action=sales_report&from=${weekFrom}&to=${today}&t=${Date.now()}`)
+    ];
+    if (needInv) fetches.push(fetch(`${url}?action=inventory&t=${Date.now()}`));
+    if (needRec) fetches.push(fetch(`${url}?action=recipes&t=${Date.now()}`));
+
+    const results = await Promise.all(fetches);
+    let ridx = 3;
+    if (needInv) { try { const d = await results[ridx++].json(); if (Array.isArray(d)) inventoryCache = d; } catch {} }
+    if (needRec) { try { const d = await results[ridx++].json(); if (Array.isArray(d)) recipesCache   = d; } catch {} }
+
+    const todaySales = results[0].ok ? await results[0].json() : [];
+    const todayExpRaw= results[1].ok ? await results[1].json() : [];
+    const weekSales  = results[2].ok ? await results[2].json() : [];
+
+    // ── Cost helpers (same as generateSalesReport) ──────────────
+    const sample = (Array.isArray(todaySales) && todaySales[0]) || (Array.isArray(weekSales) && weekSales[0]);
+    const col = sample
+      ? k => { const v=[k,k.toLowerCase(),k.replace(/ /g,'_'),k.replace(/ /g,'_').toLowerCase()]; return v.find(x=>sample[x]!==undefined)||k; }
+      : k => k;
+
+    const costMap = {};
+    inventoryCache.forEach(m => { if (m.name) costMap[m.name.trim().toLowerCase()] = parseFloat(m.unitCost)||0; });
+    const recipeMap = {};
+    recipesCache.forEach(r => {
+      const key = (r.menuItemName || r['Menu Item Name'] || '').trim();
+      if (!recipeMap[key]) recipeMap[key] = [];
+      const _qty  = parseFloat(r.qtyUsed || r['Qty Used']) || 1;
+      const _colF = parseFloat(r['Unit Cost'] ?? r.unitCost);
+      recipeMap[key].push({
+        ingredient: (r.ingredient || r['Ingredient'] || '').trim().toLowerCase(),
+        qtyUsed:    _qty,
+        unitCost:   isNaN(_colF) ? null : _colF / _qty
+      });
+    });
+    const parseSaleItems = str => String(str).split(',').map(p => {
+      const m = p.trim().match(/^(.+)\s+x(\d+)$/i);
+      return m ? { name: m[1].trim(), qty: parseInt(m[2]) } : null;
+    }).filter(Boolean);
+
+    // ── Today KPIs ──────────────────────────────────────────────
+    const tSales = Array.isArray(todaySales) ? todaySales : [];
+    const todayRev    = tSales.reduce((s,r) => s + (parseFloat(r[col('Total')])||0), 0);
+    const todayOrders = tSales.length;
+
+    let todayCOGS = 0;
+    tSales.forEach(sale => {
+      parseSaleItems(sale[col('Items')]||sale['items_summary']||'').forEach(({ name, qty }) => {
+        (recipeMap[name]||[]).forEach(({ ingredient, qtyUsed, unitCost }) => {
+          const uc = unitCost !== null ? unitCost : (costMap[ingredient]||0);
+          todayCOGS += uc * qtyUsed * qty;
+        });
+      });
+    });
+
+    // Filter out __EOD__ sentinels and Shift Log from expenses
+    const realExp = (Array.isArray(todayExpRaw) ? todayExpRaw : []).filter(r => {
+      const cat = String(r['Date']||r['Category']||r['category']||'').trim();
+      return cat !== '__EOD__' && cat !== 'Shift Log';
+    });
+    const todayExpAmt = realExp.reduce((s,r) => s + (parseFloat(r['Amount'])||0), 0);
+    const hasRecipes  = recipesCache.length > 0;
+    const netProfit   = todayRev - (hasRecipes ? todayCOGS : 0) - todayExpAmt;
+    const margin      = todayRev > 0 ? ((netProfit / todayRev) * 100).toFixed(1) : '0.0';
+
+    // ── KPI cards ───────────────────────────────────────────────
+    document.getElementById('dash-kpis').innerHTML = `
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-glow" style="background:var(--amber)"></div>
+        <div class="dash-kpi-icon">💰</div>
+        <div class="dash-kpi-lbl">Today's Revenue</div>
+        <div class="dash-kpi-num kpi-amber">${fmt(todayRev)}</div>
+        <div class="dash-kpi-hint">${todayOrders} order${todayOrders!==1?'s':''}</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-glow" style="background:#a855f7"></div>
+        <div class="dash-kpi-icon">📦</div>
+        <div class="dash-kpi-lbl">COGS</div>
+        <div class="dash-kpi-num" style="${hasRecipes?'color:#c084fc':'color:var(--muted)'}">
+          ${hasRecipes ? fmt(todayCOGS) : '—'}
+        </div>
+        <div class="dash-kpi-hint">${hasRecipes ? 'est. cost of goods' : 'set up recipes to track'}</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-glow" style="background:var(--red)"></div>
+        <div class="dash-kpi-icon">💸</div>
+        <div class="dash-kpi-lbl">Expenses</div>
+        <div class="dash-kpi-num kpi-red">${fmt(todayExpAmt)}</div>
+        <div class="dash-kpi-hint">${realExp.length} item${realExp.length!==1?'s':''}</div>
+      </div>
+      <div class="dash-kpi-card">
+        <div class="dash-kpi-glow" style="background:${netProfit>=0?'var(--green)':'var(--red)'}"></div>
+        <div class="dash-kpi-icon">${netProfit>=0?'📈':'📉'}</div>
+        <div class="dash-kpi-lbl">Net Profit</div>
+        <div class="dash-kpi-num ${netProfit>=0?'kpi-green':'kpi-red'}">${fmt(netProfit)}</div>
+        <div class="dash-kpi-hint">${hasRecipes ? margin+'% margin' : 'excl. COGS'}</div>
+      </div>`;
+
+    // ── Week top items bar chart ─────────────────────────────────
+    const wSales = Array.isArray(weekSales) ? weekSales : [];
+    const weekItemCount = {};
+    wSales.forEach(sale => {
+      parseSaleItems(sale[col('Items')]||sale['items_summary']||'').forEach(({ name, qty }) => {
+        weekItemCount[name] = (weekItemCount[name]||0) + qty;
+      });
+    });
+    const topItems = Object.entries(weekItemCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const maxQty   = topItems.length ? topItems[0][1] : 1;
+
+    const chartPeriodEl = document.getElementById('dash-chart-period');
+    if (chartPeriodEl) chartPeriodEl.textContent = `${weekFrom} → ${today}`;
+
+    document.getElementById('dash-top-items').innerHTML = topItems.length
+      ? topItems.map(([name,qty],i) => `
+          <div class="dash-bar-row">
+            <span class="dash-bar-rank">${i+1}</span>
+            <span class="dash-bar-name" title="${name}">${name}</span>
+            <div class="dash-bar-track">
+              <div class="dash-bar-fill" style="width:${Math.round((qty/maxQty)*100)}%"></div>
+            </div>
+            <span class="dash-bar-qty">${qty}</span>
+          </div>`).join('')
+      : `<div style="font-size:11px;color:var(--muted);padding:12px 0">No sales data for this week</div>`;
+
+    // ── P&L summary card ────────────────────────────────────────
+    const plRows = hasRecipes
+      ? `<div class="dash-pl-row"><span class="dash-pl-lbl">Revenue</span><span class="dash-pl-val kpi-amber" style="color:var(--amber)">${fmt(todayRev)}</span></div>
+         <div class="dash-pl-row"><span class="dash-pl-lbl">COGS</span><span class="dash-pl-val kpi-red" style="color:var(--red)">− ${fmt(todayCOGS)}</span></div>
+         <div class="dash-pl-row"><span class="dash-pl-lbl">Expenses</span><span class="dash-pl-val kpi-red" style="color:var(--red)">− ${fmt(todayExpAmt)}</span></div>`
+      : `<div class="dash-pl-row"><span class="dash-pl-lbl">Revenue</span><span class="dash-pl-val" style="color:var(--amber)">${fmt(todayRev)}</span></div>
+         <div class="dash-pl-row"><span class="dash-pl-lbl">Expenses</span><span class="dash-pl-val" style="color:var(--red)">− ${fmt(todayExpAmt)}</span></div>
+         <div class="dash-pl-row"><span class="dash-pl-lbl" style="opacity:.5">COGS</span><span class="dash-pl-val" style="color:var(--muted)">no recipes</span></div>`;
+    const netLabel = hasRecipes ? 'Net Profit' : 'Gross (excl. COGS)';
+    document.getElementById('dash-pl').innerHTML = `
+      ${plRows}
+      <div class="dash-pl-total">
+        <span class="dash-pl-total-lbl">${netLabel}</span>
+        <span class="dash-pl-total-val" style="color:${netProfit>=0?'var(--green)':'var(--red)'}">${fmt(netProfit)}</span>
+      </div>`;
+
+    // ── 7-day sparkline ─────────────────────────────────────────
+    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const days = [];
+    const dayTotals = {};
+    for (let i = 6; i >= 0; i--) {
+      const d  = new Date();
+      d.setDate(d.getDate() - i);
+      const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      days.push({ ds, dow: d.getDay() });
+      dayTotals[ds] = 0;
+    }
+    wSales.forEach(sale => {
+      const ds = String(sale[col('Date')]||'').slice(0,10);
+      if (dayTotals[ds] !== undefined) dayTotals[ds] += parseFloat(sale[col('Total')])||0;
+    });
+    // Also include today's sales in the sparkline
+    tSales.forEach(sale => {
+      const ds = String(sale[col('Date')]||today).slice(0,10);
+      if (dayTotals[ds] !== undefined) dayTotals[ds] += parseFloat(sale[col('Total')])||0;
+    });
+    const maxDay = Math.max(...Object.values(dayTotals), 1);
+
+    document.getElementById('dash-sparkline').innerHTML =
+      `<div class="dash-spark-wrap">${
+        days.map(({ ds, dow }) => {
+          const val   = dayTotals[ds];
+          const pct   = val > 0 ? Math.max((val / maxDay) * 100, 4) : 2;
+          const isToday = ds === today;
+          const amtLbl  = val > 0
+            ? (val >= 1000 ? '₱' + (val/1000).toFixed(1).replace(/\.0$/,'') + 'k' : '₱' + Math.round(val))
+            : '';
+          return `<div class="dash-spark-col">
+            <div class="dash-spark-amt" style="color:${isToday?'var(--amber)':'var(--muted)'}">${amtLbl}</div>
+            <div class="dash-spark-bar" style="height:${pct}%;background:${isToday?'var(--amber)':'var(--amber-dim)'}"></div>
+            <div class="dash-spark-lbl" style="color:${isToday?'var(--amber)':'var(--muted)'}">${dayNames[dow]}</div>
+          </div>`;
+        }).join('')
+      }</div>`;
+
+  } catch (err) {
+    document.getElementById('dash-kpis').innerHTML =
+      `<div style="grid-column:1/-1;text-align:center;padding:24px;font-size:12px;color:var(--red)">
+        ❌ Error loading dashboard: ${err.message}
+      </div>`;
+  } finally {
+    _dashLoading = false;
+  }
+}
+
 // ── INIT ───────────────────────────────────
 function init() {
   loadMenu();      // load saved menu first (fallback while GSheet loads)
@@ -5250,10 +6032,16 @@ function init() {
   renderCats();
   renderGrid();
   renderAll();
-  onMethodChange();
   setSyncStatus(false);
-  // Auto-sync menu from GSheet on every startup (silent)
-  if (localStorage.getItem(LS.GAS)) fetchMenuFromSheets(false);
+  // Auto-sync menu + caches from GSheet on startup (silent)
+  if (localStorage.getItem(LS.GAS)) {
+    fetchMenuFromSheets(false);
+    const _u = localStorage.getItem(LS.GAS);
+    Promise.all([
+      fetch(_u + '?action=inventory&t=' + Date.now()).then(r=>r.json()).then(d=>{ if(Array.isArray(d)) inventoryCache=d; }).catch(()=>{}),
+      fetch(_u + '?action=recipes&t='   + Date.now()).then(r=>r.json()).then(d=>{ if(Array.isArray(d)) recipesCache=d;   }).catch(()=>{})
+    ]);
+  }
 }
 init();
 </script>
