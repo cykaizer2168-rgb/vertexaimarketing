@@ -1695,8 +1695,8 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
       <div class="users-add-card">
         <div class="users-add-title">Add New User</div>
         <div class="users-add-row">
-          <input class="login-input" id="new-user-name" placeholder="Username" style="flex:1;min-width:110px;margin-bottom:0"/>
-          <input class="login-input" id="new-user-pass" type="password" placeholder="Password" style="flex:1;min-width:110px;margin-bottom:0"/>
+          <input class="login-input" id="new-user-name" placeholder="Username" autocomplete="off" autocapitalize="none" style="flex:1;min-width:110px;margin-bottom:0"/>
+          <input class="login-input" id="new-user-pass" type="password" placeholder="Password" autocomplete="new-password" style="flex:1;min-width:110px;margin-bottom:0"/>
           <select class="inv-cat-filter" id="new-user-role" style="height:48px">
             <option value="user">👤 User</option>
             <option value="admin">🔑 Admin</option>
@@ -5926,17 +5926,17 @@ function authGetSession() {
 }
 
 function doLogin() {
-  const username = (document.getElementById('login-user').value || '').trim();
-  const password =  document.getElementById('login-pass').value || '';
+  const username = (document.getElementById('login-user').value || '').trim().toLowerCase();
+  const password = (document.getElementById('login-pass').value || '').trim();
   const errEl    =  document.getElementById('login-err');
 
   if (!username || !password) { errEl.textContent = 'Enter username and password'; return; }
 
-  // Bootstrap default admin on first login attempt if no users stored
+  // Ensure default admin exists on first run
   if (!localStorage.getItem(AUTH_USERS_KEY)) authSaveUsers([ADMIN_DEFAULT]);
 
   const users = authGetUsers();
-  const user  = users.find(u => u.username === username && u.password === password);
+  const user  = users.find(u => u.username.toLowerCase() === username && u.password === password);
 
   if (!user) {
     errEl.textContent = 'Incorrect username or password';
@@ -5979,14 +5979,14 @@ function applyRoleAccess(role, username) {
 }
 
 function addUser() {
-  const name = (document.getElementById('new-user-name').value || '').trim();
+  const name = (document.getElementById('new-user-name').value || '').trim().toLowerCase();
   const pass = (document.getElementById('new-user-pass').value || '').trim();
   const role =  document.getElementById('new-user-role').value;
 
   if (!name || !pass) { showToast('Enter username and password', '⚠️'); return; }
 
   const users = authGetUsers();
-  if (users.find(u => u.username === name)) { showToast('Username already exists', '⚠️'); return; }
+  if (users.find(u => u.username.toLowerCase() === name)) { showToast('Username already exists', '⚠️'); return; }
 
   users.push({ username: name, password: pass, role });
   authSaveUsers(users);
