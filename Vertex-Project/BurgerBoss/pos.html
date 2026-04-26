@@ -2325,6 +2325,8 @@ function doGet(e) {
   }
 
   // ── Ping / health check ──
+  if (action === 'get_users') return json(getUsers());
+
   if (action === 'ping') {
     const menuSheet = ss.getSheets().find(s => s.getSheetId() === MENU_SHEET_GID);
     const rows = menuSheet ? Math.max(0, menuSheet.getLastRow() - 1) : 0;
@@ -2337,6 +2339,9 @@ function doGet(e) {
 function doPost(e) {
   try {
     const data = JSON.parse(e && e.postData ? e.postData.contents : '{}');
+    if (data.action === 'verify_login')       return json(verifyLogin(data));
+    if (data.action === 'add_user')           return json(addUserGAS(data));
+    if (data.action === 'delete_user')        return json(deleteUserGAS(data));
     if (data.action === 'log_sale')       logSale(data);
     if (data.action === 'deduct_stock')   deductStock(data.items || []);
     if (data.action === 'adjust_stock')   adjustStock(data.items || [], data.reason || '', data.doneBy || 'POS');
@@ -2773,6 +2778,75 @@ function reconcileStock(deductions) {
     invSheet.getRange(i + 1, stockCol + 1).setValue(newStock);
     if (updatedCol >= 0) invSheet.getRange(i + 1, updatedCol + 1).setValue(now);
   }
+}
+
+// ── USER MANAGEMENT ──────────────────────────
+const USERS_SHEET_NAME = 'Users';
+
+function getUsers() {
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(USERS_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+  return sheet.getDataRange().getValues().slice(1)
+    .filter(r => r[0])
+    .map(r => ({ username: String(r[0]).trim(), role: String(r[2] || 'user').trim() }));
+}
+
+function verifyLogin(data) {
+  const uname = String(data.username || '').trim().toLowerCase();
+  const pass  = String(data.password || '').trim();
+  if (!uname || !pass) return { ok: false, verified: true };
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(USERS_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() < 2) {
+    return (uname === 'admin' && pass === 'admin2025')
+      ? { ok: true, verified: true, role: 'admin', username: 'admin' }
+      : { ok: false, verified: true };
+  }
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0] || '').trim().toLowerCase() === uname &&
+        String(rows[i][1] || '').trim() === pass) {
+      return { ok: true, verified: true, role: String(rows[i][2] || 'user').trim(), username: String(rows[i][0]).trim() };
+    }
+  }
+  return { ok: false, verified: true };
+}
+
+function addUserGAS(data) {
+  const ss2   = SpreadsheetApp.openById(SPREADSHEET_ID);
+  let   sheet = ss2.getSheetByName(USERS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss2.insertSheet(USERS_SHEET_NAME);
+    sheet.appendRow(['Username', 'Password', 'Role']);
+    sheet.getRange(1, 1, 1, 3).setFontWeight('bold');
+    sheet.appendRow(['admin', 'admin2025', 'admin']);
+  }
+  const uname = String(data.username || '').trim().toLowerCase();
+  const pass  = String(data.password || '').trim();
+  const role  = String(data.role || 'user').trim();
+  if (!uname || !pass) return { ok: false, error: 'Missing fields' };
+  if (sheet.getLastRow() >= 2) {
+    const rows = sheet.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      if (String(rows[i][0] || '').trim().toLowerCase() === uname)
+        return { ok: false, error: 'Username already exists' };
+    }
+  }
+  sheet.appendRow([uname, pass, role]);
+  return { ok: true };
+}
+
+function deleteUserGAS(data) {
+  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(USERS_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() < 2) return { ok: false, error: 'User not found' };
+  const uname = String(data.username || '').trim().toLowerCase();
+  const rows  = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0] || '').trim().toLowerCase() === uname) {
+      sheet.deleteRow(i + 1);
+      return { ok: true };
+    }
+  }
+  return { ok: false, error: 'User not found' };
 }
 
 function json(data) {
@@ -5925,31 +5999,57 @@ function authGetSession() {
   try { return JSON.parse(localStorage.getItem(AUTH_SESSION_KEY)); } catch { return null; }
 }
 
-function doLogin() {
+async function doLogin() {
   const username = (document.getElementById('login-user').value || '').trim().toLowerCase();
   const password = (document.getElementById('login-pass').value || '').trim();
   const errEl    =  document.getElementById('login-err');
+  const btn      =  document.querySelector('.login-btn');
 
   if (!username || !password) { errEl.textContent = 'Enter username and password'; return; }
 
-  // Ensure default admin exists on first run
-  if (!localStorage.getItem(AUTH_USERS_KEY)) authSaveUsers([ADMIN_DEFAULT]);
+  errEl.textContent = '';
+  if (btn) { btn.textContent = 'Signing in…'; btn.disabled = true; }
 
-  const users = authGetUsers();
-  const user  = users.find(u => u.username.toLowerCase() === username && u.password === password);
+  const url = localStorage.getItem(LS.GAS);
+  let loggedIn = null;
 
-  if (!user) {
+  try {
+    if (url) {
+      const res  = await fetch(url, { method: 'POST', body: JSON.stringify({ action: 'verify_login', username, password }) });
+      const data = await res.json();
+      if (data.verified) {
+        // New GAS is deployed — use its result
+        if (data.ok) loggedIn = { username: data.username || username, role: data.role || 'user' };
+      } else {
+        // Old GAS returned generic {ok:true} — fall back to localStorage
+        loggedIn = _localLogin(username, password);
+      }
+    } else {
+      loggedIn = _localLogin(username, password);
+    }
+  } catch {
+    loggedIn = _localLogin(username, password);
+  } finally {
+    if (btn) { btn.textContent = 'Sign In'; btn.disabled = false; }
+  }
+
+  if (!loggedIn) {
     errEl.textContent = 'Incorrect username or password';
     document.getElementById('login-pass').value = '';
     return;
   }
 
-  localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify({ username: user.username, role: user.role }));
+  localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(loggedIn));
   document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('login-err').textContent = '';
   document.getElementById('login-user').value = '';
   document.getElementById('login-pass').value = '';
-  applyRoleAccess(user.role, user.username);
+  applyRoleAccess(loggedIn.role, loggedIn.username);
+}
+
+function _localLogin(username, password) {
+  if (!localStorage.getItem(AUTH_USERS_KEY)) authSaveUsers([ADMIN_DEFAULT]);
+  const found = authGetUsers().find(u => u.username.toLowerCase() === username && u.password === password);
+  return found ? { username: found.username, role: found.role } : null;
 }
 
 function doLogout() {
@@ -5978,54 +6078,94 @@ function applyRoleAccess(role, username) {
   if (nameEl) nameEl.textContent = username || '—';
 }
 
-function addUser() {
+async function addUser() {
   const name = (document.getElementById('new-user-name').value || '').trim().toLowerCase();
   const pass = (document.getElementById('new-user-pass').value || '').trim();
   const role =  document.getElementById('new-user-role').value;
 
   if (!name || !pass) { showToast('Enter username and password', '⚠️'); return; }
 
-  const users = authGetUsers();
-  if (users.find(u => u.username.toLowerCase() === name)) { showToast('Username already exists', '⚠️'); return; }
+  const url = localStorage.getItem(LS.GAS);
+  try {
+    if (url) {
+      const res  = await fetch(url, { method: 'POST', body: JSON.stringify({ action: 'add_user', username: name, password: pass, role }) });
+      const data = await res.json();
+      if (!data.ok) { showToast(data.error || 'Failed to add user', '⚠️'); return; }
+    } else {
+      const users = authGetUsers();
+      if (users.find(u => u.username.toLowerCase() === name)) { showToast('Username already exists', '⚠️'); return; }
+      authSaveUsers([...users, { username: name, password: pass, role }]);
+    }
+  } catch {
+    showToast('Connection error — user not saved', '❌'); return;
+  }
 
-  users.push({ username: name, password: pass, role });
-  authSaveUsers(users);
   document.getElementById('new-user-name').value = '';
   document.getElementById('new-user-pass').value = '';
-  renderUsersList();
+  await renderUsersList();
   showToast(`User "${name}" added`, '✅');
 }
 
-function deleteUser(username) {
-  const users  = authGetUsers();
-  const target = users.find(u => u.username === username);
-  if (!target) return;
-
+async function deleteUser(username) {
   const session = authGetSession();
   if (session?.username === username) { showToast('Cannot delete your own account', '⚠️'); return; }
-  if (target.role === 'admin' && users.filter(u => u.role === 'admin').length <= 1) {
-    showToast('Cannot remove the last admin', '⚠️'); return;
+
+  const url = localStorage.getItem(LS.GAS);
+  try {
+    if (url) {
+      const res  = await fetch(url, { method: 'POST', body: JSON.stringify({ action: 'delete_user', username }) });
+      const data = await res.json();
+      if (!data.ok) { showToast(data.error || 'Failed to remove user', '⚠️'); return; }
+    } else {
+      const users  = authGetUsers();
+      const target = users.find(u => u.username === username);
+      if (!target) return;
+      if (target.role === 'admin' && users.filter(u => u.role === 'admin').length <= 1) {
+        showToast('Cannot remove the last admin', '⚠️'); return;
+      }
+      authSaveUsers(users.filter(u => u.username !== username));
+    }
+  } catch {
+    showToast('Connection error', '❌'); return;
   }
 
-  authSaveUsers(users.filter(u => u.username !== username));
-  renderUsersList();
+  await renderUsersList();
   showToast(`"${username}" removed`, '🗑️');
 }
 
-function renderUsersList() {
+async function renderUsersList() {
   const el = document.getElementById('users-list');
   if (!el) return;
-  const users   = authGetUsers();
+  el.innerHTML = `<div style="font-size:11px;color:var(--muted);padding:8px 0">Loading…</div>`;
+
+  const url = localStorage.getItem(LS.GAS);
+  let users = [];
+
+  try {
+    if (url) {
+      const res  = await fetch(`${url}?action=get_users&t=${Date.now()}`);
+      const data = await res.json();
+      if (Array.isArray(data)) users = data;
+      else users = authGetUsers().map(u => ({ username: u.username, role: u.role }));
+    } else {
+      users = authGetUsers().map(u => ({ username: u.username, role: u.role }));
+    }
+  } catch {
+    users = authGetUsers().map(u => ({ username: u.username, role: u.role }));
+  }
+
   const session = authGetSession();
-  el.innerHTML  = users.map(u => `
-    <div class="user-row">
-      <div class="user-avatar">${u.role === 'admin' ? '🔑' : '👤'}</div>
-      <div class="user-info">
-        <div class="user-name">${u.username}${session?.username===u.username?' <span style="font-size:9px;color:var(--muted)">(you)</span>':''}</div>
-      </div>
-      <span class="user-role-badge ${u.role}">${u.role}</span>
-      <button class="user-del-btn" onclick="deleteUser('${u.username}')">Remove</button>
-    </div>`).join('');
+  el.innerHTML = users.length
+    ? users.map(u => `
+        <div class="user-row">
+          <div class="user-avatar">${u.role === 'admin' ? '🔑' : '👤'}</div>
+          <div class="user-info">
+            <div class="user-name">${u.username}${session?.username===u.username?' <span style="font-size:9px;color:var(--muted)">(you)</span>':''}</div>
+          </div>
+          <span class="user-role-badge ${u.role}">${u.role}</span>
+          <button class="user-del-btn" onclick="deleteUser('${u.username}')">Remove</button>
+        </div>`).join('')
+    : `<div style="font-size:11px;color:var(--muted);padding:12px 0">No users found</div>`;
 }
 
 // ── DASHBOARD ──────────────────────────────
