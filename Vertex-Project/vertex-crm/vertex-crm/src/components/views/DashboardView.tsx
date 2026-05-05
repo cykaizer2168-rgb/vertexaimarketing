@@ -1,25 +1,174 @@
 // src/components/views/DashboardView.tsx
 import { useState } from 'react'
 import { Users, Target, DollarSign, Zap, TrendingUp, ArrowUpRight,
-         Mail, Calendar, MoreHorizontal, ChevronDown, AlertTriangle } from 'lucide-react'
+         Mail, Calendar, MoreHorizontal, ChevronDown, AlertTriangle, FileText } from 'lucide-react'
 import type { Lead, LeadStatus } from '@/types'
 import { ScoreBadge, STATUS_COLORS } from './shared'
 import toast from 'react-hot-toast'
 import StatusDropdown from './StatusDropdown'
+import {
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis,
+} from 'recharts'
+
+// ── Analytics helpers ─────────────────────────────────────────────────────────
+const STATUS_CHART_COLORS: Record<string, string> = {
+  new:       '#3b82f6',
+  contacted: '#f59e0b',
+  qualified: '#a855f7',
+  hot:       '#ef4444',
+  nurture:   '#06b6d4',
+  closed:    '#10b981',
+}
+
+const SOURCE_COLORS: Record<string, string> = {
+  google_sheets: '#3b82f6',
+  manual:        '#10b981',
+  n8n_webhook:   '#f59e0b',
+  landing_page:  '#a855f7',
+}
+
+const SOURCE_LABELS: Record<string, string> = {
+  google_sheets: 'Google Sheets',
+  manual:        'Manual',
+  n8n_webhook:   'n8n Webhook',
+  landing_page:  'Landing Page',
+}
+
+function CustomTooltip({ active, payload }: { active?: boolean; payload?: { name: string; value: number }[] }) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="bg-[#1a1a2e] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-slate-200 shadow-xl">
+      <span className="capitalize">{payload[0].name}</span>
+      <span className="ml-2 font-mono font-semibold">{payload[0].value}</span>
+    </div>
+  )
+}
+
+function AnalyticsSection({ leads }: { leads: Lead[] }) {
+  const statusData = Object.entries(
+    leads.reduce<Record<string, number>>((acc, l) => {
+      acc[l.status] = (acc[l.status] || 0) + 1
+      return acc
+    }, {})
+  ).map(([name, value]) => ({ name, value }))
+
+  const industryData = Object.entries(
+    leads.reduce<Record<string, number>>((acc, l) => {
+      if (l.industry) acc[l.industry] = (acc[l.industry] || 0) + 1
+      return acc
+    }, {})
+  )
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([name, value]) => ({ name, value }))
+
+  const sourceData = Object.entries(
+    leads.reduce<Record<string, number>>((acc, l) => {
+      acc[l.source] = (acc[l.source] || 0) + 1
+      return acc
+    }, {})
+  ).map(([src, value]) => ({
+    name:  SOURCE_LABELS[src] || src,
+    value,
+    color: SOURCE_COLORS[src] || '#64748b',
+  }))
+
+  return (
+    <div className="grid grid-cols-3 gap-3">
+
+      {/* ── Status Distribution ── */}
+      <div className="bg-[#0f0f1a] border border-white/[0.06] rounded-xl p-4">
+        <div className="text-[11px] text-slate-500 uppercase tracking-wider font-medium mb-3">Status Breakdown</div>
+        <div className="flex items-center gap-3">
+          <ResponsiveContainer width={96} height={96}>
+            <PieChart>
+              <Pie data={statusData} cx="50%" cy="50%" innerRadius={26} outerRadius={44}
+                dataKey="value" strokeWidth={0} paddingAngle={2}>
+                {statusData.map((entry, i) => (
+                  <Cell key={i} fill={STATUS_CHART_COLORS[entry.name] || '#64748b'} />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+            {statusData.map(entry => (
+              <div key={entry.name} className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full flex-shrink-0"
+                  style={{ background: STATUS_CHART_COLORS[entry.name] || '#64748b' }} />
+                <span className="text-[11px] text-slate-400 capitalize truncate">{entry.name}</span>
+                <span className="text-[11px] text-slate-200 font-mono ml-auto">{entry.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Top Industries ── */}
+      <div className="bg-[#0f0f1a] border border-white/[0.06] rounded-xl p-4">
+        <div className="text-[11px] text-slate-500 uppercase tracking-wider font-medium mb-3">Top Industries</div>
+        {industryData.length === 0 ? (
+          <div className="text-[11px] text-slate-600 mt-6 text-center">No data</div>
+        ) : (
+          <ResponsiveContainer width="100%" height={128}>
+            <BarChart data={industryData} layout="vertical" barSize={7} margin={{ left: 0, right: 10, top: 0, bottom: 0 }}>
+              <XAxis type="number" hide />
+              <YAxis type="category" dataKey="name" width={90}
+                tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+              <Bar dataKey="value" fill="#3b82f6" radius={[0, 4, 4, 0]}
+                background={{ fill: '#141425', radius: 4 }} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
+      {/* ── Lead Sources ── */}
+      <div className="bg-[#0f0f1a] border border-white/[0.06] rounded-xl p-4">
+        <div className="text-[11px] text-slate-500 uppercase tracking-wider font-medium mb-3">Lead Sources</div>
+        <div className="flex items-center gap-3">
+          <ResponsiveContainer width={96} height={96}>
+            <PieChart>
+              <Pie data={sourceData} cx="50%" cy="50%" innerRadius={26} outerRadius={44}
+                dataKey="value" strokeWidth={0} paddingAngle={2}>
+                {sourceData.map((entry, i) => (
+                  <Cell key={i} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+            {sourceData.map(entry => (
+              <div key={entry.name} className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: entry.color }} />
+                <span className="text-[11px] text-slate-400 truncate">{entry.name}</span>
+                <span className="text-[11px] text-slate-200 font-mono ml-auto">{entry.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  )
+}
 
 interface Props {
-  leads:           Lead[]
-  search:          string
-  authenticated:   boolean
-  onEmailLead:     (lead: Lead) => void
-  onBookingLead:   (lead: Lead) => void
-  onSignIn:        () => void
-  onStatusChange?: (lead: Lead, status: LeadStatus) => void
-  onAddLead?:      () => void
+  leads:            Lead[]
+  search:           string
+  authenticated:    boolean
+  onEmailLead:      (lead: Lead) => void
+  onBookingLead:    (lead: Lead) => void
+  onSignIn:         () => void
+  onStatusChange?:  (lead: Lead, status: LeadStatus) => void
+  onAddLead?:       () => void
+  onGenerateQuote?: (lead: Lead) => void
 }
 
 export default function DashboardView({
-  leads, search, authenticated, onEmailLead, onBookingLead, onSignIn, onStatusChange, onAddLead
+  leads, search, authenticated, onEmailLead, onBookingLead, onSignIn, onStatusChange, onAddLead, onGenerateQuote
 }: Props) {
   const filtered = leads.filter(l =>
     !search || [l.name, l.company, l.industry].some(v =>
@@ -29,9 +178,9 @@ export default function DashboardView({
 
   const stats = {
     total:    leads.length,
-    avgScore: leads.length ? Math.round(leads.reduce((s, l) => s + l.aiScore, 0) / leads.length) : 0,
+    newLeads: leads.filter(l => l.status === 'new').length,
     pipeline: leads.reduce((s, l) => s + l.estimatedValue, 0),
-    hotLeads: leads.filter(l => l.aiScore >= 85).length,
+    hotLeads: leads.filter(l => l.status === 'hot').length,
   }
 
   return (
@@ -51,10 +200,10 @@ export default function DashboardView({
       {/* Stat Cards */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label:'Total Leads',      value: stats.total,                              sub:'+18.4% vs last mo',   icon: Users,      accent:'#3b82f6', badge:`${stats.hotLeads} hot` },
-          { label:'Avg AI Readiness', value: `${stats.avgScore}/100`,                  sub:'Target: 80+',         icon: Target,     accent:'#10b981', badge: stats.avgScore >= 80 ? 'On target' : `${80 - stats.avgScore} pts gap` },
-          { label:'Pipeline Value',   value: `₱${(stats.pipeline/1000).toFixed(0)}k`,  sub:'+32.1% est. revenue', icon: DollarSign, accent:'#a855f7', badge:'Est. total' },
-          { label:'Active n8n Flows', value: 11,                                       sub:'0 errors today',      icon: Zap,        accent:'#f59e0b', badge:'All healthy' },
+          { label:'Total Leads',      value: stats.total,                             sub:'All time',            icon: Users,      accent:'#3b82f6', badge:`${stats.hotLeads} hot` },
+          { label:'New Leads',        value: stats.newLeads,                          sub:'Awaiting contact',    icon: Target,     accent:'#10b981', badge: stats.newLeads > 0 ? 'Needs action' : 'All clear' },
+          { label:'Pipeline Value',   value: `₱${(stats.pipeline/1000).toFixed(0)}k`, sub:'Est. total revenue',  icon: DollarSign, accent:'#a855f7', badge:'Est. total' },
+          { label:'Active n8n Flows', value: 11,                                      sub:'0 errors today',      icon: Zap,        accent:'#f59e0b', badge:'All healthy' },
         ].map(card => (
           <div key={card.label} className="bg-[#0f0f1a] border border-white/[0.06] rounded-xl p-4 relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: card.accent }} />
@@ -73,6 +222,9 @@ export default function DashboardView({
         ))}
       </div>
 
+      {/* Analytics */}
+      <AnalyticsSection leads={leads} />
+
       {/* Hot Leads Table */}
       <div>
         <div className="flex items-center justify-between mb-3">
@@ -89,40 +241,21 @@ export default function DashboardView({
             </button>
           </div>
         </div>
-        <LeadsTable leads={filtered} authenticated={authenticated} onEmailLead={onEmailLead} onBookingLead={onBookingLead} onStatusChange={onStatusChange} />
+        <LeadsTable leads={filtered} authenticated={authenticated} onEmailLead={onEmailLead} onBookingLead={onBookingLead} onStatusChange={onStatusChange} onGenerateQuote={onGenerateQuote} />
       </div>
 
-      {/* Outreach Hooks */}
-      <div>
-        <div className="text-sm font-semibold text-slate-200 mb-1">AI Outreach Hooks</div>
-        <div className="text-[11px] text-slate-500 mb-3">GPT-4o generated cold email openers · click to use</div>
-        <div className="grid grid-cols-2 gap-3">
-          {leads.filter(l => l.outreachHook && l.aiScore >= 70).map(lead => (
-            <div key={lead.id}
-              className="bg-[#0f0f1a] border border-white/[0.06] rounded-xl p-4 border-l-2 cursor-pointer hover:bg-[#141425] transition-colors"
-              style={{ borderLeftColor: lead.aiScore >= 85 ? '#ef4444' : '#f59e0b' }}
-              onClick={() => { if (authenticated) onEmailLead(lead) }}>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[12px] font-semibold text-slate-200">{lead.name}</span>
-                <ScoreBadge score={lead.aiScore} />
-              </div>
-              <div className="text-[11px] text-slate-500 mb-2">{lead.company} · {lead.industry}</div>
-              <div className="text-[12px] text-slate-400 italic leading-relaxed">"{lead.outreachHook}"</div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   )
 }
 
 // ── Shared table used by DashboardView and LeadsView ──────────────────────────
-export function LeadsTable({ leads, authenticated, onEmailLead, onBookingLead, onStatusChange }: {
-  leads:           Lead[]
-  authenticated:   boolean
-  onEmailLead:     (lead: Lead) => void
-  onBookingLead:   (lead: Lead) => void
-  onStatusChange?: (lead: Lead, status: LeadStatus) => void
+export function LeadsTable({ leads, authenticated, onEmailLead, onBookingLead, onStatusChange, onGenerateQuote }: {
+  leads:            Lead[]
+  authenticated:    boolean
+  onEmailLead:      (lead: Lead) => void
+  onBookingLead:    (lead: Lead) => void
+  onStatusChange?:  (lead: Lead, status: LeadStatus) => void
+  onGenerateQuote?: (lead: Lead) => void
 }) {
   const [openId, setOpenId] = useState<string | null>(null)
   return (
@@ -182,6 +315,13 @@ export function LeadsTable({ leads, authenticated, onEmailLead, onBookingLead, o
                     className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#141425] border border-white/[0.06] text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/20 transition-colors">
                     <Calendar className="w-3 h-3" />
                   </button>
+                  {onGenerateQuote && (
+                    <button title="Generate Quote"
+                      onClick={() => onGenerateQuote(lead)}
+                      className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#141425] border border-white/[0.06] text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/20 transition-colors">
+                      <FileText className="w-3 h-3" />
+                    </button>
+                  )}
                   <button title="More" className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#141425] border border-white/[0.06] text-slate-500 hover:text-slate-200 hover:bg-[#1a1a2e] transition-colors">
                     <MoreHorizontal className="w-3 h-3" />
                   </button>

@@ -6,15 +6,18 @@ import { join } from 'path'
 export const SETTINGS_PATH = join(process.cwd(), 'settings.json')
 
 export interface AppSettings {
-  sheetId:      string
-  leadsTab:     string
-  scopingTab:   string
-  chatLogsTab:  string
-  calendlyUrl:  string
-  adminEmail:   string
-  webhookUrl:   string
-  adMetricsTab: string
-  adThresholds: Record<string, number>
+  sheetId:          string
+  leadsTab:         string
+  scopingTab:       string
+  chatLogsTab:      string
+  calendlyUrl:      string
+  adminEmail:       string
+  webhookUrl:       string
+  adMetricsTab:     string
+  adThresholds:     Record<string, number>
+  hostingerEmail:   string
+  hostingerPassword: string
+  hostingerName:    string
 }
 
 export async function readSettings(): Promise<AppSettings> {
@@ -30,8 +33,11 @@ export async function readSettings(): Promise<AppSettings> {
         calendlyUrl:  parsed.calendlyUrl  ?? process.env.NEXT_PUBLIC_CALENDLY_URL     ?? '',
         adminEmail:   parsed.adminEmail   ?? process.env.NEXT_PUBLIC_ADMIN_EMAIL      ?? '',
         webhookUrl:   parsed.webhookUrl   ?? process.env.N8N_WEBHOOK_URL              ?? '',
-        adMetricsTab: parsed.adMetricsTab ?? 'Ad Metrics',
-        adThresholds: parsed.adThresholds ?? {},
+        adMetricsTab:      parsed.adMetricsTab      ?? 'Ad Metrics',
+        adThresholds:      parsed.adThresholds      ?? {},
+        hostingerEmail:    parsed.hostingerEmail    ?? process.env.HOSTINGER_EMAIL    ?? '',
+        hostingerPassword: parsed.hostingerPassword ?? process.env.HOSTINGER_PASSWORD ?? '',
+        hostingerName:     parsed.hostingerName     ?? process.env.HOSTINGER_NAME     ?? '',
       }
     } catch (err) {
       console.error('[settings] Failed to parse settings.json:', err)
@@ -45,7 +51,10 @@ export async function readSettings(): Promise<AppSettings> {
     calendlyUrl:  process.env.NEXT_PUBLIC_CALENDLY_URL     || '',
     adminEmail:   process.env.NEXT_PUBLIC_ADMIN_EMAIL       || '',
     webhookUrl:   process.env.N8N_WEBHOOK_URL               || '',
-    adMetricsTab: 'Ad Metrics',
-    adThresholds: {},
+    adMetricsTab:      'Ad Metrics',
+    adThresholds:      {},
+    hostingerEmail:    process.env.HOSTINGER_EMAIL    || '',
+    hostingerPassword: process.env.HOSTINGER_PASSWORD || '',
+    hostingerName:     process.env.HOSTINGER_NAME     || '',
   }
 }

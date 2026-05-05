@@ -1,3 +1,23 @@
+// ─── Landing Page Data ───────────────────────────────────────────────────────
+export interface LandingLead {
+  timestamp:    string
+  fullName:     string
+  businessName: string
+  contact:      string
+  email:        string
+  interest:     string
+  message:      string
+}
+
+export interface ChatLog {
+  timestamp:  string
+  source:     string
+  sessionId:  string
+  userMessage: string
+  botReply:   string
+  summary:    string
+}
+
 // ─── Lead ───────────────────────────────────────────────────────────────────
 export type LeadStatus = 'new' | 'contacted' | 'qualified' | 'hot' | 'nurture' | 'closed'
 
@@ -115,6 +135,32 @@ export interface SheetRow {
   source?: string
   created_at?: string
   last_contacted?: string
+}
+
+// ─── Quotations ───────────────────────────────────────────────────────────────
+export type QuotationStatus = 'draft' | 'sent' | 'accepted' | 'rejected'
+export type QuotationSource = 'messenger' | 'crm' | 'landing_page'
+
+export interface Quotation {
+  sheetRow:           number
+  quoteId:            string
+  leadName:           string
+  leadEmail:          string
+  company:            string
+  chosenService:      string
+  chosenTier:         string
+  setupFee:           number
+  monthlyFee:         number
+  monthsContract:     number
+  totalContractValue: number
+  inclusions:         string
+  validityDays:       number
+  notes:              string
+  drivePdfUrl:        string
+  sentAt:             string
+  createdAt:          string
+  status:             QuotationStatus
+  source:             QuotationSource
 }
 
 // ─── Ad Performance ───────────────────────────────────────────────────────────

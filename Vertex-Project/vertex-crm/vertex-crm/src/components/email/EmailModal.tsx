@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { X, Send, Wand2, Loader2, Mail, ChevronDown } from 'lucide-react'
+import { useState, useRef, KeyboardEvent } from 'react'
+import { X, Send, Wand2, Loader2, Mail, ChevronDown, Sparkles } from 'lucide-react'
 import type { Lead } from '@/types'
 import toast from 'react-hot-toast'
 
@@ -32,17 +32,69 @@ const EMAIL_TEMPLATES = [
   },
 ]
 
+const AI_PROMPTS = [
+  'Create a cold outreach email',
+  'Write a follow-up for no response',
+  'Draft a proposal email',
+  'Write a discovery call invite',
+  'Create a re-engagement email',
+]
+
 export default function EmailModal({ lead, onClose }: EmailModalProps) {
-  const [subject, setSubject]   = useState('')
-  const [body, setBody]         = useState('')
-  const [sending, setSending]   = useState(false)
+  const [subject, setSubject]       = useState('')
+  const [body, setBody]             = useState('')
+  const [sending, setSending]       = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
+  const [aiPrompt, setAiPrompt]     = useState('')
+  const [aiLoading, setAiLoading]   = useState(false)
+  const [showPromptSugg, setShowPromptSugg] = useState(false)
+  const promptRef = useRef<HTMLInputElement>(null)
 
   const applyTemplate = (idx: number) => {
     const t = EMAIL_TEMPLATES[idx]
     setSubject(t.getSubject(lead))
     setBody(t.getBody(lead))
     setShowTemplates(false)
+  }
+
+  const generateWithAI = async (promptOverride?: string) => {
+    const p = (promptOverride ?? aiPrompt).trim()
+    if (!p) return
+    setAiLoading(true)
+    setShowPromptSugg(false)
+    try {
+      const res = await fetch('/api/ai-compose', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: p,
+          lead: {
+            name:                 lead.name,
+            company:              lead.company,
+            industry:             lead.industry,
+            painPoints:           lead.painPoints,
+            suggestedAutomation:  lead.suggestedAutomation,
+            estimatedValue:       lead.estimatedValue,
+            outreachHook:         lead.outreachHook,
+          },
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      if (data.subject) setSubject(data.subject)
+      if (data.body)    setBody(data.body)
+      toast.success('AI email generated!')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'AI generation failed'
+      toast.error(message)
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  const handlePromptKey = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') generateWithAI()
+    if (e.key === 'Escape') setShowPromptSugg(false)
   }
 
   const handleSend = async () => {
@@ -93,15 +145,57 @@ export default function EmailModal({ lead, onClose }: EmailModalProps) {
           </button>
         </div>
 
-        {/* Template Picker */}
-        <div className="px-5 py-3 border-b border-surface-border flex-shrink-0">
+        {/* AI Compose Bar */}
+        <div className="px-5 py-3 border-b border-surface-border flex-shrink-0 space-y-2">
+          {/* Prompt input */}
+          <div className="relative">
+            <div className="flex items-center gap-2 bg-purple-500/10 border border-purple-500/25 rounded-xl px-3 py-2 focus-within:border-purple-500/50 transition-colors">
+              <Sparkles className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
+              <input
+                ref={promptRef}
+                value={aiPrompt}
+                onChange={e => { setAiPrompt(e.target.value); setShowPromptSugg(e.target.value.length === 0) }}
+                onFocus={() => setShowPromptSugg(aiPrompt.length === 0)}
+                onBlur={() => setTimeout(() => setShowPromptSugg(false), 150)}
+                onKeyDown={handlePromptKey}
+                placeholder='Ask AI — e.g. "create me a proposal" or "write a follow-up"'
+                className="flex-1 bg-transparent text-xs text-slate-200 placeholder-purple-300/30 outline-none"
+              />
+              <button
+                onClick={() => generateWithAI()}
+                disabled={aiLoading || !aiPrompt.trim()}
+                className="flex items-center gap-1.5 px-3 py-1 text-[11px] font-semibold text-purple-300 bg-purple-500/20 hover:bg-purple-500/30 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors flex-shrink-0"
+              >
+                {aiLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                {aiLoading ? 'Generating…' : 'Generate'}
+              </button>
+            </div>
+
+            {/* Prompt suggestions dropdown */}
+            {showPromptSugg && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-[#0f0f1a] border border-purple-500/20 rounded-xl shadow-xl z-20 overflow-hidden">
+                {AI_PROMPTS.map((p, i) => (
+                  <button
+                    key={i}
+                    onMouseDown={() => { setAiPrompt(p); generateWithAI(p) }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-slate-400 hover:bg-purple-500/10 hover:text-slate-200 transition-colors border-b border-white/[0.04] last:border-0 flex items-center gap-2"
+                  >
+                    <Sparkles className="w-3 h-3 text-purple-400 flex-shrink-0" />
+                    {p}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Static template picker — kept as secondary option */}
           <div className="relative">
             <button
               onClick={() => setShowTemplates(v => !v)}
-              className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-200 bg-bg-2 border border-surface-border rounded-lg px-3 py-1.5 transition-colors"
+              className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-300 transition-colors"
             >
-              <Wand2 className="w-3 h-3 text-brand-blue" />
-              Use AI Template
+              <Wand2 className="w-3 h-3" />
+              Or use a static template
               <ChevronDown className="w-3 h-3" />
             </button>
             {showTemplates && (

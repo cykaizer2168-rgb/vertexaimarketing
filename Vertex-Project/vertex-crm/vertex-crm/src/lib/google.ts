@@ -35,9 +35,21 @@ export async function getCalendarClient() {
   return google.calendar({ version: 'v3', auth })
 }
 
-// ─── Google Sheets ────────────────────────────────────────────────────────────
+// ─── Google Sheets (OAuth — current user session) ────────────────────────────
 export async function getSheetsClient() {
   const auth = await getGoogleClient()
+  return google.sheets({ version: 'v4', auth })
+}
+
+// ─── Google Sheets (Service Account — for landing page sheet) ────────────────
+export async function getSheetsServiceClient() {
+  const auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      private_key:  process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    },
+    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+  })
   return google.sheets({ version: 'v4', auth })
 }
 

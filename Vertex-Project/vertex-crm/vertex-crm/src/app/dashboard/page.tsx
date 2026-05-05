@@ -3,21 +3,24 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import {
-  LayoutDashboard, Users, Cpu, Activity, Settings,
-  Bell, RefreshCw, LogOut, LogIn, CalendarDays, Layers, Search, BarChart2,
+  LayoutDashboard, Users, Activity, Settings,
+  Bell, RefreshCw, LogOut, LogIn, CalendarDays, Layers, Search, BarChart2, FileText, Inbox, Mail,
 } from 'lucide-react'
-import type { Lead, AILog, LeadStatus, AdMetric } from '@/types'
+import type { Lead, AILog, LeadStatus, AdMetric, Quotation, QuotationStatus } from '@/types'
 import EmailModal         from '@/components/email/EmailModal'
 import BookingModal       from '@/components/calendar/BookingModal'
 import AddLeadModal, { type AddLeadData } from '@/components/views/AddLeadModal'
-import AISidePanel        from '@/components/views/AISidePanel'
+import ImportLeadsModal from '@/components/views/ImportLeadsModal'
+import BulkEmailModal   from '@/components/views/BulkEmailModal'
 import DashboardView      from '@/components/views/DashboardView'
 import LeadsView          from '@/components/views/LeadsView'
-import AIInsightsView     from '@/components/views/AIInsightsView'
 import AutomationLogsView from '@/components/views/AutomationLogsView'
 import CalendarView       from '@/components/views/CalendarView'
 import SettingsView       from '@/components/views/SettingsView'
 import AdPerformanceView  from '@/components/views/AdPerformanceView'
+import QuotationsView     from '@/components/views/QuotationsView'
+import LandingDataView    from '@/components/views/LandingDataView'
+import InboxView          from '@/components/views/InboxView'
 import toast, { Toaster } from 'react-hot-toast'
 
 // ─── Mock fallback data ───────────────────────────────────────────────────────
@@ -41,12 +44,12 @@ const MOCK_LOGS: AILog[] = [
 ]
 
 // Pages that use full width (no AI side panel)
-const FULL_WIDTH_PAGES = new Set(['Calendar', 'Settings', 'Ad Performance'])
+const FULL_WIDTH_PAGES = new Set(['Calendar', 'Settings', 'Ad Performance', 'Quotations', 'Incoming Leads', 'Inbox'])
 
 // Pages that show the search bar
 const SEARCH_PAGES = new Set(['Dashboard', 'Leads (Active)'])
 
-type PageName = 'Dashboard' | 'Leads (Active)' | 'AI Insights' | 'Calendar' | 'Automation Logs' | 'Settings' | 'Ad Performance'
+type PageName = 'Dashboard' | 'Leads (Active)' | 'Calendar' | 'Quotations' | 'Automation Logs' | 'Settings' | 'Ad Performance' | 'Incoming Leads' | 'Inbox'
 
 function NavBtn({ label, icon: Icon, badge, badgeAmber, activePage, onNavigate }: {
   label: PageName; icon: React.ElementType; badge?: number; badgeAmber?: boolean
@@ -79,11 +82,14 @@ export default function DashboardPage() {
   const [loading,     setLoading]     = useState(false)
   const [emailLead,   setEmailLead]   = useState<Lead | null>(null)
   const [bookingLead, setBookingLead] = useState<Lead | null>(null)
-  const [showAddLead, setShowAddLead] = useState(false)
+  const [showAddLead,    setShowAddLead]    = useState(false)
+  const [showImport,     setShowImport]     = useState(false)
+  const [bulkEmailLeads, setBulkEmailLeads] = useState<Lead[] | null>(null)
   const [search,      setSearch]      = useState('')
   const [activePage,  setActivePage]  = useState<PageName>('Dashboard')
   const [adMetrics,    setAdMetrics]    = useState<AdMetric[]>([])
   const [adThresholds, setAdThresholds] = useState<Record<string, number>>({})
+  const [quotations,   setQuotations]   = useState<Quotation[]>([])
   const prevPausedRef      = useRef<Set<string>>(new Set())
   const isFirstAdFetchRef  = useRef(true)
 
@@ -126,13 +132,24 @@ export default function DashboardPage() {
     } catch { /* keep empty on network error */ }
   }, [session])
 
+  const fetchQuotations = useCallback(async () => {
+    if (!session) return
+    try {
+      const res = await fetch('/api/quotations')
+      if (res.ok) {
+        const data = await res.json() as { quotations: Quotation[] }
+        setQuotations(data.quotations ?? [])
+      }
+    } catch { /* keep empty on network error */ }
+  }, [session])
+
   useEffect(() => {
     fetchLeads()
     fetchAdMetrics()
-  }, [fetchLeads, fetchAdMetrics])
+    fetchQuotations()
+  }, [fetchLeads, fetchAdMetrics, fetchQuotations])
 
   const authenticated = status === 'authenticated'
-  const showSidePanel = !FULL_WIDTH_PAGES.has(activePage)
 
   async function handleStatusChange(lead: Lead, status: LeadStatus) {
     let snapshot: Lead[] | null = null
@@ -167,6 +184,23 @@ export default function DashboardPage() {
     } catch {
       toast.error('Failed to save threshold')
       throw new Error('Failed to save threshold')
+    }
+  }
+
+  async function handleUpdateQuoteStatus(sheetRow: number, status: QuotationStatus) {
+    const snapshot = quotations
+    setQuotations(prev => prev.map(q => q.sheetRow === sheetRow ? { ...q, status } : q))
+    try {
+      const res = await fetch('/api/quotations', {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ sheetRow, status }),
+      })
+      if (!res.ok) throw new Error('Update failed')
+      toast.success('Quote status updated')
+    } catch {
+      setQuotations(snapshot)
+      toast.error('Failed to update quote status')
     }
   }
 
@@ -215,18 +249,20 @@ export default function DashboardPage() {
     leads,
     search,
     authenticated,
-    onEmailLead:    setEmailLead,
-    onBookingLead:  setBookingLead,
-    onSignIn:       () => signIn('google'),
-    onStatusChange: authenticated ? handleStatusChange : undefined,
-    onAddLead:      () => setShowAddLead(true),
+    onEmailLead:      setEmailLead,
+    onBookingLead:    setBookingLead,
+    onSignIn:         () => signIn('google'),
+    onStatusChange:   authenticated ? handleStatusChange : undefined,
+    onAddLead:        () => setShowAddLead(true),
+    onImport:         () => setShowImport(true),
+    onBulkEmail:      (leads: Lead[]) => setBulkEmailLeads(leads),
+    onGenerateQuote:  () => setActivePage('Quotations'),
   }
 
   function renderContent() {
     switch (activePage) {
       case 'Dashboard':        return <DashboardView      {...sharedProps} />
       case 'Leads (Active)':   return <LeadsView          {...sharedProps} />
-      case 'AI Insights':      return <AIInsightsView     leads={leads} logs={logs} />
       case 'Automation Logs':  return <AutomationLogsView logs={logs} />
       case 'Calendar':         return <CalendarView        leads={leads} />
       case 'Settings':         return (
@@ -243,6 +279,8 @@ export default function DashboardPage() {
           onSaveThreshold={handleSaveThreshold}
         />
       )
+      case 'Incoming Leads': return <LandingDataView />
+      case 'Inbox':          return <InboxView leads={leads} />
       default: return <DashboardView {...sharedProps} />
     }
   }
@@ -252,11 +290,12 @@ export default function DashboardPage() {
   const navMain: { label: PageName; icon: React.ElementType; badge?: number; badgeAmber?: boolean }[] = [
     { label: 'Dashboard',      icon: LayoutDashboard },
     { label: 'Leads (Active)', icon: Users,       badge: leads.filter(l => l.status !== 'closed').length },
-    { label: 'AI Insights',    icon: Cpu,          badge: logs.filter(l => l.type === 'alert').length, badgeAmber: true },
     { label: 'Calendar',       icon: CalendarDays },
     { label: 'Ad Performance', icon: BarChart2,    badge: pausedCount || undefined, badgeAmber: true },
   ]
-  const navAuto: { label: PageName; icon: React.ElementType }[] = [
+  const navAuto: { label: PageName; icon: React.ElementType; badge?: number }[] = [
+    { label: 'Inbox',           icon: Inbox, badge: leads.length > 0 ? undefined : undefined },
+    { label: 'Incoming Leads',  icon: Mail },
     { label: 'Automation Logs', icon: Activity },
     { label: 'Settings',        icon: Settings },
   ]
@@ -360,7 +399,6 @@ export default function DashboardPage() {
           <div className="flex-1 overflow-y-auto p-5 min-w-0">
             {renderContent()}
           </div>
-          {showSidePanel && <AISidePanel logs={logs} leads={leads} />}
         </div>
       </div>
 
@@ -368,6 +406,22 @@ export default function DashboardPage() {
       {emailLead   && <EmailModal   lead={emailLead}   onClose={() => setEmailLead(null)} />}
       {bookingLead && <BookingModal lead={bookingLead} onClose={() => setBookingLead(null)} />}
       {showAddLead && <AddLeadModal onClose={() => setShowAddLead(false)} onAdd={handleAddLead} />}
+      {showImport && (
+        <ImportLeadsModal
+          onClose={() => setShowImport(false)}
+          onImported={(count) => {
+            setShowImport(false)
+            toast.success(`${count} leads imported successfully`)
+            fetchLeads()
+          }}
+        />
+      )}
+      {bulkEmailLeads && (
+        <BulkEmailModal
+          leads={bulkEmailLeads}
+          onClose={() => setBulkEmailLeads(null)}
+        />
+      )}
     </div>
   )
 }

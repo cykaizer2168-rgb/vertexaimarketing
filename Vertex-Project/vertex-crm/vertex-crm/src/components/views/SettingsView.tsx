@@ -1,17 +1,20 @@
 'use client'
 // src/components/views/SettingsView.tsx
 import { useState, useEffect } from 'react'
-import { Save, CheckCircle, ExternalLink, User, Database, Link } from 'lucide-react'
+import { Save, CheckCircle, ExternalLink, User, Database, Link, Mail } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface AppSettings {
-  sheetId:     string
-  leadsTab:    string
-  scopingTab:  string
-  chatLogsTab: string
-  calendlyUrl: string
-  adminEmail:  string
-  webhookUrl:  string
+  sheetId:           string
+  leadsTab:          string
+  scopingTab:        string
+  chatLogsTab:       string
+  calendlyUrl:       string
+  adminEmail:        string
+  webhookUrl:        string
+  hostingerEmail:    string
+  hostingerPassword: string
+  hostingerName:     string
 }
 
 interface Props {
@@ -22,13 +25,16 @@ interface Props {
 
 export default function SettingsView({ userEmail, userName, userImage }: Props) {
   const [settings, setSettings] = useState<AppSettings>({
-    sheetId:     '',
-    leadsTab:    'Leads',
-    scopingTab:  'Scoping Calls',
-    chatLogsTab: 'Chat Logs',
-    calendlyUrl: '',
-    adminEmail:  '',
-    webhookUrl:  '',
+    sheetId:           '',
+    leadsTab:          'Leads',
+    scopingTab:        'Scoping Calls',
+    chatLogsTab:       'Chat Logs',
+    calendlyUrl:       '',
+    adminEmail:        '',
+    webhookUrl:        '',
+    hostingerEmail:    '',
+    hostingerPassword: '',
+    hostingerName:     '',
   })
   const [loading, setLoading] = useState(true)
   const [saving,  setSaving]  = useState(false)
@@ -163,6 +169,51 @@ export default function SettingsView({ userEmail, userName, userImage }: Props) 
               type="text"
               className="w-full bg-[#141425] border border-white/[0.08] rounded-lg px-3 py-2 text-[13px] text-slate-200 font-mono outline-none focus:border-blue-500/50 transition-colors"
               placeholder="https://your-n8n.com/webhook/abc123" />
+          </div>
+        </div>
+      </section>
+
+      {/* Hostinger Email */}
+      <section className="bg-[#0f0f1a] border border-white/[0.06] rounded-xl p-5">
+        <div className="flex items-center gap-2 mb-1">
+          <Mail className="w-4 h-4 text-orange-400" />
+          <div className="text-sm font-semibold text-slate-200">Hostinger Shared Mailbox</div>
+        </div>
+        <p className="text-[11px] text-slate-500 mb-4">
+          All CRM users share this mailbox for sending and reading emails. Leave blank to use Gmail API.
+        </p>
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[11px] text-slate-500 uppercase tracking-wider font-medium mb-1 block">Email Address</label>
+              <input
+                value={settings.hostingerEmail}
+                onChange={e => set('hostingerEmail', e.target.value)}
+                type="email"
+                className="w-full bg-[#141425] border border-white/[0.08] rounded-lg px-3 py-2 text-[13px] text-slate-200 outline-none focus:border-blue-500/50 transition-colors"
+                placeholder="hello@vertexaimarketing.cloud"
+              />
+            </div>
+            <div>
+              <label className="text-[11px] text-slate-500 uppercase tracking-wider font-medium mb-1 block">Display Name</label>
+              <input
+                value={settings.hostingerName}
+                onChange={e => set('hostingerName', e.target.value)}
+                className="w-full bg-[#141425] border border-white/[0.08] rounded-lg px-3 py-2 text-[13px] text-slate-200 outline-none focus:border-blue-500/50 transition-colors"
+                placeholder="Vertex Consulting Partner"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-[11px] text-slate-500 uppercase tracking-wider font-medium mb-1 block">SMTP / IMAP Password</label>
+            <input
+              value={settings.hostingerPassword}
+              onChange={e => set('hostingerPassword', e.target.value)}
+              type="password"
+              className="w-full bg-[#141425] border border-white/[0.08] rounded-lg px-3 py-2 text-[13px] text-slate-200 outline-none focus:border-blue-500/50 transition-colors"
+              placeholder="••••••••••••"
+            />
+            <p className="text-[10px] text-slate-600 mt-1">SMTP: smtp.hostinger.com:465 · IMAP: imap.hostinger.com:993</p>
           </div>
         </div>
       </section>

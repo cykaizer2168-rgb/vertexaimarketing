@@ -1,10 +1,11 @@
 import { getSheetsClient } from './google'
-import type { Lead, SheetRow, AdMetric } from '@/types'
+import type { Lead, SheetRow, AdMetric, Quotation, QuotationStatus, QuotationSource } from '@/types'
 import { readSettings } from './settings'
 
-const SHEET_ID   = process.env.GOOGLE_SHEET_ID!
-const LEADS_TAB  = process.env.GOOGLE_SHEET_LEADS_TAB  || 'Leads'
-const SCOPING_TAB = process.env.GOOGLE_SHEET_SCOPING_TAB || 'Scoping Calls'
+const SHEET_ID        = process.env.GOOGLE_SHEET_ID!
+const LEADS_TAB       = process.env.GOOGLE_SHEET_LEADS_TAB       || 'Leads'
+const SCOPING_TAB     = process.env.GOOGLE_SHEET_SCOPING_TAB     || 'Scoping Calls'
+const QUOTATIONS_TAB  = process.env.GOOGLE_SHEET_QUOTATIONS_TAB  || 'Quotations'
 
 // ─── Column order in your Google Sheet ───────────────────────────────────────
 // Matches: row_number | name | email | phone | company | industry | pain_points
@@ -202,4 +203,85 @@ export async function getAdMetrics(): Promise<AdMetric[]> {
     console.error('[Sheets] getAdMetrics error:', err)
     return []
   }
+}
+
+// ─── Quotations ───────────────────────────────────────────────────────────────
+// Column order (A–R): quote_id | lead_name | lead_email | company | chosen_service |
+// chosen_tier | setup_fee | monthly_fee | months_contract | total_contract_value |
+// inclusions | validity_days | notes | drive_pdf_url | sent_at | created_at | status | source
+
+export async function getQuotations(): Promise<Quotation[]> {
+  try {
+    const sheets = await getSheetsClient()
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range:         `${QUOTATIONS_TAB}!A2:R`,
+    })
+    const rows = res.data.values || []
+    return rows.map((row, i) => ({
+      sheetRow:           i + 2,
+      quoteId:            row[0]  || '',
+      leadName:           row[1]  || '',
+      leadEmail:          row[2]  || '',
+      company:            row[3]  || '',
+      chosenService:      row[4]  || '',
+      chosenTier:         row[5]  || '',
+      setupFee:           parseFloat(row[6])  || 0,
+      monthlyFee:         parseFloat(row[7])  || 0,
+      monthsContract:     parseInt(row[8])    || 0,
+      totalContractValue: parseFloat(row[9])  || 0,
+      inclusions:         row[10] || '',
+      validityDays:       parseInt(row[11])   || 0,
+      notes:              row[12] || '',
+      drivePdfUrl:        row[13] || '',
+      sentAt:             row[14] || '',
+      createdAt:          row[15] || '',
+      status:             (row[16] as QuotationStatus) || 'draft',
+      source:             (row[17] as QuotationSource) || 'crm',
+    }))
+  } catch (err) {
+    console.error('[Sheets] getQuotations error:', err)
+    return []
+  }
+}
+
+export async function appendQuotation(data: Omit<Quotation, 'sheetRow'>): Promise<void> {
+  const sheets = await getSheetsClient()
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_ID,
+    range:         `${QUOTATIONS_TAB}!A:R`,
+    valueInputOption: 'RAW',
+    requestBody: {
+      values: [[
+        data.quoteId,
+        data.leadName,
+        data.leadEmail,
+        data.company,
+        data.chosenService,
+        data.chosenTier,
+        data.setupFee,
+        data.monthlyFee,
+        data.monthsContract,
+        data.totalContractValue,
+        data.inclusions,
+        data.validityDays,
+        data.notes,
+        data.drivePdfUrl,
+        data.sentAt,
+        data.createdAt,
+        data.status,
+        data.source,
+      ]],
+    },
+  })
+}
+
+export async function updateQuoteStatus(sheetRow: number, status: QuotationStatus): Promise<void> {
+  const sheets = await getSheetsClient()
+  await sheets.spreadsheets.values.update({
+    spreadsheetId:   SHEET_ID,
+    range:           `${QUOTATIONS_TAB}!Q${sheetRow}`,
+    valueInputOption: 'RAW',
+    requestBody:     { values: [[status]] },
+  })
 }

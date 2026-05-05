@@ -1,5 +1,5 @@
 // src/components/views/LeadsView.tsx
-import { Users } from 'lucide-react'
+import { Users, Upload, Mail } from 'lucide-react'
 import type { Lead, LeadStatus } from '@/types'
 import { LeadsTable } from './DashboardView'
 
@@ -12,9 +12,11 @@ interface Props {
   onSignIn?:       () => void
   onStatusChange?: (lead: Lead, status: LeadStatus) => void
   onAddLead?:      () => void
+  onImport?:       () => void
+  onBulkEmail?:    (leads: Lead[]) => void
 }
 
-export default function LeadsView({ leads, search, authenticated, onEmailLead, onBookingLead, onStatusChange, onAddLead }: Props) {
+export default function LeadsView({ leads, search, authenticated, onEmailLead, onBookingLead, onStatusChange, onAddLead, onImport, onBulkEmail }: Props) {
   const active = leads.filter(l => l.status !== 'closed')
   const filtered = active.filter(l =>
     !search || [l.name, l.company, l.industry, l.email].some(v =>
@@ -54,9 +56,19 @@ export default function LeadsView({ leads, search, authenticated, onEmailLead, o
             </div>
             <div className="text-[11px] text-slate-500">{filtered.length} of {active.length} shown · closed leads excluded</div>
           </div>
-          <button onClick={onAddLead} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors">
-            + Add Lead
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={onAddLead} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors">
+              + Add Lead
+            </button>
+            <button onClick={onImport} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-white/[0.05] hover:bg-white/[0.09] border border-white/[0.08] rounded-lg transition-colors">
+              <Upload className="w-3.5 h-3.5" /> Import CSV
+            </button>
+            {filtered.length > 0 && (
+              <button onClick={() => onBulkEmail?.(filtered)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 rounded-lg transition-colors">
+                <Mail className="w-3.5 h-3.5" /> Bulk Email ({filtered.length})
+              </button>
+            )}
+          </div>
         </div>
         <LeadsTable leads={filtered} authenticated={authenticated} onEmailLead={onEmailLead} onBookingLead={onBookingLead} onStatusChange={onStatusChange} />
       </div>

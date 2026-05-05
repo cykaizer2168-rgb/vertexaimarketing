@@ -4,6 +4,8 @@ import { updateLastContacted } from '@/lib/sheets'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { triggerWebhook } from '@/lib/webhook'
+import { readSettings } from '@/lib/settings'
+import nodemailer from 'nodemailer'
 
 /**
  * POST /api/send-email
@@ -24,9 +26,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields: to, subject, body' }, { status: 400 })
     }
 
-    const gmail = await getGmailClient()
+    const settings = await readSettings()
+    const { hostingerEmail, hostingerPassword, hostingerName } = settings
 
-    // Build HTML email with Vertex AI Marketing branding
+    // Build HTML email with Vertex Consulting branding
     const htmlBody = `
 <!DOCTYPE html>
 <html>
@@ -36,13 +39,13 @@ export async function POST(req: NextRequest) {
     <div style="background:#0f0f1a;border:1px solid rgba(148,163,184,0.1);border-radius:12px;overflow:hidden">
       <div style="background:#0f0f1a;border-bottom:1px solid rgba(59,130,246,0.3);padding:20px 28px;display:flex;align-items:center;gap:10px">
         <div style="width:28px;height:28px;background:#3b82f6;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:white;font-weight:700">V</div>
-        <span style="font-size:13px;font-weight:600;color:#e2e8f0">Vertex AI Marketing</span>
+        <span style="font-size:13px;font-weight:600;color:#e2e8f0">Vertex Consulting Partner</span>
       </div>
       <div style="padding:28px;color:#e2e8f0;font-size:15px;line-height:1.7">
         ${body.replace(/\n/g, '<br>')}
       </div>
       <div style="padding:16px 28px;border-top:1px solid rgba(148,163,184,0.08);text-align:center">
-        <p style="font-size:11px;color:#475569;margin:0">Vertex AI Marketing · Marilao, Bulacan, Philippines</p>
+        <p style="font-size:11px;color:#475569;margin:0">Vertex Consulting Partner · Bulacan</p>
         <p style="font-size:11px;color:#475569;margin:4px 0 0"><a href="https://vertexaimarketing.cloud" style="color:#3b82f6;text-decoration:none">vertexaimarketing.cloud</a></p>
       </div>
     </div>
@@ -50,20 +53,46 @@ export async function POST(req: NextRequest) {
 </body>
 </html>`
 
-    const rawMime = buildMimeEmail({
-      from:     session.user.email,
-      fromName: 'Angelo Franco | Vertex AI Marketing',
-      to,
-      toName,
-      subject,
-      body:     htmlBody,
-      replyTo:  session.user.email,
-    })
+    let messageId: string | null = null
 
-    const result = await gmail.users.messages.send({
-      userId: 'me',
-      requestBody: { raw: encodeEmail(rawMime) },
-    })
+    // ── Hostinger SMTP ────────────────────────────────────────────────────────
+    if (hostingerEmail && hostingerPassword) {
+      const transporter = nodemailer.createTransport({
+        host:   'smtp.hostinger.com',
+        port:   465,
+        secure: true,
+        auth:   { user: hostingerEmail, pass: hostingerPassword },
+      })
+
+      const info = await transporter.sendMail({
+        from:    `"${hostingerName || 'Vertex Consulting Partner'}" <${hostingerEmail}>`,
+        to:      toName ? `"${toName}" <${to}>` : to,
+        subject,
+        html:    htmlBody,
+        replyTo: hostingerEmail,
+      })
+      messageId = info.messageId
+
+    // ── Gmail API fallback ────────────────────────────────────────────────────
+    } else {
+      const gmail   = await getGmailClient()
+      const rawMime = buildMimeEmail({
+        from:     session.user.email,
+        fromName: 'Angelo Franco | Vertex Consulting Partner',
+        to,
+        toName,
+        subject,
+        body:     htmlBody,
+        replyTo:  session.user.email,
+      })
+      const result = await gmail.users.messages.send({
+        userId: 'me',
+        requestBody: { raw: encodeEmail(rawMime) },
+      })
+      messageId = result.data.id ?? null
+    }
+
+    const result = { data: { id: messageId, threadId: null } }
 
     // Fire n8n webhook
     await triggerWebhook('email_sent', { leadId: leadId ?? null, to, subject })

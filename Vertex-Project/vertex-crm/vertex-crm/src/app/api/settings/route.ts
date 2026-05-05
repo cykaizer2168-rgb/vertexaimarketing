@@ -28,8 +28,11 @@ export async function POST(req: NextRequest) {
       calendlyUrl:  body.calendlyUrl  ?? current.calendlyUrl,
       adminEmail:   body.adminEmail   ?? current.adminEmail,
       webhookUrl:   body.webhookUrl   ?? current.webhookUrl,
-      adMetricsTab: body.adMetricsTab ?? current.adMetricsTab,
-      adThresholds: body.adThresholds ?? current.adThresholds,
+      adMetricsTab:      body.adMetricsTab      ?? current.adMetricsTab,
+      adThresholds:      body.adThresholds      ?? current.adThresholds,
+      hostingerEmail:    body.hostingerEmail    ?? current.hostingerEmail,
+      hostingerPassword: body.hostingerPassword ?? current.hostingerPassword,
+      hostingerName:     body.hostingerName     ?? current.hostingerName,
     }
     await writeFile(SETTINGS_PATH, JSON.stringify(updated, null, 2), 'utf-8')
     return NextResponse.json({ ok: true, settings: updated })
