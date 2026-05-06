@@ -1734,7 +1734,9 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
     <div class="inv-toolbar">
       <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase">GL Report</span>
       <div style="flex:1"></div>
-      <input type="date" id="gl-date" style="background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:5px 8px;font-size:12px;color:var(--text);outline:none;max-width:140px"/>
+      <input type="date" id="gl-from" style="background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:5px 8px;font-size:12px;color:var(--text);outline:none;max-width:130px"/>
+      <span style="font-size:11px;color:var(--muted)">–</span>
+      <input type="date" id="gl-to" style="background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:5px 8px;font-size:12px;color:var(--text);outline:none;max-width:130px"/>
       <button class="inv-refresh-btn" onclick="loadGLReport()">📊 Generate</button>
     </div>
     <div class="eod-wrap" id="eod-wrap">
@@ -4423,7 +4425,9 @@ function computeEODData() {
 async function loadGLReport() {
   const url  = localStorage.getItem(LS.GAS);
   const wrap = document.getElementById('eod-wrap');
-  const selDate = document.getElementById('gl-date')?.value || todayManila();
+  const today   = todayManila();
+  const fromDate = document.getElementById('gl-from')?.value || today;
+  const toDate   = document.getElementById('gl-to')?.value   || today;
 
   if (!url) {
     wrap.innerHTML = `<div class="inv-empty"><div style="font-size:32px">⚠️</div><div style="font-size:13px;font-weight:700">No Sheets connected</div><div style="font-size:11px">Add your Apps Script URL in Settings</div></div>`;
@@ -4450,13 +4454,15 @@ async function loadGLReport() {
     return;
   }
 
-  // Helper: does a date/timestamp value match the selected date string (YYYY-MM-DD)?
+  // Helper: is a date/timestamp value within [fromDate, toDate] (YYYY-MM-DD strings)?
   const matchDate = val => {
     if (!val) return false;
     const s = String(val).trim();
-    if (s.startsWith(selDate)) return true;
-    try { const d = new Date(s); if (!isNaN(d)) return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }) === selDate; } catch {}
-    return false;
+    let isoDate;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) { isoDate = s; }
+    else { try { const d = new Date(s); if (!isNaN(d)) isoDate = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }); } catch {} }
+    if (!isoDate) return false;
+    return isoDate >= fromDate && isoDate <= toDate;
   };
 
   const totalKey = (['Total','Subtotal','Grand Total'].find(k => allSales.some(r => parseFloat(r[k]) > 0))) || 'Total';
@@ -4493,6 +4499,7 @@ async function loadGLReport() {
     const amt      = parseFloat(r[totalKey]) || 0;
     const orderId  = r['Order ID'] || '—';
     const time     = r['Time'] || r['Timestamp'] || '';
+    const recDate  = r['Date'] ? String(r['Date']).slice(0,10) : (r['Timestamp'] ? String(r['Timestamp']).slice(0,10) : fromDate);
     const pm       = r['Payment Method'] || 'Cash';
     const itemsStr = r['Items'] || r['items_summary'] || '—';
     const ingUsage = {};
@@ -4522,18 +4529,20 @@ async function loadGLReport() {
     } else {
       lines.push({ isDebit: false, account: 'Sales Revenue', debit: 0, credit: amt, memo: itemsStr });
     }
-    groups.push({ sortKey: time, lines });
+    groups.push({ sortKey: recDate + time, date: recDate, lines });
   });
   dayPurch.forEach(r => {
     const amt = parseFloat(r['Line Total'] || r['Subtotal'] || r['Sub Total'] || r['Total']) || 0;
-    groups.push({ sortKey: r['Time'] || r['Date'] || '55-p', lines: [
+    const pd  = String(r['Date'] || '').slice(0,10) || fromDate;
+    groups.push({ sortKey: pd + (r['Time'] || '55-p'), date: pd, lines: [
       { isDebit: true,  account: 'Purchases',    debit: amt, credit: 0,   memo: `${r['Item Name'] || r['Item'] || '—'} · ${r['Supplier'] || '—'}` },
       { isDebit: false, account: 'Cash on Hand', debit: 0,   credit: amt, memo: `Ref #${r['Receipt No'] || r['Notes'] || '—'}` }
     ]});
   });
   dayExp.forEach(r => {
     const amt = parseFloat(r['Amount']) || 0;
-    groups.push({ sortKey: r['Time'] || r['Date'] || '66-e', lines: [
+    const ed  = String(r['Date'] || '').slice(0,10) || fromDate;
+    groups.push({ sortKey: ed + (r['Time'] || '66-e'), date: ed, lines: [
       { isDebit: true,  account: `${r['Category'] || 'Expense'} Expense`, debit: amt, credit: 0,   memo: r['Description'] || '—' },
       { isDebit: false, account: 'Cash on Hand',                           debit: 0,   credit: amt, memo: `Ref #${r['Ref No'] || r['Vendor'] || '—'}` }
     ]});
@@ -4558,7 +4567,8 @@ async function loadGLReport() {
   const grossProfit = totalSales - totalCOGS;
   const margin = totalSales > 0 ? ((grossProfit / totalSales) * 100).toFixed(1) : '0.0';
   const profitColor = grossProfit >= 0 ? 'var(--green)' : 'var(--red)';
-  const displayDate = (() => { try { return new Date(selDate + 'T12:00:00').toLocaleDateString('en-PH', {year:'numeric',month:'long',day:'numeric'}); } catch { return selDate; } })();
+  const fmtD = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString('en-PH', {year:'numeric',month:'long',day:'numeric'}); } catch { return d; } };
+  const displayDate = fromDate === toDate ? fmtD(fromDate) : `${fmtD(fromDate)} – ${fmtD(toDate)}`;
 
   let glSection = '';
   if (!groups.length) {
@@ -4571,7 +4581,7 @@ async function loadGLReport() {
       return g.lines.map((l, li) => {
         const isLast = li === g.lines.length - 1;
         return `<tr style="${altBg}${isLast ? ';border-bottom:1px solid var(--border)' : ''}">
-          <td style="font-family:var(--font-mono);font-size:10px;color:var(--muted);white-space:nowrap;vertical-align:top;padding-top:7px">${li === 0 ? selDate : ''}</td>
+          <td style="font-family:var(--font-mono);font-size:10px;color:var(--muted);white-space:nowrap;vertical-align:top;padding-top:7px">${li === 0 ? (g.date || fromDate) : ''}</td>
           <td style="padding-left:${l.isDebit ? '0' : '20'}px;font-weight:${l.isDebit ? '600' : '400'};font-size:11px">${l.account}</td>
           <td style="font-family:var(--font-mono);font-weight:600;color:var(--green);text-align:right;white-space:nowrap">${l.debit > 0 ? '₱' + l.debit.toFixed(2) : ''}</td>
           <td style="font-family:var(--font-mono);font-weight:600;color:var(--red);text-align:right;white-space:nowrap">${l.credit > 0 ? '₱' + l.credit.toFixed(2) : ''}</td>
@@ -4830,7 +4840,7 @@ function switchView(view) {
   if (isInventory)  loadInventory();
   if (isReports)    switchReport(currentReport, false);
   if (isAdjust)     { loadStockAdjust(); loadAdjLog(); }
-  if (isEOD)        { const dp = document.getElementById('gl-date'); if (dp && !dp.value) dp.value = todayManila(); }
+  if (isEOD)        { const t = todayManila(); const f = document.getElementById('gl-from'); const to = document.getElementById('gl-to'); if (f && !f.value) f.value = t; if (to && !to.value) to.value = t; }
   if (isShift)      loadShiftZone();
   if (isBOM)        loadBOM();
   if (isPurchEntry) loadPurchases();
