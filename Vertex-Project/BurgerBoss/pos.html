@@ -1130,6 +1130,19 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
 }
 .eod-beg-cash-inp:focus{border-color:var(--amber)}
 
+/* ── SHIFT ZONE ── */
+.shift-wrap{padding:16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;flex:1;min-height:0}
+.shift-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:16px;max-width:420px}
+.shift-cash-inp{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;font-size:20px;font-family:var(--font-mono);font-weight:500;color:var(--amber);outline:none;transition:border-color .15s;box-sizing:border-box}
+.shift-cash-inp:focus{border-color:var(--amber)}
+.shift-start-btn{padding:14px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;font-family:var(--font-ui);cursor:pointer;transition:all .15s}
+.shift-start-btn:hover{background:#059669}
+.shift-end-btn{padding:14px;border-radius:10px;border:1px solid var(--amber-dim);background:transparent;color:var(--amber);font-size:13px;font-weight:700;font-family:var(--font-ui);cursor:pointer;transition:all .15s}
+.shift-end-btn:hover{background:var(--amber);color:#0A0700}
+.shift-info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.shift-info-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.shift-info-val{font-size:14px;font-family:var(--font-mono);color:var(--amber)}
+
 /* ── GAS GUIDE MODAL ── */
 .gg-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.88);
@@ -1436,6 +1449,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
       <button class="view-tab" data-view="purchases-entry"><span class="tab-icon">🛒</span><span class="tab-label">Purchases</span></button>
       <button class="view-tab" data-view="expenses-entry"><span class="tab-icon">💸</span><span class="tab-label">Expenses</span></button>
       <button class="view-tab" data-view="eod"><span class="tab-icon">📋</span><span class="tab-label">EOD</span></button>
+      <button class="view-tab" data-view="shift"><span class="tab-icon">⏱</span><span class="tab-label">Shift</span></button>
       <button class="view-tab" data-view="bom"><span class="tab-icon">🧪</span><span class="tab-label">Recipes</span></button>
       <button class="view-tab" data-view="users" id="tab-users"><span class="tab-icon">👥</span><span class="tab-label">Users</span></button>
     </nav>
@@ -1644,6 +1658,9 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
       </div>
       <button class="adj-save-btn" id="exp-save-btn" onclick="saveExpense()" style="width:100%;margin-top:16px">💾 Save Expense</button>
     </div>
+    <div id="exp-history-content" style="padding:0 16px 16px">
+      <div class="inv-empty" style="padding:20px 0"><div style="font-size:20px;opacity:.3">💸</div><div style="font-size:11px">No expenses logged yet today</div></div>
+    </div>
     </div>
   </div><!-- /expenses-entry-zone -->
 
@@ -1725,6 +1742,16 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
     </div>
     <div class="eod-wrap" id="eod-wrap">
       <div class="inv-empty"><div style="font-size:28px;opacity:.3">📋</div><div style="font-size:12px">Loading…</div></div>
+    </div>
+  </div>
+
+  <!-- SHIFT ZONE (cashier role) -->
+  <div id="shift-zone" style="flex:1;display:none;flex-direction:column;overflow:hidden;order:3;min-width:0">
+    <div class="inv-toolbar">
+      <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase">Shift</span>
+    </div>
+    <div class="shift-wrap" id="shift-wrap">
+      <div class="inv-empty"><div style="font-size:28px;opacity:.3">⏱</div><div style="font-size:12px">Loading…</div></div>
     </div>
   </div>
 
@@ -1989,7 +2016,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
     <div style="display:flex;gap:6px;margin-top:6px">
       <button class="sp-secondary-btn" onclick="testGasConnection()">🔌 Test</button>
       <button class="sp-secondary-btn" onclick="saveSettings();fetchMenuFromSheets(true)" style="flex:2">🔄 Sync Menu Now</button>
-      <button class="sp-secondary-btn" onclick="openGasGuide()">📋 Setup Guide</button>
+      <button class="sp-secondary-btn" onclick="openGasGuide()">📋 App Script</button>
     </div>
   </div>
   <div class="sp-divider"></div>
@@ -2069,8 +2096,8 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
   <div class="gg-modal">
     <div class="gg-head">
       <div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase">Google Sheets</div>
-        <div style="font-size:16px;font-weight:800">Apps Script Setup Guide</div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--muted);text-transform:uppercase">Google Apps Script</div>
+        <div style="font-size:16px;font-weight:800">Copy &amp; Deploy Script</div>
       </div>
       <button class="sp-close" onclick="closeGasGuide()">✕</button>
     </div>
@@ -2080,755 +2107,501 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
         Spreadsheet ID: <code>1bw9L53ncmbBeyY8ua3oVQCI5B9cO77mAssgnXk-rD9c</code> — columns mapped automatically.
       </div>
       <div class="gg-step">
-        <strong>Step 1 — Open Apps Script</strong><br>
-        In your Google Sheet, go to <strong>Extensions → Apps Script</strong>.<br>
-        Delete any existing code, then paste the script below (already configured for your sheet).
+        <strong>Step 1 — Copy the script below</strong><br>
+        Click <strong>📋 Copy</strong>, then go to <strong>script.google.com</strong> → open your project.<br>
+        Press <strong>Ctrl+A</strong> to select all, then <strong>Ctrl+V</strong> to paste. Press <strong>Ctrl+S</strong> to save.
       </div>
       <div class="gg-code-wrap">
         <button class="gg-copy-btn" onclick="copyGasScript()">📋 Copy</button>
-        <pre class="gg-code" id="gas-code">// Kambal Burger POS — Google Apps Script
-// Spreadsheet: 1bw9L53ncmbBeyY8ua3oVQCI5B9cO77mAssgnXk-rD9c
-const SPREADSHEET_ID = '1bw9L53ncmbBeyY8ua3oVQCI5B9cO77mAssgnXk-rD9c';
-const MENU_SHEET_GID  = 631965176;
-const SALES_SHEET_NAME = 'Sales';
+        <pre class="gg-code" id="gas-code">// ═══════════════════════════════════════════════════════════════
+//  BurgerBoss POS — Google Apps Script Backend
+//  Copy-paste the entire file into Apps Script editor, then
+//  Deploy → New deployment → Web app → Execute as: Me →
+//  Who has access: Anyone → Deploy → copy URL.
+// ═══════════════════════════════════════════════════════════════
 
-const PH_TZ = 'Asia/Manila'; // GMT+8
+// If this script is NOT bound to a spreadsheet, paste the Sheet ID:
+var SPREADSHEET_ID = &#x27;1bw9L53ncmbBeyY8ua3oVQCI5B9cO77mAssgnXk-rD9c&#x27;;
 
-// Formats a GSheet cell value: Date→'yyyy-MM-dd', time-only (epoch 1899-12-30)→'HH:mm', else passthrough
-function fmtVal(val) {
-  if (!(val instanceof Date)) return val;
-  const dateStr = Utilities.formatDate(val, PH_TZ, 'yyyy-MM-dd');
-  return dateStr === '1899-12-30'
-    ? Utilities.formatDate(val, PH_TZ, 'HH:mm')
-    : dateStr;
+// ── Core helpers ─────────────────────────────────────────────────
+function ss() {
+  return SPREADSHEET_ID
+    ? SpreadsheetApp.openById(SPREADSHEET_ID)
+    : SpreadsheetApp.getActiveSpreadsheet();
 }
 
+function getSheet(name) {
+  var s = ss().getSheetByName(name);
+  if (!s) s = ss().insertSheet(name);
+  return s;
+}
+
+function okJson(data) {
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function sheetToObjects(sheet) {
+  var data = sheet.getDataRange().getValues();
+  if (data.length &lt; 2) return [];
+  var headers = data[0].map(function(h) { return String(h).trim(); });
+  return data.slice(1).map(function(row) {
+    var obj = {};
+    headers.forEach(function(h, i) {
+      var val = row[i];
+      // Serialize Date objects in Manila timezone to avoid UTC offset shifting the date
+      if (val instanceof Date) {
+        val = Utilities.formatDate(val, &#x27;Asia/Manila&#x27;, &quot;yyyy-MM-dd&#x27;T&#x27;HH:mm:ss&#x27;+08:00&#x27;&quot;);
+      }
+      obj[h] = val;
+    });
+    return obj;
+  });
+}
+
+// Always use Manila timezone so dates are consistent across devices
+function nowPH() {
+  return Utilities.formatDate(new Date(), &#x27;Asia/Manila&#x27;, &#x27;MM/dd/yyyy HH:mm:ss&#x27;);
+}
+function todayISO() {
+  return Utilities.formatDate(new Date(), &#x27;Asia/Manila&#x27;, &#x27;yyyy-MM-dd&#x27;);
+}
+
+// ── doGet ────────────────────────────────────────────────────────
 function doGet(e) {
-  const action = (e && e.parameter && e.parameter.action) || '';
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-
-  // ── Menu lookup ──
-  if (action === 'menu') {
-    const sheet = ss.getSheets().find(s => s.getSheetId() === MENU_SHEET_GID);
-    if (!sheet) return json({ error: 'Menu sheet not found' });
-    const [headers, ...rows] = sheet.getDataRange().getValues();
-    const items = rows.filter(r => r[0]).map(r => {
-      const raw = {};
-      headers.forEach((h, i) => raw[String(h).trim()] = r[i]);
-      return {
-        id:        String(raw['Item ID']   || '').trim(),
-        emoji:     String(raw['Emoji']     || '🍔').trim(),
-        name:      String(raw['Item Name'] || '').trim(),
-        cat:       String(raw['Category']  || '').trim(),
-        price:     parseFloat(raw['Price']) || 0,
-        available: String(raw['Available']).toUpperCase().trim() === 'YES'
-      };
-    }).filter(m => m.name);
-    return json(items);
-  }
-
-  // ── Inventory ──
-  if (action === 'inventory') {
-    const sheet = ss.getSheetByName('Inventory');
-    if (!sheet) return json([]);
-    const [headers, ...rows] = sheet.getDataRange().getValues();
-    const h = headers.map(x => String(x).trim());
-    const items = rows.filter(r => r[0]).map(r => {
-      const o = {};
-      h.forEach((k, i) => o[k] = r[i]);
-      return {
-        name:       String(o['Item Name']            || '').trim(),
-        category:   String(o['Category']             || '').trim(),
-        stock:      parseFloat(o['Stock (Base Unit)'])          || 0,
-        unit:       String(o['Unit of Measure']      || 'pcs').trim(),
-        conversion: parseFloat(o['Conversion (Pcs/Pack)'])      || 1,
-        bulkStock:  parseFloat(o['Stock (Bulk/Packs)'])         || 0,
-        minStock:   parseFloat(o['Min Stock (Alert)'])          || 0,
-        unitCost:   parseFloat(o['Unit Cost (Base)'])           || 0,
-        totalValue: parseFloat(o['Total Value'])                || 0
-      };
-    });
-    return json(items);
-  }
-
-  // ── Recipes / BOM ──
-  if (action === 'recipes') {
-    const sheet = ss.getSheetByName('Recipes');
-    if (!sheet) return json([]);
-    const [headers, ...rows] = sheet.getDataRange().getValues();
-    const h = headers.map(x => String(x).trim());
-    // Flexible column finder — tries regex patterns against header names
-    function findKey(patterns) {
-      for (const pat of patterns) {
-        const found = h.find(k => pat.test(k));
-        if (found) return found;
-      }
-      return '';
-    }
-    const menuIdKey   = findKey([/menu.?item.?id/i, /item.?id/i]);
-    const menuNmKey   = findKey([/menu.?item.?name/i, /item.?name/i, /menu.?name/i]);
-    const ingKey      = findKey([/^ingredient/i, /ingredient/i]);
-    const qtyKey      = findKey([/qty.?used/i, /quantity.?used/i, /^qty$/i, /^quantity$/i]);
-    const unitKey     = findKey([/^unit$/i, /^unit\b/i]);
-    const ucKey       = findKey([/unit.?cost/i, /cost/i]);
-    const recipes = rows.filter(r => r[0]).map(r => {
-      const o = {};
-      h.forEach((k, i) => o[k] = r[i]);
-      return {
-        menuItemId:   String(o[menuIdKey]  || '').trim(),
-        menuItemName: String(o[menuNmKey]  || '').trim(),
-        ingredient:   String(o[ingKey]     || '').trim(),
-        qtyUsed:      parseFloat(o[qtyKey])|| 0,
-        unit:         String(o[unitKey]    || '').trim(),
-        unitCost:     parseFloat(o[ucKey]) || 0
-      };
-    });
-    return json(recipes);
-  }
-
-  // ── Sales history (last 100 rows, newest first) ──
-  if (action === 'sales') {
-    const sheet = ss.getSheetByName(SALES_SHEET_NAME);
-    if (!sheet || sheet.getLastRow() < 2) return json([]);
-    const [headers, ...rows] = sheet.getDataRange().getValues();
-    const sales = rows
-      .filter(r => r[0])
-      .slice(-100)
-      .reverse()
-      .map(r => {
-        const obj = {};
-        headers.forEach((h, i) => {
-          const val = r[i];
-          obj[String(h).trim()] = fmtVal(val);
-        });
-        return obj;
-      });
-    return json(sales);
-  }
-
-  // ── Purchases (last 100 rows, newest first) ──
-  if (action === 'purchases') {
-    const sheet = ss.getSheetByName('Purchases');
-    if (!sheet || sheet.getLastRow() < 2) return json([]);
-    const [headers, ...rows] = sheet.getDataRange().getValues();
-    const h = headers.map(x => String(x).trim());
-    const purchases = rows
-      .filter(r => r[0])
-      .slice(-100)
-      .reverse()
-      .map(r => {
-        const o = {};
-        h.forEach((k, i) => {
-          const val = r[i];
-          o[k] = fmtVal(val);
-        });
-        // Normalise alternate column names from older sheet versions
-        if (o['Line Total'] === undefined && o['Total'] !== undefined) o['Line Total'] = o['Total'];
-        if (o['Unit Cost']  === undefined && o['Cost']  !== undefined) o['Unit Cost']  = o['Cost'];
-        return o;
-      });
-    return json(purchases);
-  }
-
-  // ── Stock Adjustment Logs (last 50, newest first) ──
-  if (action === 'stock_log') {
-    const sheet = ss.getSheetByName('stock adjustments');
-    if (!sheet || sheet.getLastRow() < 2) return json([]);
-    const [headers, ...rows] = sheet.getDataRange().getValues();
-    const h = headers.map(x => String(x).trim());
-    const logs = rows
-      .filter(r => r[0])
-      .slice(-50)
-      .reverse()
-      .map(r => {
-        const o = {};
-        h.forEach((k, i) => o[k] = r[i]);
-        return o;
-      });
-    return json(logs);
-  }
-
-  // ── Expenses (last 100, newest first) ──
-  if (action === 'expenses') {
-    const sheet = ss.getSheetByName('Expenses');
-    if (!sheet || sheet.getLastRow() < 2) return json([]);
-    const [headers, ...rows] = sheet.getDataRange().getValues();
-    const h = headers.map(x => String(x).trim());
-    const expenses = rows
-      .filter(r => r[0])
-      .slice(-100)
-      .reverse()
-      .map(r => {
-        const o = {};
-        h.forEach((k, i) => {
-          const val = r[i];
-          o[k] = fmtVal(val);
-        });
-        return o;
-      });
-    return json(expenses);
-  }
-
-  // ── Sales Report (date-range filtered, no row cap) ──
-  if (action === 'sales_report') {
-    const from = (e.parameter && e.parameter.from) || '';
-    const to   = (e.parameter && e.parameter.to)   || '';
-    const sheet = ss.getSheetByName(SALES_SHEET_NAME);
-    if (!sheet || sheet.getLastRow() < 2) return json([]);
-    const [headers, ...rows] = sheet.getDataRange().getValues();
-    const sales = rows
-      .filter(r => r[0])
-      .map(r => {
-        const obj = {};
-        headers.forEach((h, i) => {
-          const val = r[i];
-          obj[String(h).trim()] = fmtVal(val);
-        });
-        return obj;
-      })
-      .filter(r => {
-        const d = String(r['Date'] || '');
-        if (from && d < from) return false;
-        if (to   && d > to)   return false;
-        return true;
-      })
-      .reverse();
-    return json(sales);
-  }
-
-  // ── Expenses Report (date-range filtered, no row cap) ──
-  if (action === 'expenses_report') {
-    const from = (e.parameter && e.parameter.from) || '';
-    const to   = (e.parameter && e.parameter.to)   || '';
-    const sheet = ss.getSheetByName('Expenses');
-    if (!sheet || sheet.getLastRow() < 2) return json([]);
-    const [headers, ...rows] = sheet.getDataRange().getValues();
-    const h = headers.map(x => String(x).trim());
-    const expenses = rows
-      .filter(r => r[0])
-      .map(r => {
-        const o = {};
-        h.forEach((k, i) => {
-          const val = r[i];
-          o[k] = fmtVal(val);
-        });
-        return o;
-      })
-      .filter(r => {
-        const d = String(r['Date'] || '');
-        if (from && d < from) return false;
-        if (to   && d > to)   return false;
-        return true;
-      })
-      .reverse();
-    return json(expenses);
-  }
-
-  // ── Ping / health check ──
-  if (action === 'get_users') return json(getUsers());
-
-  if (action === 'ping') {
-    const menuSheet = ss.getSheets().find(s => s.getSheetId() === MENU_SHEET_GID);
-    const rows = menuSheet ? Math.max(0, menuSheet.getLastRow() - 1) : 0;
-    return json({ ok: true, rows });
-  }
-
-  return json({ ok: true });
-}
-
-function doPost(e) {
+  var params = e.parameter || {};
+  var action = params.action || &#x27;&#x27;;
   try {
-    const data = JSON.parse(e && e.postData ? e.postData.contents : '{}');
-    if (data.action === 'verify_login')       return json(verifyLogin(data));
-    if (data.action === 'add_user')           return json(addUserGAS(data));
-    if (data.action === 'delete_user')        return json(deleteUserGAS(data));
-    if (data.action === 'log_sale')       logSale(data);
-    if (data.action === 'deduct_stock')   deductStock(data.items || []);
-    if (data.action === 'adjust_stock')   adjustStock(data.items || [], data.reason || '', data.doneBy || 'POS');
-    if (data.action === 'reconcile_stock') reconcileStock(data.deductions || []);
-    if (data.action === 'log_purchase')  logPurchase(data);
-    if (data.action === 'log_eod')       logEOD(data);
-    if (data.action === 'log_expense')   logExpense(data);
-    if (data.action === 'add_menu_item')    addMenuItem(data);
-    if (data.action === 'add_recipe_row')    addRecipeRow(data);
-    if (data.action === 'delete_recipe_row') deleteRecipeRow(data);
-    if (data.action === 'update_recipe_cost') updateRecipeCost(data);
-    return json({ ok: true });
-  } catch(err) {
-    return json({ ok: false, error: err.message });
+    switch (action) {
+      case &#x27;inventory&#x27;:     return okJson(getInventory());
+      case &#x27;sales&#x27;:         return okJson(getSales());
+      case &#x27;purchases&#x27;:     return okJson(getPurchases());
+      case &#x27;expenses&#x27;:      return okJson(getExpenses());
+      case &#x27;recipes&#x27;:       return okJson(getRecipes());
+      case &#x27;get_eod_state&#x27;: return okJson(gasGetEodState());
+      case &#x27;get_users&#x27;:       return okJson(getUsers());
+      case &#x27;get_shift_logs&#x27;:  return okJson(getShiftLogs());
+      case &#x27;ping&#x27;:            return okJson({ ok: true, time: nowPH(), today: todayISO() });
+      default:              return okJson({ error: &#x27;Unknown GET action: &#x27; + action });
+    }
+  } catch (err) {
+    return okJson({ error: String(err) });
   }
 }
 
-function logSale(d) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  let sheet = ss.getSheetByName(SALES_SHEET_NAME);
+// ── doPost ───────────────────────────────────────────────────────
+function doPost(e) {
+  var payload = {};
+  try { payload = JSON.parse(e.postData.contents); } catch (ex) {}
+  var action = payload.action || &#x27;&#x27;;
+  try {
+    switch (action) {
+      case &#x27;verify_login&#x27;:    return okJson(verifyLogin(payload));
+      case &#x27;add_user&#x27;:        return okJson(addUserGAS(payload));
+      case &#x27;delete_user&#x27;:     return okJson(deleteUserGAS(payload));
+      case &#x27;log_sale&#x27;:        return okJson(logSale(payload));
+      case &#x27;adjust_stock&#x27;:    return okJson(adjustStock(payload));
+      case &#x27;log_purchase&#x27;:    return okJson(logPurchase(payload));
+      case &#x27;log_expense&#x27;:     return okJson(logExpense(payload));
+      case &#x27;log_shift&#x27;:       return okJson(logShift(payload));
+      case &#x27;log_eod&#x27;:         return okJson(logEOD(payload));
+      case &#x27;reconcile_stock&#x27;: return okJson(reconcileStock(payload.deductions || []));
+      case &#x27;start_day&#x27;:       return okJson(gasStartDay(payload));
+      case &#x27;end_day&#x27;:         return okJson(gasEndDay(payload));
+      case &#x27;save_settings&#x27;:   return okJson(saveSettings(payload));
+      default:                return okJson({ error: &#x27;Unknown POST action: &#x27; + action });
+    }
+  } catch (err) {
+    return okJson({ error: String(err) });
+  }
+}
 
-  if (!sheet) {
-    sheet = ss.insertSheet(SALES_SHEET_NAME);
-    sheet.appendRow([
-      'Order ID','Date','Time','Customer','Payment Method',
-      'Subtotal','Tax','Total','Items','Payment Received','Change','Timestamp'
-    ]);
-    sheet.getRange(1,1,1,12).setFontWeight('bold');
-  }
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow([
-      'Order ID','Date','Time','Customer','Payment Method',
-      'Subtotal','Tax','Total','Items','Payment Received','Change','Timestamp'
-    ]);
-    sheet.getRange(1,1,1,12).setFontWeight('bold');
-  }
+// ════════════════════════════════════════════════════════════════
+//  EOD STATE — uses PropertiesService for instant cross-device sync
+//  No sheet needed. Data is stored at the script level.
+// ════════════════════════════════════════════════════════════════
 
-  // Read existing headers and map data dynamically — works with any column order
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(h => String(h).trim());
-  // Normalize date to YYYY-MM-DD so GSheet doesn't auto-convert and cause timezone drift
-  const rawDate = d.date || '';
-  let isoDate = rawDate;
-  if (rawDate && !/^\d{4}-\d{2}-\d{2}/.test(rawDate)) {
-    try { isoDate = Utilities.formatDate(new Date(rawDate), Session.getScriptTimeZone(), 'yyyy-MM-dd'); } catch(e) {}
-  }
-  const dataMap = {
-    'Order ID':         d.order_id        || '',
-    'Date':             isoDate           || '',
-    'Time':             d.time            || '',
-    'Customer':         d.customer_name   || '',
-    'Payment Method':   d.payment_method  || '',
-    'Payment Details':  d.payment_details || '',
-    'Subtotal':         d.subtotal        || 0,
-    'Tax':              d.tax             || 0,
-    'Total':            d.total           || 0,
-    'Items':            d.items_summary   || '',
-    'Payment Received': d.payment_received|| 0,
-    'Change':           d.change          || 0,
-    'Timestamp':        d.timestamp       || ''
+function gasGetEodState() {
+  var props     = PropertiesService.getScriptProperties();
+  var today     = todayISO();
+  var eodDate   = props.getProperty(&#x27;eod_date&#x27;)   || &#x27;&#x27;;
+  var eodStatus = props.getProperty(&#x27;eod_status&#x27;) || &#x27;none&#x27;;
+
+  if (eodDate !== today) return { status: &#x27;none&#x27;, serverDate: today };
+
+  return {
+    date:    eodDate,
+    status:  eodStatus,
+    begCash: parseFloat(props.getProperty(&#x27;eod_beg_cash&#x27;) || &#x27;0&#x27;) || 0,
+    begInv:  props.getProperty(&#x27;eod_beg_inv&#x27;) || &#x27;[]&#x27;
   };
-  sheet.appendRow(headers.map(h => dataMap[h] !== undefined ? dataMap[h] : ''));
 }
 
-function logPurchase(d) {
-  const ss      = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const items   = d.items || [];
-  const now     = new Date();
-  const nowStr  = now.toLocaleString('en-PH');
-  const dateStr = d.date || now.toLocaleDateString('en-PH', {year:'numeric',month:'2-digit',day:'2-digit'});
-  const timeStr = now.toLocaleTimeString('en-PH', {hour:'2-digit',minute:'2-digit'});
-  const doneBy  = d.doneBy || 'POS';
-
-  // 1. Log to Purchases tab (create if not exists)
-  const PUR_HEADERS = ['Date','Receipt #','Supplier','Item','Qty','Unit','Unit Cost','Line Total','Logged By','Timestamp'];
-  let purSheet = ss.getSheetByName('Purchases');
-  if (!purSheet) {
-    purSheet = ss.insertSheet('Purchases');
-    purSheet.appendRow(PUR_HEADERS);
-    purSheet.getRange(1,1,1,PUR_HEADERS.length).setFontWeight('bold');
-  }
-  // Ensure all expected columns exist (add missing ones to the right)
-  const existingHeaders = purSheet.getRange(1,1,1,purSheet.getLastColumn()).getValues()[0].map(h => String(h).trim());
-  PUR_HEADERS.forEach(h => {
-    if (!existingHeaders.includes(h)) {
-      const newCol = purSheet.getLastColumn() + 1;
-      purSheet.getRange(1, newCol).setValue(h).setFontWeight('bold');
-      existingHeaders.push(h);
-    }
+function gasStartDay(p) {
+  var props   = PropertiesService.getScriptProperties();
+  var today   = todayISO(); // always use server Manila date
+  props.setProperties({
+    &#x27;eod_date&#x27;:     today,
+    &#x27;eod_status&#x27;:   &#x27;started&#x27;,
+    &#x27;eod_beg_cash&#x27;: String(p.begCash || 0),
+    &#x27;eod_beg_inv&#x27;:  String(p.begInv  || &#x27;[]&#x27;)
   });
-  items.forEach(item => {
-    const dataMap = {
-      'Date':       dateStr,
-      'Receipt #':  d.receiptNo || '',
-      'Supplier':   d.supplier  || '',
-      'Item':       item.name,
-      'Qty':        item.qty,
-      'Unit':       item.unit || 'pcs',
-      'Unit Cost':  item.unitCost  || 0,
-      'Line Total': item.lineTotal || 0,
-      'Logged By':  doneBy,
-      'Timestamp':  now.toISOString()
-    };
-    purSheet.appendRow(existingHeaders.map(h => dataMap[h] !== undefined ? dataMap[h] : ''));
-  });
-
-  // 2. Update Inventory stock + log to stock adjustments
-  const invSheet = ss.getSheetByName('Inventory');
-  const logSheet = ss.getSheetByName('stock adjustments');
-  if (!invSheet) return;
-
-  const invData    = invSheet.getDataRange().getValues();
-  const invHeaders = invData[0].map(h => String(h).trim());
-  const itemCol    = invHeaders.indexOf('Item Name') >= 0 ? invHeaders.indexOf('Item Name') : invHeaders.indexOf('Item');
-  const stockCol   = invHeaders.indexOf('Stock (Base Unit)') >= 0 ? invHeaders.indexOf('Stock (Base Unit)') : invHeaders.indexOf('Stock');
-  const updatedCol = invHeaders.indexOf('Last Updated');
-  const restockCol = invHeaders.indexOf('Last Restocked');
-  const rstQtyCol  = invHeaders.indexOf('Last Restock Qty');
-
-  items.forEach(item => {
-    const qty = parseFloat(item.qty) || 0;
-    for (let i = 1; i < invData.length; i++) {
-      if (String(invData[i][itemCol]).trim() !== String(item.name).trim()) continue;
-      const current  = parseFloat(invData[i][stockCol]) || 0;
-      const newStock = current + qty;
-      invSheet.getRange(i + 1, stockCol + 1).setValue(newStock);
-      if (updatedCol >= 0) invSheet.getRange(i + 1, updatedCol + 1).setValue(nowStr);
-      if (restockCol >= 0) invSheet.getRange(i + 1, restockCol + 1).setValue(nowStr);
-      if (rstQtyCol  >= 0) invSheet.getRange(i + 1, rstQtyCol  + 1).setValue(qty);
-      // Log to stock adjustments tab
-      if (logSheet) {
-        logSheet.appendRow([
-          dateStr, timeStr, item.name, 'Item Receipt',
-          qty, current, newStock,
-          `Item Receipt${d.receiptNo ? ' - ' + d.receiptNo : ''}`,
-          doneBy, now.toISOString()
-        ]);
-      }
-      break;
-    }
-  });
+  return { ok: true, date: today };
 }
 
-function logExpense(d) {
-  const ss  = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const now = new Date();
-  const dateStr = d.date || now.toLocaleDateString('en-PH', {year:'numeric',month:'2-digit',day:'2-digit'});
-  let sheet = ss.getSheetByName('Expenses');
-  if (!sheet) {
-    sheet = ss.insertSheet('Expenses');
-    sheet.appendRow(['Date','Category','Description','Amount','Reference #','Logged By','Timestamp']);
-    sheet.getRange(1,1,1,7).setFontWeight('bold');
-  }
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Date','Category','Description','Amount','Reference #','Logged By','Timestamp']);
-  }
-  sheet.appendRow([
-    dateStr,
-    d.category || 'Miscellaneous',
-    d.description || '',
-    parseFloat(d.amount) || 0,
-    d.refNo || '',
-    d.doneBy || 'POS',
-    now.toISOString()
-  ]);
+function gasEndDay(p) {
+  var props = PropertiesService.getScriptProperties();
+  props.setProperty(&#x27;eod_status&#x27;, &#x27;ended&#x27;);
+  return { ok: true };
 }
 
-function addMenuItem(d) {
-  const ss  = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const now = new Date();
+// ════════════════════════════════════════════════════════════════
+//  READ HANDLERS
+// ════════════════════════════════════════════════════════════════
 
-  // 1. Append to Menu sheet (find by GID)
-  const menuSheet = ss.getSheets().find(s => s.getSheetId() === MENU_SHEET_GID);
-  if (menuSheet) {
-    const [headers] = menuSheet.getDataRange().getValues();
-    const h = headers.map(x => String(x).trim());
-    const dataMap = {
-      'Item ID':   d.id   || ('M' + now.getTime()),
-      'Emoji':     '🍔',
-      'Item Name': d.name || '',
-      'Category':  d.cat  || 'Burgers',
-      'Price':     parseFloat(d.price) || 0,
-      'Available': 'YES'
-    };
-    menuSheet.appendRow(h.map(k => dataMap[k] !== undefined ? dataMap[k] : ''));
-  }
-
-  // 2. Append to Inventory sheet (create if missing)
-  let invSheet = ss.getSheetByName('Inventory');
-  if (!invSheet) {
-    invSheet = ss.insertSheet('Inventory');
-    invSheet.appendRow(['Item','Emoji','Category','Unit','Purchase Unit','Pcs Per Purchase Unit','Stock','Min Stock','Unit Cost','Supplier','Last Restocked','Last Updated','Notes']);
-    invSheet.getRange(1,1,1,13).setFontWeight('bold');
-  }
-  const [invHeaders] = invSheet.getDataRange().getValues();
-  const ih = invHeaders.map(x => String(x).trim());
-  const invData = {
-    'Item':     d.name || '',
-    'Emoji':    '📦',
-    'Category': d.cat  || 'Burgers',
-    'Unit':     'pcs',
-    'Stock':    parseFloat(d.stock) || 0,
-    'Last Updated': now.toLocaleString('en-PH')
-  };
-  invSheet.appendRow(ih.map(k => invData[k] !== undefined ? invData[k] : ''));
+function getInventory() {
+  return sheetToObjects(getSheet(&#x27;Inventory&#x27;));
+}
+function getSales() {
+  return sheetToObjects(getSheet(&#x27;Sales&#x27;));
+}
+function getPurchases() {
+  return sheetToObjects(getSheet(&#x27;Purchases&#x27;));
+}
+function getExpenses() {
+  return sheetToObjects(getSheet(&#x27;Expenses&#x27;));
+}
+function getRecipes() {
+  return sheetToObjects(getSheet(&#x27;Recipes&#x27;));
 }
 
-function addRecipeRow(d) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const REC_HEADERS = ['Menu Item ID','Menu Item Name','Ingredient','Qty Used','Unit','Unit Cost'];
-  let sheet = ss.getSheetByName('Recipes');
-  if (!sheet) {
-    sheet = ss.insertSheet('Recipes');
-    sheet.appendRow(REC_HEADERS);
-    sheet.getRange(1,1,1,REC_HEADERS.length).setFontWeight('bold');
-  }
-  const [headers] = sheet.getDataRange().getValues();
-  const h = headers.map(x => String(x).trim());
-  REC_HEADERS.forEach(hdr => {
-    if (!h.includes(hdr)) {
-      sheet.getRange(1, sheet.getLastColumn()+1).setValue(hdr).setFontWeight('bold');
-      h.push(hdr);
-    }
-  });
-  const dataMap = {
-    'Menu Item ID':   d.menuItemId   || '',
-    'Menu Item Name': d.menuItemName || '',
-    'Ingredient':     d.ingredient   || '',
-    'Qty Used':       parseFloat(d.qtyUsed)   || 0,
-    'Unit':           d.unit         || 'pcs',
-    'Unit Cost':      parseFloat(d.unitCost)  || 0
-  };
-  sheet.appendRow(h.map(k => dataMap[k] !== undefined ? dataMap[k] : ''));
-}
+// ════════════════════════════════════════════════════════════════
+//  WRITE HANDLERS
+// ════════════════════════════════════════════════════════════════
 
-function updateRecipeCost(d) {
-  const ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName('Recipes');
-  if (!sheet || sheet.getLastRow() < 2) return;
-  const [headers, ...rows] = sheet.getDataRange().getValues();
-  const h      = headers.map(x => String(x).trim());
-  const nmCol  = h.findIndex(k => /menu.?item.?name/i.test(k) || /item.?name/i.test(k));
-  const ingCol = h.findIndex(k => /^ingredient/i.test(k));
-  let   ucCol  = h.findIndex(k => /unit.?cost/i.test(k));
-  if (ucCol < 0) {
-    ucCol = sheet.getLastColumn();
-    sheet.getRange(1, ucCol + 1).setValue('Unit Cost').setFontWeight('bold');
-  }
-  for (let i = 0; i < rows.length; i++) {
-    if (String(rows[i][nmCol]).trim()  === String(d.menuItemName).trim() &&
-        String(rows[i][ingCol]).trim() === String(d.ingredient).trim()) {
-      sheet.getRange(i + 2, ucCol + 1).setValue(parseFloat(d.unitCost) || 0);
-    }
-  }
-}
-
-function deleteRecipeRow(d) {
-  const ss    = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheetByName('Recipes');
-  if (!sheet || sheet.getLastRow() < 2) return;
-  const [headers, ...rows] = sheet.getDataRange().getValues();
-  const h    = headers.map(x => String(x).trim());
-  const nmCol  = h.indexOf('Menu Item Name');
-  const ingCol = h.indexOf('Ingredient');
-  if (nmCol < 0 || ingCol < 0) return;
-  for (let i = rows.length - 1; i >= 0; i--) {
-    if (String(rows[i][nmCol]).trim()  === String(d.menuItemName).trim() &&
-        String(rows[i][ingCol]).trim() === String(d.ingredient).trim()) {
-      sheet.deleteRow(i + 2); // +1 for header, +1 for 1-indexed
-    }
-  }
-}
-
-function logEOD(d) {
-  const ss   = SpreadsheetApp.openById(SPREADSHEET_ID);
-  let sheet  = ss.getSheetByName('EOD Reports');
-  if (!sheet) {
-    sheet = ss.insertSheet('EOD Reports');
-    sheet.appendRow(['Date','Type','Item','Unit','Beginning','Delivery','Offtake','Ending','Notes','Logged By','Timestamp']);
-    sheet.getRange(1,1,1,11).setFontWeight('bold');
-  }
-
-  const date    = d.date || '';
-  const doneBy  = d.doneBy || 'POS';
-  const ts      = d.timestamp || new Date().toISOString();
-
-  // Log cash row
-  const c = d.cash || {};
-  sheet.appendRow([date,'Cash','—','₱', c.beginning||0, c.cashSales||0, c.purchases||0, c.ending||0, 'Cash Summary', doneBy, ts]);
-
-  // Log stock rows
-  (d.stock || []).forEach(r => {
-    sheet.appendRow([date,'Stock', r.name, r.unit||'pcs', r.beginning||0, r.delivery||0, r.offtake||0, r.ending||0, '', doneBy, ts]);
-  });
-}
-
-function adjustStock(items, reason, doneBy) {
-  const ss       = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const invSheet = ss.getSheetByName('Inventory');
-  if (!invSheet) return;
-
-  const invData       = invSheet.getDataRange().getValues();
-  const headers       = invData[0].map(h => String(h).trim());
-  const itemCol       = headers.indexOf('Item');
-  const stockCol      = headers.indexOf('Stock');
-  const updatedCol    = headers.indexOf('Last Updated');
-  const notesCol      = headers.indexOf('Notes');
-  const restockCol    = headers.indexOf('Last Restocked');
-  const restockQtyCol = headers.indexOf('Last Restock Qty');
-
-  // Use the existing 'stock adjustments' log tab
-  const logSheet  = ss.getSheetByName('stock adjustments');
-  const doneByStr = doneBy || 'POS';
-
-  const now     = new Date();
-  const nowStr  = now.toLocaleString('en-PH');
-  const dateStr = now.toLocaleDateString('en-PH', { year:'numeric', month:'2-digit', day:'2-digit' });
-  const timeStr = now.toLocaleTimeString('en-PH', { hour:'2-digit', minute:'2-digit' });
-
-  items.forEach(adj => {
-    for (let i = 1; i < invData.length; i++) {
-      if (String(invData[i][itemCol]).trim() !== String(adj.name).trim()) continue;
-      const current  = parseFloat(invData[i][stockCol]) || 0;
-      const delta    = parseFloat(adj.delta) || 0;
-      const newStock = Math.max(0, current + delta);
-
-      // Update Inventory sheet
-      invSheet.getRange(i + 1, stockCol + 1).setValue(newStock);
-      if (updatedCol >= 0)   invSheet.getRange(i + 1, updatedCol + 1).setValue(nowStr);
-      if (notesCol >= 0)     invSheet.getRange(i + 1, notesCol + 1).setValue(reason || '');
-      if (delta > 0) {
-        if (restockCol >= 0)    invSheet.getRange(i + 1, restockCol + 1).setValue(nowStr);
-        if (restockQtyCol >= 0) invSheet.getRange(i + 1, restockQtyCol + 1).setValue(delta);
-      }
-
-      // Append to existing 'stock adjustments' log tab
-      // Columns: Date | Time | Item | Adjustment Type | Qty Changed | Old Stock | New Stock | Reason | Done By | Timestamp
-      if (logSheet) {
-        logSheet.appendRow([
-          dateStr,
-          timeStr,
-          adj.name,
-          reason || '',
-          delta,
-          current,
-          newStock,
-          reason || '',
-          doneByStr,
-          now.toISOString()
-        ]);
-      }
-      break;
-    }
-  });
-}
-
-function deductStock(orderItems) {
-  const ss       = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const invSheet = ss.getSheetByName('Inventory');
-  if (!invSheet) return;
-
-  const invData    = invSheet.getDataRange().getValues();
-  const invHeaders = invData[0].map(h => String(h).trim());
-  const itemCol    = invHeaders.indexOf('Item Name') >= 0 ? invHeaders.indexOf('Item Name') : invHeaders.indexOf('Item');
-  const stockCol   = invHeaders.indexOf('Stock (Base Unit)') >= 0 ? invHeaders.indexOf('Stock (Base Unit)') : invHeaders.indexOf('Stock');
-  const updatedCol = invHeaders.indexOf('Last Updated');
-  const now        = new Date().toLocaleString('en-PH');
-
-  // Build deduction map: { ingredientName: totalQty }
-  const deduct = {};
-  const recSheet = ss.getSheetByName('Recipes');
-
-  if (recSheet && recSheet.getLastRow() > 1) {
-    // ── BOM mode: deduct ingredients based on Recipes tab ──
-    const [recHeaders, ...recRows] = recSheet.getDataRange().getValues();
-    const rh      = recHeaders.map(h => String(h).trim());
-    const rIdCol  = rh.indexOf('Menu Item ID');
-    const rNmCol  = rh.indexOf('Menu Item Name');
-    const rIngCol = rh.indexOf('Ingredient');
-    const rQtyCol = rh.indexOf('Qty Used');
-    orderItems.forEach(item => {
-      recRows
-        .filter(r => {
-          const matchId   = rIdCol  >= 0 && String(r[rIdCol]).trim()  === String(item.id  || '').trim();
-          const matchName = rNmCol  >= 0 && String(r[rNmCol]).trim().toLowerCase() === String(item.name || '').trim().toLowerCase();
-          return matchId || matchName;
-        })
-        .forEach(r => {
-          const ing = String(r[rIngCol]).trim().toLowerCase();
-          const qty = (parseFloat(r[rQtyCol]) || 0) * (item.qty || 1);
-          deduct[ing] = (deduct[ing] || 0) + qty;
-        });
-    });
+// ── Log Sale + auto-deduct stock ──────────────────────────────────
+function logSale(p) {
+  var sheet   = getSheet(&#x27;Sales&#x27;);
+  var lr      = sheet.getLastRow();
+  var headers;
+  if (lr === 0) {
+    headers = [&#x27;Date&#x27;,&#x27;Time&#x27;,&#x27;Order ID&#x27;,&#x27;Customer&#x27;,&#x27;Items&#x27;,&#x27;Total&#x27;,&#x27;Payment Method&#x27;,&#x27;Cash Received&#x27;,&#x27;Change&#x27;,&#x27;Timestamp&#x27;];
+    sheet.appendRow(headers);
   } else {
-    // ── Direct mode: match menu item name to Inventory item name (case-insensitive) ──
-    orderItems.forEach(item => {
-      const name = String(item.name || '').trim().toLowerCase();
-      if (name) deduct[name] = (deduct[name] || 0) + (item.qty || 1);
+    headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  }
+
+  var row = headers.map(function(h) {
+    switch (String(h).trim()) {
+      case &#x27;Date&#x27;:           return p.date          || todayISO();
+      case &#x27;Time&#x27;:           return p.time          || nowPH();
+      case &#x27;Order ID&#x27;:       return p.orderId       || &#x27;&#x27;;
+      case &#x27;Customer&#x27;:       return p.customer      || &#x27;Walk-in&#x27;;
+      case &#x27;Items&#x27;:          return p.items         || &#x27;&#x27;;
+      case &#x27;Total&#x27;:          return parseFloat(p.total)         || 0;
+      case &#x27;Payment Method&#x27;: return p.paymentMethod  || &#x27;Cash&#x27;;
+      case &#x27;Cash Received&#x27;:  return parseFloat(p.cashReceived)  || 0;
+      case &#x27;Change&#x27;:         return parseFloat(p.change)        || 0;
+      case &#x27;Timestamp&#x27;:      return new Date();
+      default:               return &#x27;&#x27;;
+    }
+  });
+  sheet.appendRow(row);
+
+  if (p.items) deductStock(p.items);
+
+  return { ok: true };
+}
+
+// ── Stock deduction via Recipes ───────────────────────────────────
+function deductStock(itemsSummary) {
+  var spreadsheet  = ss();
+  var recipeSheet  = spreadsheet.getSheetByName(&#x27;Recipes&#x27;);
+  var invSheet     = spreadsheet.getSheetByName(&#x27;Inventory&#x27;);
+  if (!recipeSheet || !invSheet) return;
+
+  var recipeData   = recipeSheet.getDataRange().getValues();
+  var invData      = invSheet.getDataRange().getValues();
+  var recHeaders   = recipeData[0].map(function(h) { return String(h).trim(); });
+  var invHeaders   = invData[0].map(function(h) { return String(h).trim(); });
+
+  // Support both old and new column names
+  var menuCol    = recHeaders.indexOf(&#x27;Menu Item Name&#x27;) &gt;= 0 ? recHeaders.indexOf(&#x27;Menu Item Name&#x27;) : recHeaders.indexOf(&#x27;Item&#x27;);
+  var ingCol     = recHeaders.indexOf(&#x27;Ingredient&#x27;)     &gt;= 0 ? recHeaders.indexOf(&#x27;Ingredient&#x27;)     : recHeaders.indexOf(&#x27;ingredient&#x27;);
+  var qtyUsedCol = recHeaders.indexOf(&#x27;Qty Used&#x27;)       &gt;= 0 ? recHeaders.indexOf(&#x27;Qty Used&#x27;)       : recHeaders.indexOf(&#x27;qtyUsed&#x27;);
+  var itemCol    = invHeaders.indexOf(&#x27;Item Name&#x27;)         &gt;= 0 ? invHeaders.indexOf(&#x27;Item Name&#x27;)         : invHeaders.indexOf(&#x27;Item&#x27;);
+  var stockCol   = invHeaders.indexOf(&#x27;Stock (Base Unit)&#x27;) &gt;= 0 ? invHeaders.indexOf(&#x27;Stock (Base Unit)&#x27;) : invHeaders.indexOf(&#x27;Stock&#x27;);
+  var updatedCol = invHeaders.indexOf(&#x27;Last Updated&#x27;);
+
+  if (menuCol &lt; 0 || ingCol &lt; 0 || qtyUsedCol &lt; 0 || itemCol &lt; 0 || stockCol &lt; 0) return;
+
+  // Build recipe map
+  var recipeMap = {};
+  for (var ri = 1; ri &lt; recipeData.length; ri++) {
+    var key = String(recipeData[ri][menuCol]).trim().toLowerCase();
+    if (!key) continue;
+    if (!recipeMap[key]) recipeMap[key] = [];
+    recipeMap[key].push({
+      ingredient: String(recipeData[ri][ingCol]).trim().toLowerCase(),
+      qtyUsed:    parseFloat(recipeData[ri][qtyUsedCol]) || 0
     });
   }
 
-  // Apply deductions to Inventory sheet (case-insensitive name match)
-  for (let i = 1; i < invData.length; i++) {
-    const name = String(invData[i][itemCol]).trim().toLowerCase();
-    if (deduct[name] === undefined) continue;
-    const current  = parseFloat(invData[i][stockCol]) || 0;
-    const newStock = Math.max(0, current - deduct[name]);
-    invSheet.getRange(i + 1, stockCol + 1).setValue(newStock);
-    if (updatedCol >= 0) invSheet.getRange(i + 1, updatedCol + 1).setValue(now);
+  // Parse &quot;Burger x2, Hotdog x1&quot;
+  var ingUsage = {};
+  String(itemsSummary).split(&#x27;,&#x27;).forEach(function(part) {
+    var m = part.trim().match(/^(.+)\s+x(\d+)$/i);
+    if (!m) return;
+    var menuKey = m[1].trim().toLowerCase();
+    var qty     = parseInt(m[2]) || 0;
+    (recipeMap[menuKey] || []).forEach(function(r) {
+      ingUsage[r.ingredient] = (ingUsage[r.ingredient] || 0) + r.qtyUsed * qty;
+    });
+  });
+
+  // Apply to inventory
+  var now = nowPH();
+  for (var ii = 1; ii &lt; invData.length; ii++) {
+    var name = String(invData[ii][itemCol]).trim().toLowerCase();
+    if (ingUsage[name] === undefined) continue;
+    var current  = parseFloat(invData[ii][stockCol]) || 0;
+    var newStock = Math.max(0, current - ingUsage[name]);
+    invSheet.getRange(ii + 1, stockCol + 1).setValue(newStock);
+    if (updatedCol &gt;= 0) invSheet.getRange(ii + 1, updatedCol + 1).setValue(now);
   }
 }
 
-// Direct ingredient deduction — used for reconciliation
-// deductions: [{ ingredient: 'burger buns', qty: 20 }, ...]
+// ── Bulk reconcile (past sales) ───────────────────────────────────
 function reconcileStock(deductions) {
-  const ss       = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const invSheet = ss.getSheetByName('Inventory');
-  if (!invSheet || !deductions.length) return;
+  if (!deductions || !deductions.length) return { ok: true, updated: 0 };
+  var invSheet = ss().getSheetByName(&#x27;Inventory&#x27;);
+  if (!invSheet) return { ok: false, error: &#x27;No Inventory sheet&#x27; };
 
-  const invData    = invSheet.getDataRange().getValues();
-  const invHeaders = invData[0].map(h => String(h).trim());
-  const itemCol    = invHeaders.indexOf('Item Name') >= 0 ? invHeaders.indexOf('Item Name') : invHeaders.indexOf('Item');
-  const stockCol   = invHeaders.indexOf('Stock (Base Unit)') >= 0 ? invHeaders.indexOf('Stock (Base Unit)') : invHeaders.indexOf('Stock');
-  const updatedCol = invHeaders.indexOf('Last Updated');
-  const now        = new Date().toLocaleString('en-PH');
+  var invData    = invSheet.getDataRange().getValues();
+  var invHeaders = invData[0].map(function(h) { return String(h).trim(); });
+  var itemCol    = invHeaders.indexOf(&#x27;Item Name&#x27;)         &gt;= 0 ? invHeaders.indexOf(&#x27;Item Name&#x27;)         : invHeaders.indexOf(&#x27;Item&#x27;);
+  var stockCol   = invHeaders.indexOf(&#x27;Stock (Base Unit)&#x27;) &gt;= 0 ? invHeaders.indexOf(&#x27;Stock (Base Unit)&#x27;) : invHeaders.indexOf(&#x27;Stock&#x27;);
+  var updatedCol = invHeaders.indexOf(&#x27;Last Updated&#x27;);
 
-  const deductMap = {};
-  deductions.forEach(d => { deductMap[String(d.ingredient).trim().toLowerCase()] = parseFloat(d.qty) || 0; });
+  var deductMap = {};
+  deductions.forEach(function(d) {
+    deductMap[String(d.ingredient).trim().toLowerCase()] = parseFloat(d.qty) || 0;
+  });
 
-  for (let i = 1; i < invData.length; i++) {
-    const name = String(invData[i][itemCol]).trim().toLowerCase();
+  var now = nowPH();
+  var updated = 0;
+  for (var i = 1; i &lt; invData.length; i++) {
+    var name = String(invData[i][itemCol]).trim().toLowerCase();
     if (deductMap[name] === undefined) continue;
-    const current  = parseFloat(invData[i][stockCol]) || 0;
-    const newStock = Math.max(0, current - deductMap[name]);
+    var current  = parseFloat(invData[i][stockCol]) || 0;
+    var newStock = Math.max(0, current - deductMap[name]);
     invSheet.getRange(i + 1, stockCol + 1).setValue(newStock);
-    if (updatedCol >= 0) invSheet.getRange(i + 1, updatedCol + 1).setValue(now);
+    if (updatedCol &gt;= 0) invSheet.getRange(i + 1, updatedCol + 1).setValue(now);
+    updated++;
   }
+  return { ok: true, updated: updated };
 }
 
-// ── USER MANAGEMENT ──────────────────────────
-const USERS_SHEET_NAME = 'Users';
+// ── Stock In ──────────────────────────────────────────────────────
+function adjustStock(p) {
+  var invSheet = ss().getSheetByName(&#x27;Inventory&#x27;);
+  if (!invSheet) return { ok: false, error: &#x27;No Inventory sheet&#x27; };
+
+  var invData    = invSheet.getDataRange().getValues();
+  var invHeaders = invData[0].map(function(h) { return String(h).trim(); });
+  var itemCol    = invHeaders.indexOf(&#x27;Item Name&#x27;)         &gt;= 0 ? invHeaders.indexOf(&#x27;Item Name&#x27;)         : invHeaders.indexOf(&#x27;Item&#x27;);
+  var stockCol   = invHeaders.indexOf(&#x27;Stock (Base Unit)&#x27;) &gt;= 0 ? invHeaders.indexOf(&#x27;Stock (Base Unit)&#x27;) : invHeaders.indexOf(&#x27;Stock&#x27;);
+  var updatedCol = invHeaders.indexOf(&#x27;Last Updated&#x27;);
+
+  var target = String(p.itemName || p.name || &#x27;&#x27;).trim().toLowerCase();
+  var qty    = parseFloat(p.qty)  || 0;
+  var mode   = p.mode || &#x27;add&#x27;;
+  var now    = nowPH();
+
+  for (var i = 1; i &lt; invData.length; i++) {
+    if (String(invData[i][itemCol]).trim().toLowerCase() !== target) continue;
+    var current  = parseFloat(invData[i][stockCol]) || 0;
+    var newStock = mode === &#x27;set&#x27; ? qty : Math.max(0, current + qty);
+    invSheet.getRange(i + 1, stockCol + 1).setValue(newStock);
+    if (updatedCol &gt;= 0) invSheet.getRange(i + 1, updatedCol + 1).setValue(now);
+    return { ok: true, newStock: newStock };
+  }
+  return { ok: false, error: &#x27;Item not found: &#x27; + (p.itemName || p.name) };
+}
+
+// ── Log Purchase ──────────────────────────────────────────────────
+function logPurchase(p) {
+  var sheet = getSheet(&#x27;Purchases&#x27;);
+  var lr    = sheet.getLastRow();
+  var headers;
+  if (lr === 0) {
+    headers = [&#x27;Date&#x27;,&#x27;Supplier&#x27;,&#x27;Item Name&#x27;,&#x27;Quantity&#x27;,&#x27;Unit&#x27;,&#x27;Unit Cost&#x27;,&#x27;Line Total&#x27;,&#x27;Notes&#x27;,&#x27;Timestamp&#x27;];
+    sheet.appendRow(headers);
+  } else {
+    headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  }
+
+  var rows = Array.isArray(p.items) ? p.items : [p];
+  rows.forEach(function(item) {
+    var row = headers.map(function(h) {
+      switch (String(h).trim()) {
+        case &#x27;Date&#x27;:       return p.date      || todayISO();
+        case &#x27;Supplier&#x27;:   return p.supplier  || item.supplier || &#x27;&#x27;;
+        case &#x27;Item Name&#x27;:  return item.itemName || item.name   || &#x27;&#x27;;
+        case &#x27;Quantity&#x27;:   return parseFloat(item.qty)      || 0;
+        case &#x27;Unit&#x27;:       return item.unit   || &#x27;&#x27;;
+        case &#x27;Unit Cost&#x27;:  return parseFloat(item.unitCost) || 0;
+        case &#x27;Line Total&#x27;: return parseFloat(item.lineTotal) || (parseFloat(item.qty || 0) * parseFloat(item.unitCost || 0));
+        case &#x27;Notes&#x27;:      return p.notes     || item.notes || &#x27;&#x27;;
+        case &#x27;Timestamp&#x27;:  return new Date();
+        default:           return &#x27;&#x27;;
+      }
+    });
+    sheet.appendRow(row);
+  });
+  return { ok: true };
+}
+
+// ── Log Expense ───────────────────────────────────────────────────
+function logExpense(p) {
+  if (!p) return { ok: false, error: &#x27;No payload&#x27; };
+  var sheet = getSheet(&#x27;Expenses&#x27;);
+  var lr    = sheet.getLastRow();
+  var headers;
+  if (lr === 0) {
+    headers = [&#x27;Record ID&#x27;,&#x27;Date&#x27;,&#x27;Category&#x27;,&#x27;Description&#x27;,&#x27;Vendor&#x27;,&#x27;Amount&#x27;,&#x27;Logged By&#x27;,&#x27;Timestamp&#x27;];
+    sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight(&#x27;bold&#x27;);
+  } else {
+    headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  }
+
+  var now = new Date();
+  var row = headers.map(function(h) {
+    switch (String(h).trim()) {
+      case &#x27;Record ID&#x27;:   return Utilities.formatDate(now, &#x27;Asia/Manila&#x27;, &#x27;yyyyMMdd-HHmmss&#x27;);
+      case &#x27;Date&#x27;:        return p.date        || todayISO();
+      case &#x27;Category&#x27;:    return p.category    || &#x27;Miscellaneous&#x27;;
+      case &#x27;Description&#x27;: return p.description || p.desc || &#x27;&#x27;;
+      case &#x27;Vendor&#x27;:      return p.vendor      || &#x27;&#x27;;
+      case &#x27;Amount&#x27;:      return parseFloat(p.amount) || 0;
+      case &#x27;Logged By&#x27;:   return p.doneBy      || p.loggedBy || &#x27;POS&#x27;;
+      case &#x27;Paid By&#x27;:     return p.doneBy      || p.paidBy   || &#x27;&#x27;;
+      case &#x27;Notes&#x27;:       return p.notes       || &#x27;&#x27;;
+      case &#x27;Timestamp&#x27;:   return now;
+      default:            return &#x27;&#x27;;
+    }
+  });
+  sheet.appendRow(row);
+  return { ok: true };
+}
+
+// ── Log EOD ───────────────────────────────────────────────────────
+function logEOD(p) {
+  var sheet = getSheet(&#x27;EOD Log&#x27;);
+  var lr    = sheet.getLastRow();
+  var headers;
+  if (lr === 0) {
+    headers = [&#x27;Date&#x27;,&#x27;Done By&#x27;,&#x27;Timestamp&#x27;,&#x27;Beg Cash&#x27;,&#x27;Cash Sales&#x27;,&#x27;Purchases&#x27;,&#x27;Ending Cash&#x27;,&#x27;Orders&#x27;,&#x27;Notes&#x27;];
+    sheet.appendRow(headers);
+  } else {
+    headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  }
+
+  var cash = p.cash || {};
+  var row = headers.map(function(h) {
+    switch (String(h).trim()) {
+      case &#x27;Date&#x27;:        return p.date                               || todayISO();
+      case &#x27;Done By&#x27;:     return p.doneBy                            || &#x27;POS&#x27;;
+      case &#x27;Timestamp&#x27;:   return p.timestamp ? new Date(p.timestamp) : new Date();
+      case &#x27;Beg Cash&#x27;:    return parseFloat(cash.beginning)          || 0;
+      case &#x27;Cash Sales&#x27;:  return parseFloat(cash.cashSales)          || 0;
+      case &#x27;Purchases&#x27;:   return parseFloat(cash.purchases)          || 0;
+      case &#x27;Ending Cash&#x27;: return parseFloat(cash.ending)             || 0;
+      case &#x27;Orders&#x27;:      return parseFloat(p.orders)                || 0;
+      case &#x27;Notes&#x27;:       return p.notes                             || &#x27;&#x27;;
+      default:            return &#x27;&#x27;;
+    }
+  });
+  sheet.appendRow(row);
+
+  // Mark day ended in Properties
+  gasEndDay({});
+  return { ok: true };
+}
+
+// ── Save Settings ─────────────────────────────────────────────────
+function saveSettings(p) {
+  var sheet = getSheet(&#x27;Settings&#x27;);
+  if (sheet.getLastRow() === 0) sheet.appendRow([&#x27;Key&#x27;, &#x27;Value&#x27;]);
+
+  function setKV(key, val) {
+    var data = sheet.getDataRange().getValues();
+    for (var i = 1; i &lt; data.length; i++) {
+      if (String(data[i][0]).trim() === key) {
+        sheet.getRange(i + 1, 2).setValue(val);
+        return;
+      }
+    }
+    sheet.appendRow([key, val]);
+  }
+
+  if (p.shopName !== undefined) setKV(&#x27;shopName&#x27;, p.shopName);
+  if (p.taxRate  !== undefined) setKV(&#x27;taxRate&#x27;,  p.taxRate);
+  if (p.currency !== undefined) setKV(&#x27;currency&#x27;, p.currency);
+
+  return { ok: true };
+}
+
+// ── USER MANAGEMENT ──────────────────────────────────────────────
+var USERS_SHEET_NAME = &#x27;Users&#x27;;
 
 function getUsers() {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(USERS_SHEET_NAME);
-  if (!sheet || sheet.getLastRow() < 2) return [];
+  var sheet = ss().getSheetByName(USERS_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() &lt; 2) return [];
   return sheet.getDataRange().getValues().slice(1)
-    .filter(r => r[0])
-    .map(r => ({ username: String(r[0]).trim(), role: String(r[2] || 'user').trim() }));
+    .filter(function(r) { return r[0]; })
+    .map(function(r) { return { username: String(r[0]).trim(), role: String(r[2] || &#x27;user&#x27;).trim() }; });
 }
 
 function verifyLogin(data) {
-  const uname = String(data.username || '').trim().toLowerCase();
-  const pass  = String(data.password || '').trim();
+  var uname = String(data.username || &#x27;&#x27;).trim().toLowerCase();
+  var pass  = String(data.password || &#x27;&#x27;).trim();
   if (!uname || !pass) return { ok: false, verified: true };
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(USERS_SHEET_NAME);
-  if (!sheet || sheet.getLastRow() < 2) {
-    return (uname === 'admin' && pass === 'admin2025')
-      ? { ok: true, verified: true, role: 'admin', username: 'admin' }
+  var sheet = ss().getSheetByName(USERS_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() &lt; 2) {
+    return (uname === &#x27;admin&#x27; &amp;&amp; pass === &#x27;admin2025&#x27;)
+      ? { ok: true, verified: true, role: &#x27;admin&#x27;, username: &#x27;admin&#x27; }
       : { ok: false, verified: true };
   }
-  const rows = sheet.getDataRange().getValues();
-  for (let i = 1; i < rows.length; i++) {
-    if (String(rows[i][0] || '').trim().toLowerCase() === uname &&
-        String(rows[i][1] || '').trim() === pass) {
-      return { ok: true, verified: true, role: String(rows[i][2] || 'user').trim(), username: String(rows[i][0]).trim() };
+  var rows = sheet.getDataRange().getValues();
+  for (var i = 1; i &lt; rows.length; i++) {
+    if (String(rows[i][0] || &#x27;&#x27;).trim().toLowerCase() === uname &amp;&amp;
+        String(rows[i][1] || &#x27;&#x27;).trim() === pass) {
+      return { ok: true, verified: true, role: String(rows[i][2] || &#x27;user&#x27;).trim(), username: String(rows[i][0]).trim() };
     }
   }
   return { ok: false, verified: true };
 }
 
 function addUserGAS(data) {
-  const ss2   = SpreadsheetApp.openById(SPREADSHEET_ID);
-  let   sheet = ss2.getSheetByName(USERS_SHEET_NAME);
+  var sheet = ss().getSheetByName(USERS_SHEET_NAME);
   if (!sheet) {
-    sheet = ss2.insertSheet(USERS_SHEET_NAME);
-    sheet.appendRow(['Username', 'Password', 'Role']);
-    sheet.getRange(1, 1, 1, 3).setFontWeight('bold');
-    sheet.appendRow(['admin', 'admin2025', 'admin']);
+    sheet = ss().insertSheet(USERS_SHEET_NAME);
+    sheet.appendRow([&#x27;Username&#x27;, &#x27;Password&#x27;, &#x27;Role&#x27;]);
+    sheet.getRange(1, 1, 1, 3).setFontWeight(&#x27;bold&#x27;);
+    sheet.appendRow([&#x27;admin&#x27;, &#x27;admin2025&#x27;, &#x27;admin&#x27;]);
   }
-  const uname = String(data.username || '').trim().toLowerCase();
-  const pass  = String(data.password || '').trim();
-  const role  = String(data.role || 'user').trim();
-  if (!uname || !pass) return { ok: false, error: 'Missing fields' };
-  if (sheet.getLastRow() >= 2) {
-    const rows = sheet.getDataRange().getValues();
-    for (let i = 1; i < rows.length; i++) {
-      if (String(rows[i][0] || '').trim().toLowerCase() === uname)
-        return { ok: false, error: 'Username already exists' };
+  var uname = String(data.username || &#x27;&#x27;).trim().toLowerCase();
+  var pass  = String(data.password || &#x27;&#x27;).trim();
+  var role  = String(data.role || &#x27;user&#x27;).trim();
+  if (!uname || !pass) return { ok: false, error: &#x27;Missing fields&#x27; };
+  if (sheet.getLastRow() &gt;= 2) {
+    var rows = sheet.getDataRange().getValues();
+    for (var i = 1; i &lt; rows.length; i++) {
+      if (String(rows[i][0] || &#x27;&#x27;).trim().toLowerCase() === uname)
+        return { ok: false, error: &#x27;Username already exists&#x27; };
     }
   }
   sheet.appendRow([uname, pass, role]);
@@ -2836,24 +2609,68 @@ function addUserGAS(data) {
 }
 
 function deleteUserGAS(data) {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(USERS_SHEET_NAME);
-  if (!sheet || sheet.getLastRow() < 2) return { ok: false, error: 'User not found' };
-  const uname = String(data.username || '').trim().toLowerCase();
-  const rows  = sheet.getDataRange().getValues();
-  for (let i = 1; i < rows.length; i++) {
-    if (String(rows[i][0] || '').trim().toLowerCase() === uname) {
+  var sheet = ss().getSheetByName(USERS_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() &lt; 2) return { ok: false, error: &#x27;User not found&#x27; };
+  var uname = String(data.username || &#x27;&#x27;).trim().toLowerCase();
+  var rows  = sheet.getDataRange().getValues();
+  for (var i = 1; i &lt; rows.length; i++) {
+    if (String(rows[i][0] || &#x27;&#x27;).trim().toLowerCase() === uname) {
       sheet.deleteRow(i + 1);
       return { ok: true };
     }
   }
-  return { ok: false, error: 'User not found' };
+  return { ok: false, error: &#x27;User not found&#x27; };
 }
 
-function json(data) {
-  return ContentService
-    .createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
-}</pre>
+// ── Shift Logs ───────────────────────────────────────────────────
+var SHIFT_LOG_SHEET = &#x27;Shift Logs&#x27;;
+
+function getShiftLogs() {
+  var sheet = ss().getSheetByName(SHIFT_LOG_SHEET);
+  if (!sheet || sheet.getLastRow() &lt; 2) return [];
+  var data    = sheet.getDataRange().getValues();
+  var headers = data[0].map(function(h) { return String(h).trim(); });
+  return data.slice(1).map(function(row) {
+    var obj = {};
+    headers.forEach(function(h, i) {
+      var val = row[i];
+      if (val instanceof Date) {
+        if (h === &#x27;Date&#x27;) {
+          val = Utilities.formatDate(val, &#x27;Asia/Manila&#x27;, &#x27;yyyy-MM-dd&#x27;);
+        } else if (h === &#x27;Time&#x27;) {
+          val = Utilities.formatDate(val, &#x27;Asia/Manila&#x27;, &#x27;hh:mm a&#x27;);
+        } else {
+          val = String(val);
+        }
+      }
+      obj[h] = val;
+    });
+    return obj;
+  }).reverse();
+}
+
+function logShift(p) {
+  var spreadsheet = ss();
+  var sheet = spreadsheet.getSheetByName(SHIFT_LOG_SHEET);
+  if (!sheet) {
+    sheet = spreadsheet.insertSheet(SHIFT_LOG_SHEET);
+    sheet.appendRow([&#x27;Date&#x27;, &#x27;Time&#x27;, &#x27;Action&#x27;, &#x27;Username&#x27;, &#x27;Amount&#x27;]);
+    sheet.getRange(1, 1, 1, 5).setFontWeight(&#x27;bold&#x27;);
+    sheet.setColumnWidth(1, 110);
+    sheet.setColumnWidth(2, 90);
+    sheet.setColumnWidth(3, 80);
+    sheet.setColumnWidth(4, 120);
+    sheet.setColumnWidth(5, 100);
+  }
+  var date   = p.date   || Utilities.formatDate(new Date(), &#x27;Asia/Manila&#x27;, &#x27;yyyy-MM-dd&#x27;);
+  var time   = p.time   || Utilities.formatDate(new Date(), &#x27;Asia/Manila&#x27;, &#x27;hh:mm a&#x27;);
+  var action = p.action_type || &#x27;&#x27;;   // &#x27;Start&#x27; or &#x27;End&#x27;
+  var uname  = p.username || &#x27;&#x27;;
+  var amount = parseFloat(p.amount) || 0;
+  sheet.appendRow([date, time, action, uname, amount]);
+  return { ok: true };
+}
+</pre>
       </div>
       <div class="gg-step">
         <strong>Step 2 — Deploy as Web App</strong><br>
@@ -2893,7 +2710,7 @@ const LS = {
   MENU:'bb_menu', GAS:'bb_gas_url'
 };
 const DEFAULT_WEBHOOK = 'https://n8n.srv1356414.hstgr.cloud/webhook/kambalburger';
-const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbzDPjSQ-JdJBH0JrkWMJG4Z8RzaSUrPgkVQHvNZqfezTEADjKtb9t3TCD3kigXib_DF8g/exec';
+const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwM394biKdcWHxEsfp3kZ3iA0ksg8XWNyyWaDSr8CD01L3kezlOtlik3swdbKm29LiKIw/exec';
 // Always sync DEFAULT_GAS_URL — paste new URL here to update all devices via Vercel
 if (DEFAULT_GAS_URL) localStorage.setItem(LS.GAS, DEFAULT_GAS_URL);
 
@@ -3122,7 +2939,19 @@ async function testGasConnection() {
     const res = await fetch(url + '?action=ping&t=' + Date.now());
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-    showToast('Connection OK — ' + (data.rows || '?') + ' menu rows found','✅');
+
+    // Also check if GAS has user management support
+    let userSupport = false;
+    try {
+      const ur = await fetch(url + '?action=get_users&t=' + Date.now());
+      const ud = await ur.json();
+      userSupport = Array.isArray(ud);
+    } catch {}
+
+    const msg = userSupport
+      ? 'GAS OK · User login ✅ · Menu rows: ' + (data.rows || '?')
+      : 'GAS connected but NO user management — update your GAS code in Settings';
+    showToast(msg, userSupport ? '✅' : '⚠️', 5000);
   } catch(e) {
     showToast('Connection failed: ' + e.message,'❌',4000);
   }
@@ -3236,7 +3065,7 @@ function loadStockAdjust() {
   document.getElementById('adj-body').innerHTML = `<div class="inv-empty"><div style="font-size:28px;opacity:.3">📥</div><div style="font-size:12px">Loading…</div></div>`;
   fetch(url + '?action=inventory&t=' + Date.now())
     .then(r => r.json()).then(data => {
-      if (Array.isArray(data)) { inventoryCache = data; renderStockAdjust(); }
+      if (Array.isArray(data)) { inventoryCache = normalizeInv(data); renderStockAdjust(); }
     }).catch(e => {
       document.getElementById('adj-body').innerHTML = `<div class="inv-empty"><div style="font-size:28px">❌</div><div style="font-size:11px">${e.message}</div></div>`;
     });
@@ -3386,8 +3215,17 @@ async function saveStockAdjust() {
     saveBtn.textContent = '💾 Save Changes';
     renderStockAdjust();
     document.getElementById('adj-changed-count').style.display = 'none';
-    // Reload log after a short delay (GAS write is async)
-    setTimeout(loadAdjLog, 2000);
+    // Re-fetch inventory from GAS after write settles to confirm actual sheet values
+    setTimeout(async () => {
+      const u = localStorage.getItem(LS.GAS);
+      if (!u) return;
+      try {
+        const r = await fetch(u + '?action=inventory&t=' + Date.now());
+        const d = await r.json();
+        if (Array.isArray(d)) { inventoryCache = normalizeInv(d); renderStockAdjust(); }
+      } catch {}
+      loadAdjLog();
+    }, 3000);
   } catch(e) {
     showToast('Save failed: ' + e.message, '❌', 4000);
     saveBtn.disabled     = false;
@@ -3439,7 +3277,7 @@ function rptDateRange(preset) {
   const pad = n => String(n).padStart(2, '0');
   const fmtDate = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   if (preset === 'today') {
-    const t = fmtDate(now);
+    const t = shiftDate(); // shift-aware: before 3AM = previous day's shift
     return { from: t, to: t };
   }
   if (preset === 'week') {
@@ -3492,14 +3330,39 @@ async function generateSalesReport(from, to, preset) {
   output.innerHTML = `<div class="sh-loading">Generating report…</div>`;
   try {
     const [salesRes, invRes, recRes] = await Promise.all([
-      fetch(`${url}?action=sales_report&from=${from}&to=${to}&t=${Date.now()}`),
+      fetch(`${url}?action=sales&t=${Date.now()}`),
       inventoryCache.length ? Promise.resolve(null) : fetch(`${url}?action=inventory&t=${Date.now()}`),
       recipesCache.length   ? Promise.resolve(null) : fetch(`${url}?action=recipes&t=${Date.now()}`)
     ]);
     if (!salesRes.ok) throw new Error('HTTP ' + salesRes.status);
-    const sales = await salesRes.json();
-    if (!Array.isArray(sales)) throw new Error('Invalid response');
-    if (invRes && invRes.ok) { const d = await invRes.json(); if (Array.isArray(d)) inventoryCache = d; }
+    const allSales = await salesRes.json();
+    if (!Array.isArray(allSales)) throw new Error('Invalid response');
+
+    // Filter by shift window (timestamp-based) for 'today'; date-based for other presets
+    let sales;
+    if (preset === 'today') {
+      const { start, end } = shiftWindow();
+      sales = allSales.filter(r => {
+        const raw = r['Timestamp'] || r['Date'] || '';
+        const d   = new Date(String(raw).trim());
+        if (isNaN(d.getTime())) return false;
+        return d >= start && d < end;
+      });
+    } else {
+      sales = allSales.filter(r => {
+        const raw = r['Date'] || r['Timestamp'] || '';
+        const s   = String(raw).trim();
+        if (!s) return false;
+        let recDate = s.slice(0, 10);
+        if (s.includes('T') || s.includes('Z')) {
+          const d = new Date(s);
+          if (!isNaN(d.getTime())) recDate = d.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' });
+        }
+        return recDate >= from && recDate <= to;
+      });
+    }
+
+    if (invRes && invRes.ok) { const d = await invRes.json(); if (Array.isArray(d)) inventoryCache = normalizeInv(d); }
     if (recRes && recRes.ok) { const d = await recRes.json(); if (Array.isArray(d)) recipesCache   = d; }
 
     if (!sales.length) {
@@ -3510,7 +3373,10 @@ async function generateSalesReport(from, to, preset) {
     const sample = sales[0];
     const col = k => {
       const variants = [k, k.toLowerCase(), k.replace(/ /g,'_'), k.replace(/ /g,'_').toLowerCase()];
-      return variants.find(v => sample[v] !== undefined) || k;
+      const exact = variants.find(v => sample[v] !== undefined && sample[v] !== '');
+      if (exact) return exact;
+      const fuzzy = Object.keys(sample).find(x => x.toLowerCase().includes(k.toLowerCase()));
+      return fuzzy || k;
     };
 
     const totalRev   = sales.reduce((s,r) => s + (parseFloat(r[col('Total')])||0), 0);
@@ -3575,7 +3441,7 @@ async function generateSalesReport(from, to, preset) {
       </div>
       ${topItems.length ? `<div class="sales-section-label">Top Items</div><div style="overflow-x:auto"><table class="rpt-cat-table"><thead><tr><th style="text-align:left">Item</th><th style="text-align:right">Qty Sold</th></tr></thead><tbody>${topItems.map(([name,qty],i) => `<tr><td><span style="color:var(--muted);font-family:var(--font-mono);font-size:10px">#${i+1}</span> ${name}</td><td class="rpt-cat-total">${qty}</td></tr>`).join('')}</tbody></table></div>` : ''}
       <div class="sales-section-label">Order Detail</div>
-      <div style="overflow-x:auto"><table class="sh-table"><thead><tr><th>Order ID</th><th>Date</th><th>Items</th><th>Payment</th><th style="text-align:right">Total</th></tr></thead><tbody>${sales.map(r => `<tr><td class="sh-oid">${r[col('Order ID')]||'-'}</td><td style="font-family:var(--font-mono);font-size:10px">${r[col('Date')]||'-'}</td><td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r[col('Items')]||r['items_summary']||'-'}</td><td><span class="sh-pay-badge">${r[col('Payment Method')]||'-'}</span></td><td class="sh-total" style="text-align:right">${fmt(parseFloat(r[col('Total')])||0)}</td></tr>`).join('')}</tbody></table></div>
+      <div style="overflow-x:auto"><table class="sh-table"><thead><tr><th>Order ID</th><th>Date &amp; Time</th><th>Items</th><th>Payment</th><th style="text-align:right">Total</th></tr></thead><tbody>${sortByDateDesc(sales, col('Timestamp'), col('Date')).map(r => `<tr><td class="sh-oid">${r[col('Order ID')]||'-'}</td><td style="font-family:var(--font-mono);font-size:10px;white-space:nowrap">${fmtDisplayDate(r[col('Timestamp')]||r[col('Date')])}</td><td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r[col('Items')]||r['items_summary']||'-'}</td><td><span class="sh-pay-badge">${r[col('Payment Method')]||'-'}</span></td><td class="sh-total" style="text-align:right">${fmt(parseFloat(r[col('Total')])||0)}</td></tr>`).join('')}</tbody></table></div>
     `;
   } catch(err) {
     output.innerHTML = `<div class="inv-empty"><div style="font-size:32px">❌</div><div style="font-size:13px;font-weight:700">Error loading report</div><div style="font-size:11px;color:var(--muted)">${err.message}</div></div>`;
@@ -3591,10 +3457,20 @@ async function generateExpensesReport(from, to, preset) {
   }
   output.innerHTML = `<div class="sh-loading">Generating report…</div>`;
   try {
-    const res = await fetch(`${url}?action=expenses_report&from=${from}&to=${to}&t=${Date.now()}`);
+    const res = await fetch(`${url}?action=expenses&t=${Date.now()}`);
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const expenses = await res.json();
-    if (!Array.isArray(expenses)) throw new Error('Invalid response');
+    const allExp = await res.json();
+    if (!Array.isArray(allExp)) throw new Error('Invalid response');
+
+    // Filter by date range + strip internal sentinels (__EOD__, Shift Log)
+    const expenses = allExp.filter(r => {
+      const cat = String(r['Category'] || r['category'] || '').trim();
+      if (cat === '__EOD__' || cat === 'Shift Log') return false;
+      const raw = String(r['Date'] || r['date'] || '').trim();
+      if (!raw) return false;
+      const recDate = raw.slice(0, 10);
+      return recDate >= from && recDate <= to;
+    });
 
     if (!expenses.length) {
       output.innerHTML = `<div class="inv-empty"><div style="font-size:32px;opacity:.3">💸</div><div style="font-size:13px;font-weight:700">No expenses for this period</div></div>`;
@@ -3624,7 +3500,7 @@ async function generateExpensesReport(from, to, preset) {
       <div class="sales-section-label">By Category</div>
       <div style="overflow-x:auto"><table class="rpt-cat-table"><thead><tr><th style="text-align:left">Category</th><th style="text-align:right">Count</th><th style="text-align:right">Total</th><th style="text-align:right">% of Total</th></tr></thead><tbody>${catEntries.map(([cat,d]) => `<tr><td>${catIcons[cat]||'\u{1F4CE}'} ${cat}</td><td style="text-align:right;font-family:var(--font-mono)">${d.count}</td><td class="rpt-cat-total">${fmt(d.total)}</td><td style="text-align:right;font-family:var(--font-mono);color:var(--muted)">${totalAmt>0?((d.total/totalAmt)*100).toFixed(1):'0.0'}%</td></tr>`).join('')}</tbody></table></div>
       <div class="sales-section-label">Itemized List</div>
-      <div style="overflow-x:auto"><table class="sh-table"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Ref #</th><th style="text-align:right">Amount</th></tr></thead><tbody>${expenses.map(r => `<tr><td style="font-family:var(--font-mono);font-size:10px">${r['Date']||'-'}</td><td>${catIcons[r['Category']]||'\u{1F4CE}'} ${r['Category']||'-'}</td><td>${r['Description']||'-'}</td><td style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${r['Ref No']||r['Reference']||'-'}</td><td class="sh-total" style="text-align:right;color:var(--red)">${fmt(parseFloat(r['Amount'])||0)}</td></tr>`).join('')}</tbody></table></div>
+      <div style="overflow-x:auto"><table class="sh-table"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Ref #</th><th style="text-align:right">Amount</th></tr></thead><tbody>${expenses.map(r => `<tr><td style="font-family:var(--font-mono);font-size:10px">${r['Date']||'-'}</td><td>${catIcons[r['Category']]||'\u{1F4CE}'} ${r['Category']||'-'}</td><td>${r['Description']||'-'}</td><td style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${r['Ref No']||r['Vendor']||r['Reference']||'-'}</td><td class="sh-total" style="text-align:right;color:var(--red)">${fmt(parseFloat(r['Amount'])||0)}</td></tr>`).join('')}</tbody></table></div>
     `;
   } catch(err) {
     output.innerHTML = `<div class="inv-empty"><div style="font-size:32px">❌</div><div style="font-size:13px;font-weight:700">Error loading report</div><div style="font-size:11px;color:var(--muted)">${err.message}</div></div>`;
@@ -3680,13 +3556,11 @@ async function saveExpense() {
     document.getElementById('exp-desc').value   = '';
     document.getElementById('exp-amount').value = '';
     document.getElementById('exp-ref').value    = '';
-    document.getElementById('exp-date').value   = todayManila();
+    document.getElementById('exp-date').value = shiftDate();
     document.getElementById('exp-photo-thumb').innerHTML = `<span style="font-size:22px">🧾</span><span style="font-size:9px;color:var(--muted)">No receipt</span>`;
     expPhotoBase64 = null;
-    setTimeout(() => {
-      const { from, to } = rptDateRange('today');
-      generateExpensesReport(from, to, 'today');
-    }, 2000);
+    // Refresh history after GAS has time to write the row (GAS typically takes 1-3s)
+    setTimeout(() => loadExpenseHistory(), 3000);
 
   } catch(e) { showToast('Save failed: ' + e.message, '❌', 4000); }
   finally { btn.disabled = false; btn.textContent = '💾 Save Expense'; }
@@ -3696,39 +3570,45 @@ async function loadExpenseHistory() {
   const url     = localStorage.getItem(LS.GAS);
   const content = document.getElementById('exp-history-content');
   if (!url || !content) return;
-  content.innerHTML = `<div class="inv-empty"><div style="font-size:24px;opacity:.3">💸</div><div style="font-size:12px">Loading…</div></div>`;
+  content.innerHTML = `<div style="padding:12px;font-size:11px;color:var(--muted);text-align:center">Loading…</div>`;
   try {
     const res  = await fetch(url + '?action=expenses&t=' + Date.now());
     const data = await res.json();
-    expensesCache = Array.isArray(data) ? data.filter(r => { const c = String(r['Date']||r['Category']||r['category']||'').trim(); return c !== '__EOD__' && c !== 'Shift Log'; }) : [];
+    expensesCache = Array.isArray(data) ? data.filter(r => {
+      const c = String(r['Category']||r['category']||'').trim();
+      return c !== '__EOD__' && c !== 'Shift Log';
+    }) : [];
+    // Show today's expenses, newest first (GAS already returns newest-first)
+    const todayExp = expensesCache.filter(r => dateMatchesToday(r['Date'] || r['Timestamp']));
+    const displayList = todayExp.length ? todayExp : expensesCache.slice(0, 10);
     if (!expensesCache.length) {
-      content.innerHTML = `<div class="inv-empty"><div style="font-size:28px">💸</div><div style="font-size:13px;font-weight:700">No expenses yet</div></div>`;
+      content.innerHTML = `<div class="inv-empty" style="padding:16px 0"><div style="font-size:20px;opacity:.3">💸</div><div style="font-size:11px">No expenses logged yet</div></div>`;
       return;
     }
-    const total = expensesCache.reduce((s, r) => s + (parseFloat(r['Amount']) || 0), 0);
+    const todayTotal = todayExp.reduce((s, r) => s + (parseFloat(r['Amount']) || 0), 0);
+    const label = todayExp.length ? `Today · ${todayExp.length} expense${todayExp.length!==1?'s':''}` : `Recent (${displayList.length})`;
     content.innerHTML = `
-      <div style="padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);background:var(--card);border-bottom:1px solid var(--border)">
-        Total: <span style="color:var(--amber)">${fmt(total)}</span> across ${expensesCache.length} expense${expensesCache.length!==1?'s':''}
+      <div style="padding:6px 0 8px;font-size:11px;font-weight:700;color:var(--muted)">
+        ${label}${todayExp.length ? ` · <span style="color:var(--amber)">${fmt(todayTotal)}</span>` : ''}
       </div>
       <table class="sh-table">
         <thead><tr>
-          <th>Date</th><th>Category</th><th>Description</th><th>Ref #</th><th style="text-align:right">Amount</th>
+          <th>Date</th><th>Category</th><th>Description</th><th style="text-align:right">Amount</th>
         </tr></thead>
-        <tbody>${expensesCache.map(r => `<tr>
-          <td>${r['Date']||''}</td>
+        <tbody>${displayList.map(r => `<tr>
+          <td style="font-family:var(--font-mono);font-size:10px">${String(r['Date']||'').slice(0,10)}</td>
           <td>${r['Category']||'—'}</td>
           <td>${r['Description']||''}</td>
-          <td style="font-family:var(--font-mono);font-size:10px">${r['Reference #']||'—'}</td>
-          <td style="text-align:right"><span class="sh-total">${fmt(parseFloat(r['Amount'])||0)}</span></td>
+          <td style="text-align:right"><span class="sh-total" style="color:var(--red)">${fmt(parseFloat(r['Amount'])||0)}</span></td>
         </tr>`).join('')}</tbody>
       </table>`;
   } catch(e) {
-    content.innerHTML = `<div class="inv-empty"><div style="font-size:13px;color:var(--red)">Failed to load: ${e.message}</div></div>`;
+    content.innerHTML = `<div style="padding:12px;font-size:11px;color:var(--red)">Failed to load: ${e.message}</div>`;
   }
 }
 
 function loadExpenses() {
-  document.getElementById('exp-date').value = todayManila();
+  document.getElementById('exp-date').value = shiftDate();
   loadExpenseHistory();
 }
 
@@ -3823,13 +3703,13 @@ function loadPurchases() {
   const url = localStorage.getItem(LS.GAS);
   // Set today's date
   const dateInput = document.getElementById('purch-date');
-  if (dateInput && !dateInput.value) dateInput.value = todayManila();
+  if (dateInput && !dateInput.value) dateInput.value = shiftDate();
   // Start with one empty row
   if (!purchaseRows.length) addPurchaseRow();
   // Load inventory for suggestions
   if (!inventoryCache.length && url) {
     fetch(url + '?action=inventory&t=' + Date.now())
-      .then(r => r.json()).then(d => { if (Array.isArray(d)) inventoryCache = d; })
+      .then(r => r.json()).then(d => { if (Array.isArray(d)) inventoryCache = normalizeInv(d); })
       .catch(() => {});
   }
   loadPurchaseHistory();
@@ -3878,7 +3758,7 @@ async function savePurchase() {
     document.getElementById('purch-photo-thumb').innerHTML = `<span style="font-size:22px">📄</span><span style="font-size:9px;color:var(--muted)">No photo</span>`;
     document.getElementById('purch-supplier').value = '';
     document.getElementById('purch-receipt').value  = '';
-    document.getElementById('purch-date').value = todayManila();
+    document.getElementById('purch-date').value = shiftDate();
     renderPurchaseRows(); updatePurchGrandTotal(); addPurchaseRow();
     setTimeout(loadPurchaseHistory, 2000);
 
@@ -3907,11 +3787,11 @@ async function loadPurchaseHistory() {
       <tbody>${purchasesCache.map(r => `<tr>
         <td>${r['Date']||''}</td>
         <td>${r['Supplier']||'—'}</td>
-        <td style="font-family:var(--font-mono);font-size:10px">${r['Receipt #']||'—'}</td>
-        <td>${r['Item']||''}</td>
-        <td style="font-family:var(--font-mono)">${r['Qty']||0} ${r['Unit']||''}</td>
+        <td style="font-family:var(--font-mono);font-size:10px">${r['Receipt No']||r['Record ID']||r['Notes']||'—'}</td>
+        <td>${r['Item Name']||r['Item']||r['Description']||''}</td>
+        <td style="font-family:var(--font-mono)">${r['Quantity']||r['Qty']||0} ${r['Unit']||''}</td>
         <td><span class="sh-total">${fmt(parseFloat(r['Unit Cost'])||0)}</span></td>
-        <td><span class="sh-total">${fmt(parseFloat(r['Line Total'])||0)}</span></td>
+        <td><span class="sh-total">${fmt(parseFloat(r['Line Total'])||r['Subtotal']||r['Sub Total']||0)}</span></td>
       </tr>`).join('')}</tbody>
     </table>`;
   } catch(e) {
@@ -4162,37 +4042,96 @@ function todayManila() {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }); // "YYYY-MM-DD"
 }
 
-// Robust date-match helper — handles ISO, MM/DD/YYYY, DD/MM/YYYY, Date objects, and parsed timestamps
+// Format any date/timestamp value for display in Manila timezone.
+// Handles: ISO timestamps, YYYY-MM-DD, and GSheet time-only serials (shows as 1899).
+function fmtDisplayDate(val) {
+  if (!val) return '-';
+  const s = String(val).trim();
+  try {
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) {
+      // GSheet time-only serial — year comes back as 1899 or 1900
+      if (d.getUTCFullYear() <= 1900) {
+        return d.toLocaleTimeString('en-PH', {
+          timeZone: 'UTC', // keep UTC so the HH:MM is preserved as-is
+          hour: '2-digit', minute: '2-digit', hour12: true
+        });
+      }
+      return d.toLocaleString('en-PH', {
+        timeZone: 'Asia/Manila',
+        month: 'short', day: 'numeric', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      });
+    }
+  } catch {}
+  return s;
+}
+
+// Sort records by date descending (latest first)
+function sortByDateDesc(arr, dateKey, fallbackKey) {
+  return [...arr].sort((a, b) => {
+    const da = new Date(a[dateKey] || a[fallbackKey] || 0).getTime();
+    const db = new Date(b[dateKey] || b[fallbackKey] || 0).getTime();
+    return db - da;
+  });
+}
+
+// Shift-aware date: crew duty is 4PM–3AM.
+// Before 4PM Manila → the relevant shift is yesterday's (either still running before 3AM, or between shifts 3AM–4PM).
+// At 4PM onwards → today's shift begins.
+function shiftDate() {
+  const now = new Date();
+  const manilaHour = parseInt(
+    now.toLocaleString('en-PH', { timeZone: 'Asia/Manila', hour: 'numeric', hour12: false })
+  );
+  if (manilaHour < 16) {
+    // Before 4PM: last shift started yesterday
+    const d = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+    d.setDate(d.getDate() - 1);
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+  return todayManila(); // 4PM onwards → today's shift
+}
+
+// Exact shift window timestamps: 4:00 PM Manila → 3:00 AM next day Manila
+function shiftWindow() {
+  const sd   = shiftDate();
+  const pad  = n => String(n).padStart(2, '0');
+  const start = new Date(`${sd}T16:00:00+08:00`);
+  const parts = sd.split('-').map(Number);
+  const nd    = new Date(parts[0], parts[1] - 1, parts[2] + 1);
+  const ndStr = `${nd.getFullYear()}-${pad(nd.getMonth()+1)}-${pad(nd.getDate())}`;
+  const end   = new Date(`${ndStr}T03:00:00+08:00`);
+  return { start, end, shiftDate: sd };
+}
+
+// Match a record's date/timestamp to the current shift window (4PM–3AM Manila).
 function dateMatchesToday(val) {
-  const todayISO = todayManila();
   if (!val) return false;
   const s = String(val).trim();
   if (!s) return false;
-  // ISO / starts-with match (most reliable)
-  if (s.startsWith(todayISO)) return true;
-  // Try parsing the string as a Date and compare in local timezone
+  // Date-only values (e.g. expenses) stored at midnight Manila — check prefix first
+  if (s.startsWith(shiftDate())) return true;
+  const { start, end } = shiftWindow();
   try {
-    const parsed = new Date(s);
-    if (!isNaN(parsed.getTime())) {
-      if (parsed.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }) === todayISO) return true;
-    }
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) return d >= start && d < end;
   } catch {}
-  // en-PH MM/DD/YYYY fallback
-  const todayPH = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'2-digit',day:'2-digit'});
-  return s === todayPH;
+  return false;
 }
 
 function getEODState() {
-  const today  = todayManila();
+  const today  = shiftDate();
   const stored = localStorage.getItem(EOD_LS.DATE);
-  if (stored !== today) return 'none'; // new day, reset
+  if (stored !== today) return 'none'; // new shift day, reset
   return localStorage.getItem(EOD_LS.STATUS) || 'none';
 }
 
 async function startDay() {
   const inp = document.getElementById('eod-beg-cash-inp');
   const begCash = parseFloat(inp?.value) || 0;
-  const today = todayManila();
+  const today = shiftDate();
 
   // Snapshot current inventory
   if (!inventoryCache.length) { showToast('Load inventory first — go to 📦 Inventory tab','⚠️',3000); return; }
@@ -4248,6 +4187,9 @@ async function startDay() {
 
   showToast(`Day started at ${startTime} · Beginning cash ₱${fmt(begCash).replace('₱','')}`, '▶️');
   loadEOD();
+  // Auto-generate sales report for this shift
+  const _sw = shiftWindow();
+  generateSalesReport(_sw.shiftDate, _sw.shiftDate, 'today');
 }
 
 async function endDay() {
@@ -4258,7 +4200,7 @@ async function endDay() {
   const { cashRow, stockRows } = computeEODData();
   if (!stockRows) { showToast('Could not compute EOD data','❌'); return; }
 
-  const today = todayManila();
+  const today = shiftDate();
   const payload = {
     action: 'log_eod',
     date: today,
@@ -4322,6 +4264,9 @@ async function endDay() {
 
   showToast('EOD report saved!', '✅');
   loadEOD();
+  // Auto-generate final shift sales report
+  const _sw = shiftWindow();
+  generateSalesReport(_sw.shiftDate, _sw.shiftDate, 'today');
 }
 
 function computeCOGS() {
@@ -4399,8 +4344,8 @@ function computeEODData() {
   // Delivery map: { itemName: totalQty }
   const deliveryMap = {};
   todayPurch.forEach(r => {
-    const name = String(r['Item'] || '').trim();
-    const qty  = parseFloat(r['Qty']) || 0;
+    const name = String(r['Item Name'] || r['Item'] || r['Description'] || '').trim();
+    const qty  = parseFloat(r['Quantity'] || r['Qty']) || 0;
     if (name) deliveryMap[name] = (deliveryMap[name] || 0) + qty;
   });
 
@@ -4491,7 +4436,7 @@ async function loadEOD() {
       if (res.ok) {
         const allExp = await res.json();
         if (Array.isArray(allExp)) {
-          const today = todayManila();
+          const today = shiftDate();
           // Column names are shifted in this sheet: Record ID=date, Date=category, Category=desc, Description=amount, Amount=paidBy
           const sentinels = allExp.filter(e => {
             // Category value is stored in the 'Date' key due to column misalignment
@@ -4531,7 +4476,7 @@ async function loadEOD() {
       wrap.innerHTML = `<div class="inv-empty"><div style="font-size:24px;opacity:.4">📋</div><div style="font-size:12px">Loading inventory…</div></div>`;
       try {
         const res = await fetch(url + '?action=inventory&t=' + Date.now());
-        if (res.ok) { const d = await res.json(); if (Array.isArray(d)) inventoryCache = d; }
+        if (res.ok) { const d = await res.json(); if (Array.isArray(d)) inventoryCache = normalizeInv(d); }
       } catch {}
     }
     wrap.innerHTML = `
@@ -4572,12 +4517,17 @@ async function loadEOD() {
       if (salesRes.ok){
         const sales = await salesRes.json();
         if (Array.isArray(sales)) {
-          const todaySales = sales.filter(r => dateMatchesToday(r['Date'] || r['Timestamp']));
+          const todaySales = sales.filter(r => dateMatchesToday(r['Timestamp'] || r['Date']));
+          // detect which column holds the revenue value (sheet may use 'Subtotal' instead of 'Total')
+          const _eodTotalKey = (['Total','Subtotal','Grand Total'].find(k =>
+            sales.some(r => parseFloat(r[k]) > 0)
+          )) || 'Total';
+          window._eodTotalKey      = _eodTotalKey;
           window._eodTodayOrders   = todaySales.length;
-          window._eodTodaySales    = todaySales.reduce((s,r) => s + (parseFloat(r['Total'])||0), 0);
+          window._eodTodaySales    = todaySales.reduce((s,r) => s + (parseFloat(r[_eodTotalKey])||0), 0);
           window._eodCashSales     = todaySales
             .filter(r => String(r['Payment Method']||'').toLowerCase().includes('cash'))
-            .reduce((s,r) => s + (parseFloat(r['Total'])||0), 0);
+            .reduce((s,r) => s + (parseFloat(r[_eodTotalKey])||0), 0);
           window._eodTodaySalesRaw = todaySales;
         }
       }
@@ -4652,7 +4602,8 @@ async function loadEOD() {
       // ── GENERAL LEDGER (Compound Journal Entries) ──
       const todayStr = todayManila();
       const groups = [];
-      const rawSales = window._eodTodaySalesRaw || [];
+      const rawSales   = window._eodTodaySalesRaw || [];
+      const _totalKey  = window._eodTotalKey || 'Total';
 
       // ── Per-order compound entry: DR Cash + DR COGS / CR Sales Revenue + CR Raw Materials
       // Build lookup maps once for COGS computation
@@ -4675,7 +4626,7 @@ async function loadEOD() {
       });
 
       rawSales.forEach(r => {
-        const amt      = parseFloat(r['Total']) || 0;
+        const amt      = parseFloat(r[_totalKey]) || 0;
         const orderId  = r['Order ID'] || '—';
         const time     = r['Time'] || r['Timestamp'] || '';
         const pm       = r['Payment Method'] || 'Cash';
@@ -4725,12 +4676,12 @@ async function loadEOD() {
 
       // ── INDIVIDUAL: Purchases → DR Purchases / CR Cash (one per receipt)
       purchasesCache.filter(r => dateMatchesToday(r['Date'] || r['Timestamp'])).forEach(r => {
-        const amt = parseFloat(r['Line Total'] || r['Total']) || 0;
+        const amt = parseFloat(r['Line Total'] || r['Subtotal'] || r['Sub Total'] || r['Total']) || 0;
         groups.push({
           sortKey: r['Time'] || r['Date'] || '55-purch',
           lines: [
-            { isDebit: true,  account: 'Purchases',    debit: amt, credit: 0,   memo: `${r['Item'] || '—'} · ${r['Supplier'] || '—'}` },
-            { isDebit: false, account: 'Cash on Hand', debit: 0,   credit: amt, memo: `Ref #${r['Receipt No'] || r['Receipt #'] || '—'}` }
+            { isDebit: true,  account: 'Purchases',    debit: amt, credit: 0,   memo: `${r['Item Name'] || r['Item'] || r['Description'] || '—'} · ${r['Supplier'] || '—'}` },
+            { isDebit: false, account: 'Cash on Hand', debit: 0,   credit: amt, memo: `Ref #${r['Receipt No'] || r['Notes'] || r['Receipt #'] || '—'}` }
           ]
         });
       });
@@ -4742,7 +4693,7 @@ async function loadEOD() {
           sortKey: r['Time'] || r['Date'] || '66-exp',
           lines: [
             { isDebit: true,  account: `${r['Category'] || 'Expense'} Expense`, debit: amt, credit: 0,   memo: r['Description'] || '—' },
-            { isDebit: false, account: 'Cash on Hand',                           debit: 0,   credit: amt, memo: `Ref #${r['Ref No'] || r['Reference'] || '—'}` }
+            { isDebit: false, account: 'Cash on Hand',                           debit: 0,   credit: amt, memo: `Ref #${r['Ref No'] || r['Vendor'] || r['Reference'] || '—'}` }
           ]
         });
       });
@@ -4848,8 +4799,8 @@ async function loadStockLedger() {
     (Array.isArray(purchData) ? purchData : [])
       .filter(r => String(r['Date'] || '').startsWith(todayStr))
       .forEach(r => {
-        const nm = String(r['Item'] || '').trim().toLowerCase();
-        const qty = parseFloat(r['Qty'] || r['Quantity'] || 0) || 0;
+        const nm = String(r['Item Name'] || r['Item'] || r['Description'] || '').trim().toLowerCase();
+        const qty = parseFloat(r['Quantity'] || r['Qty'] || 0) || 0;
         if (nm) deliveryMap[nm] = (deliveryMap[nm] || 0) + qty;
       });
 
@@ -4936,6 +4887,22 @@ let inventoryCache = [];
 let invSearchQ = '';
 let invCatFilter = '';
 
+function normalizeInvRow(m) {
+  return {
+    ...m,
+    name:       String(m.name       || m['Item Name']              || m['Item']     || m['name']     || '').trim(),
+    stock:      parseFloat(m.stock  || m['Available Qty']          || m['Stock (Base Unit)'] || m['Stock'] || m['stock'] || 0) || 0,
+    unit:       String(m.unit       || m['Unit of Measure']        || m['Unit']     || m['unit']     || 'pcs').trim(),
+    category:   String(m.category   || m['Category']               || m['category'] || '').trim(),
+    minStock:   parseFloat(m.minStock || m['Min Stock (Alert)']    || m['Min Stock']|| m['minStock'] || 0) || 0,
+    unitCost:   parseFloat(m.unitCost || m['Unit Cost (Base)']     || m['Unit Cost']|| m['unitCost'] || 0) || 0,
+    conversion: parseFloat(m.conversion || m['Conversion (Pcs/Pack)'] || m['Conversion'] || m['conversion'] || 1) || 1,
+  };
+}
+function normalizeInv(data) {
+  return Array.isArray(data) ? data.map(normalizeInvRow).filter(m => m.name) : [];
+}
+
 function toggleNavSidebar() {
   const sidebar  = document.getElementById('nav-sidebar');
   const backdrop = document.getElementById('nav-backdrop');
@@ -4962,6 +4929,7 @@ function switchView(view) {
   const isExpEntry   = view === 'expenses-entry';
   const isDashboard  = view === 'dashboard';
   const isUsers      = view === 'users';
+  const isShift      = view === 'shift';
 
   document.getElementById('menu-zone').style.display             = isMenu       ? ''     : 'none';
   document.getElementById('order-panel').style.display           = isMenu       ? ''     : 'none';
@@ -4971,6 +4939,7 @@ function switchView(view) {
   document.getElementById('reports-zone').style.display          = isReports    ? 'flex' : 'none';
   document.getElementById('adjust-zone').style.display           = isAdjust     ? 'flex' : 'none';
   document.getElementById('eod-zone').style.display              = isEOD        ? 'flex' : 'none';
+  document.getElementById('shift-zone').style.display            = isShift      ? 'flex' : 'none';
   document.getElementById('bom-zone').style.display              = isBOM        ? 'flex' : 'none';
   document.getElementById('purchases-entry-zone').style.display  = isPurchEntry ? 'flex' : 'none';
   document.getElementById('expenses-entry-zone').style.display   = isExpEntry   ? 'flex' : 'none';
@@ -4983,11 +4952,12 @@ function switchView(view) {
   if (isReports)    switchReport(currentReport, false);
   if (isAdjust)     { loadStockAdjust(); loadAdjLog(); }
   if (isEOD)        loadEOD();
+  if (isShift)      loadShiftZone();
   if (isBOM)        loadBOM();
   if (isPurchEntry) loadPurchases();
   if (isExpEntry)   {
     const expDate = document.getElementById('exp-date');
-    if (expDate && !expDate.value) expDate.value = todayManila();
+    if (expDate && !expDate.value) expDate.value = shiftDate();
   }
   if (isDashboard)  loadDashboard();
   if (isUsers)      renderUsersList();
@@ -5062,7 +5032,7 @@ async function loadInventory() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error('Invalid response');
-    inventoryCache = data;
+    inventoryCache = normalizeInv(data);
     renderInventory();
   } catch(e) {
     content.innerHTML = `<div class="inv-empty"><div style="font-size:28px">❌</div><div style="font-size:13px;font-weight:700">Failed to load</div><div style="font-size:11px">${e.message}</div></div>`;
@@ -5124,7 +5094,7 @@ function renderInventory() {
   // Sort: out first, then low, then ok — then by name
   items.sort((a,b) => {
     const rank = m => m.stock <= 0 ? 0 : m.stock < m.minStock ? 1 : 2;
-    return rank(a) - rank(b) || a.name.localeCompare(b.name);
+    return rank(a) - rank(b) || (a.name||'').localeCompare(b.name||'');
   });
 
   content.innerHTML = `<table class="inv-table">
@@ -5210,7 +5180,7 @@ async function deductInventory(orderItems) {
       if (!res.ok) return;
       const data = await res.json();
       if (!Array.isArray(data)) return;
-      inventoryCache = data;
+      inventoryCache = normalizeInv(data);
       if (document.getElementById('inventory-zone').style.display !== 'none') renderInventory();
       const low = data.filter(m => parseFloat(m.stock) > 0 && parseFloat(m.stock) < parseFloat(m.minStock));
       const out = data.filter(m => parseFloat(m.stock) <= 0);
@@ -5718,7 +5688,7 @@ async function processOrder() {
   const payload = {
     action: 'pos_order',
     order_id: oid,
-    date: todayManila(),  // Manila timezone, YYYY-MM-DD — unambiguous for GSheet filtering
+    date: shiftDate(),    // shift-aware: 12AM–2:59AM still maps to previous day's shift
     time: now.toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'}),
     timestamp: now.toISOString(),
     customer_name: name,
@@ -6012,29 +5982,49 @@ async function doLogin() {
 
   const url = localStorage.getItem(LS.GAS);
   let loggedIn = null;
+  let gasError  = null;
 
   try {
     if (url) {
-      const res  = await fetch(url, { method: 'POST', body: JSON.stringify({ action: 'verify_login', username, password }) });
-      const data = await res.json();
-      if (data.verified) {
-        // New GAS is deployed — use its result
-        if (data.ok) loggedIn = { username: data.username || username, role: data.role || 'user' };
-      } else {
-        // Old GAS returned generic {ok:true} — fall back to localStorage
-        loggedIn = _localLogin(username, password);
+      let data;
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'verify_login', username, password })
+        });
+        data = await res.json();
+      } catch (fetchErr) {
+        gasError = 'Cannot reach server — check your GAS URL in Settings';
+      }
+
+      if (data) {
+        if (data.verified) {
+          // GAS supports user management
+          if (data.ok) {
+            loggedIn = { username: data.username || username, role: data.role || 'user' };
+          }
+          // else: GAS says wrong credentials → loggedIn stays null
+        } else {
+          // GAS doesn't support verify_login (old deployment) — try local only
+          loggedIn = _localLogin(username, password);
+          if (!loggedIn) gasError = 'GAS not updated yet — copy the new GAS code from Settings and redeploy';
+        }
       }
     } else {
       loggedIn = _localLogin(username, password);
     }
-  } catch {
-    loggedIn = _localLogin(username, password);
+  } catch (e) {
+    gasError = 'Unexpected error: ' + String(e);
   } finally {
     if (btn) { btn.textContent = 'Sign In'; btn.disabled = false; }
   }
 
   if (!loggedIn) {
-    errEl.textContent = 'Incorrect username or password';
+    if (gasError) {
+      errEl.textContent = gasError;
+    } else {
+      errEl.textContent = 'Incorrect username or password';
+    }
     document.getElementById('login-pass').value = '';
     return;
   }
@@ -6060,7 +6050,7 @@ function doLogout() {
 }
 
 function applyRoleAccess(role, username) {
-  const isAdmin = role === 'admin';
+  const isAdmin = String(role || '').toLowerCase() === 'admin';
 
   // Show/hide nav tabs based on role
   document.querySelectorAll('.view-tab[data-view]').forEach(b => {
@@ -6068,8 +6058,8 @@ function applyRoleAccess(role, username) {
     if (isAdmin) {
       b.style.display = '';
     } else {
-      // user role: menu only
-      b.style.display = view === 'menu' ? '' : 'none';
+      // user role: menu + shift + dashboard + stock adjustment
+      b.style.display = (view === 'menu' || view === 'shift' || view === 'dashboard' || view === 'adjust') ? '' : 'none';
     }
   });
 
@@ -6168,15 +6158,215 @@ async function renderUsersList() {
     : `<div style="font-size:11px;color:var(--muted);padding:12px 0">No users found</div>`;
 }
 
+// ── SHIFT (cashier + admin) ─────────────────
+async function loadShiftZone() {
+  const wrap    = document.getElementById('shift-wrap');
+  if (!wrap) return;
+  const session = authGetSession();
+  const isAdmin = String(session?.role || '').toLowerCase() === 'admin';
+
+  // Admin: show shift log history table
+  if (isAdmin) {
+    wrap.innerHTML = `<div style="font-size:11px;color:var(--muted);padding:8px 0">Loading shift logs…</div>`;
+    const url = localStorage.getItem(LS.GAS);
+    let logs = [];
+    try {
+      if (url) {
+        const res = await fetch(`${url}?action=get_shift_logs&t=${Date.now()}`);
+        const d   = await res.json();
+        if (Array.isArray(d)) logs = d;
+      }
+    } catch {}
+
+    if (!logs.length) {
+      wrap.innerHTML = `<div class="inv-empty"><div style="font-size:28px;opacity:.3">⏱</div><div style="font-size:12px">No shift logs yet</div></div>`;
+      return;
+    }
+
+    const fmtShiftDate = raw => {
+      try {
+        const d = new Date(String(raw).trim() + 'T00:00:00');
+        if (!isNaN(d)) return d.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+      } catch {}
+      return String(raw || '');
+    };
+    const fmtShiftTime = raw => {
+      const s = String(raw || '').trim();
+      // GSheets time serialized as 1899-12-30T...Z — extract Manila time
+      if (s.includes('1899-12-30T')) {
+        try {
+          const d  = new Date(s);
+          const mH = (d.getUTCHours() + 8) % 24;
+          const mM = d.getUTCMinutes();
+          const suf = mH >= 12 ? 'PM' : 'AM';
+          const h12 = mH % 12 || 12;
+          return `${String(h12).padStart(2,'0')}:${String(mM).padStart(2,'0')} ${suf}`;
+        } catch {}
+      }
+      // Already formatted AM/PM
+      if (/AM|PM/i.test(s)) return s.toUpperCase();
+      // HH:MM 24h → 12h
+      const m = s.match(/^(\d{1,2}):(\d{2})$/);
+      if (m) {
+        let h = parseInt(m[1]), mn = m[2], suf = 'AM';
+        if (h === 0) { h = 12; } else if (h === 12) { suf = 'PM'; } else if (h > 12) { h -= 12; suf = 'PM'; }
+        return `${String(h).padStart(2,'0')}:${mn} ${suf}`;
+      }
+      return s;
+    };
+    const rows = logs.map(r => {
+      const action  = String(r['Action'] || '').trim();
+      const isStart = action === 'Start';
+      const amtNum  = parseFloat(r['Amount']) || 0;
+      const amtStr  = '₱' + amtNum.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+      return `<tr>
+        <td>${fmtShiftDate(r['Date'])}</td>
+        <td style="white-space:nowrap">${fmtShiftTime(r['Time'])}</td>
+        <td><span style="font-weight:700;color:${isStart ? 'var(--green)' : 'var(--amber)'}">${isStart ? '▶ Start' : '⏹ End'}</span></td>
+        <td>${r['Username'] || ''}</td>
+        <td style="font-family:var(--font-mono);text-align:right">${isStart ? '<span style="color:var(--muted2)">Beg: </span>' : '<span style="color:var(--muted2)">End: </span>'}${amtStr}</td>
+      </tr>`;
+    }).join('');
+
+    wrap.innerHTML = `
+      <div style="overflow-x:auto">
+        <table class="eod-table" style="min-width:420px">
+          <thead><tr>
+            <th style="text-align:left">Date</th>
+            <th style="text-align:left">Time</th>
+            <th style="text-align:left">Action</th>
+            <th style="text-align:left">Crew</th>
+            <th>Amount</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+    return;
+  }
+
+  // Cashier: show start/end shift form
+  const today   = shiftDate();
+  const state   = getEODState();
+  const begCash = parseFloat(localStorage.getItem(EOD_LS.BEG_CASH)) || 0;
+
+  if (state === 'none') {
+    wrap.innerHTML = `
+      <div class="shift-card">
+        <div class="eod-day-badge"><div class="eod-day-dot idle"></div><span>No active shift · ${today}</span></div>
+        <div>
+          <div class="eod-cash-label" style="margin-bottom:8px">Beginning Cash On Hand</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px;color:var(--muted2);font-family:var(--font-mono)">₱</span>
+            <input class="shift-cash-inp" id="shift-beg-inp" type="number" min="0" step="any" placeholder="0.00"/>
+          </div>
+        </div>
+        <button class="shift-start-btn" onclick="userStartShift()">▶ Start Shift</button>
+      </div>`;
+    setTimeout(() => document.getElementById('shift-beg-inp')?.focus(), 80);
+    return;
+  }
+
+  if (state === 'started') {
+    wrap.innerHTML = `
+      <div class="shift-card">
+        <div class="eod-day-badge"><div class="eod-day-dot"></div><span>Shift Active · ${today}</span></div>
+        <div class="shift-info-row">
+          <span class="shift-info-label">Beginning Cash</span>
+          <span class="shift-info-val">₱${begCash.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',')}</span>
+        </div>
+        <div>
+          <div class="eod-cash-label" style="margin-bottom:8px">Total Cash On Hand (End of Shift)</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px;color:var(--muted2);font-family:var(--font-mono)">₱</span>
+            <input class="shift-cash-inp" id="shift-end-inp" type="number" min="0" step="any" placeholder="0.00"/>
+          </div>
+        </div>
+        <button class="shift-end-btn" onclick="userEndShift()">⏹ End Shift</button>
+      </div>`;
+    setTimeout(() => document.getElementById('shift-end-inp')?.focus(), 80);
+    return;
+  }
+
+  // ended
+  wrap.innerHTML = `
+    <div class="shift-card">
+      <div class="eod-day-badge"><div class="eod-day-dot idle"></div><span>Shift Ended · ${today}</span></div>
+      <div style="font-size:12px;color:var(--muted);padding:8px 0 12px">Shift complete. Start a new shift when ready.</div>
+      <div>
+        <div class="eod-cash-label" style="margin-bottom:8px">Beginning Cash On Hand</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px;color:var(--muted2);font-family:var(--font-mono)">₱</span>
+          <input class="shift-cash-inp" id="shift-beg-inp" type="number" min="0" step="any" placeholder="0.00"/>
+        </div>
+      </div>
+      <button class="shift-start-btn" onclick="userStartShift()">▶ Start Shift</button>
+    </div>`;
+  setTimeout(() => document.getElementById('shift-beg-inp')?.focus(), 80);
+}
+
+async function userStartShift() {
+  const inp     = document.getElementById('shift-beg-inp');
+  const begCash = parseFloat(inp?.value) || 0;
+  const today   = shiftDate();
+  const session = authGetSession();
+  const uname   = session?.username || 'Cashier';
+  const time    = new Date().toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', hour12: true });
+  const url     = localStorage.getItem(LS.GAS);
+
+  localStorage.setItem(EOD_LS.DATE,     today);
+  localStorage.setItem(EOD_LS.BEG_CASH, begCash);
+  localStorage.setItem(EOD_LS.STATUS,   'started');
+
+  if (url) {
+    const post = body => fetch(url, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) }).catch(()=>{});
+    // EOD cross-device sentinel (keeps EOD tab in sync)
+    await post({ action:'log_expense', date:today, category:'__EOD__', description:'[]', amount:begCash, paidBy:'started', notes:`Shift started by ${uname}` });
+    // Dedicated Shift Logs tab
+    await post({ action:'log_shift', date:today, time, action_type:'Start', username:uname, amount:begCash });
+  }
+
+  showToast(`Shift started · Beg cash ₱${begCash.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',')}`, '▶️');
+  loadShiftZone();
+  loadDashboard(true); // force-refresh so Today Revenue resets to ₱0 for the new shift
+}
+
+async function userEndShift() {
+  const inp        = document.getElementById('shift-end-inp');
+  const endingCash = parseFloat(inp?.value);
+  if (inp?.value === '' || isNaN(endingCash)) { showToast('Enter total cash on hand', '⚠️'); return; }
+  if (!confirm('End shift and record ₱' + endingCash.toFixed(2) + ' as ending cash?')) return;
+
+  const today   = shiftDate();
+  const session = authGetSession();
+  const uname   = session?.username || 'Cashier';
+  const time    = new Date().toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit', hour12: true });
+  const url     = localStorage.getItem(LS.GAS);
+
+  localStorage.setItem(EOD_LS.STATUS, 'ended');
+
+  if (url) {
+    const post = body => fetch(url, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) }).catch(()=>{});
+    // EOD cross-device sentinel
+    await post({ action:'log_expense', date:today, category:'__EOD__', description:'[]', amount:0, paidBy:'ended', notes:`Shift ended by ${uname}` });
+    // Dedicated Shift Logs tab
+    await post({ action:'log_shift', date:today, time, action_type:'End', username:uname, amount:endingCash });
+  }
+
+  showToast(`Shift ended · Cash on hand ₱${endingCash.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',')}`, '⏹');
+  loadShiftZone();
+  loadDashboard(true);
+}
+
 // ── DASHBOARD ──────────────────────────────
 let _dashLoading = false;
 
-async function loadDashboard() {
-  if (_dashLoading) return;
+async function loadDashboard(force = false) {
+  if (_dashLoading && !force) return;
   _dashLoading = true;
 
   const url   = localStorage.getItem(LS.GAS);
-  const today = todayManila();
+  const today = shiftDate();
+  const { start: shiftStart, end: shiftEnd } = shiftWindow();
 
   const subEl = document.getElementById('dash-sub');
   if (subEl) subEl.textContent = new Date().toLocaleDateString('en-PH', {
@@ -6192,32 +6382,63 @@ async function loadDashboard() {
     return;
   }
 
-  const { from: weekFrom } = rptDateRange('week');
+  // Last 7 shift-dates ending at current shiftDate()
+  const _w7 = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+  _w7.setDate(_w7.getDate() - 6);
+  const weekFrom = `${_w7.getFullYear()}-${String(_w7.getMonth()+1).padStart(2,'0')}-${String(_w7.getDate()).padStart(2,'0')}`;
   const needInv = !inventoryCache.length;
   const needRec = !recipesCache.length;
 
   try {
     const fetches = [
-      fetch(`${url}?action=sales_report&from=${today}&to=${today}&t=${Date.now()}`),
-      fetch(`${url}?action=expenses_report&from=${today}&to=${today}&t=${Date.now()}`),
-      fetch(`${url}?action=sales_report&from=${weekFrom}&to=${today}&t=${Date.now()}`)
+      fetch(`${url}?action=sales&t=${Date.now()}`),
+      fetch(`${url}?action=expenses&t=${Date.now()}`),
     ];
     if (needInv) fetches.push(fetch(`${url}?action=inventory&t=${Date.now()}`));
     if (needRec) fetches.push(fetch(`${url}?action=recipes&t=${Date.now()}`));
 
     const results = await Promise.all(fetches);
-    let ridx = 3;
-    if (needInv) { try { const d = await results[ridx++].json(); if (Array.isArray(d)) inventoryCache = d; } catch {} }
+    let ridx = 2;
+    if (needInv) { try { const d = await results[ridx++].json(); if (Array.isArray(d)) inventoryCache = normalizeInv(d); } catch {} }
     if (needRec) { try { const d = await results[ridx++].json(); if (Array.isArray(d)) recipesCache   = d; } catch {} }
 
-    const todaySales = results[0].ok ? await results[0].json() : [];
-    const todayExpRaw= results[1].ok ? await results[1].json() : [];
-    const weekSales  = results[2].ok ? await results[2].json() : [];
+    const allSalesRaw = results[0].ok ? await results[0].json() : [];
+    const allExpRaw   = results[1].ok ? await results[1].json() : [];
+    const allSales    = Array.isArray(allSalesRaw) ? allSalesRaw : [];
+
+    // Client-side: filter by shift window (4PM → 3AM)
+    const todaySales = allSales.filter(r => {
+      const raw = String(r['Timestamp'] || r['Date'] || '').trim();
+      const d = new Date(raw);
+      if (!isNaN(d.getTime())) return d >= shiftStart && d < shiftEnd;
+      return raw.startsWith(today);
+    });
+
+    // Client-side: filter by week (use shift date stored in Date column)
+    const weekSales = Array.isArray(allSales) ? allSales.filter(r => {
+      const ds = String(r['Date'] || r['Timestamp'] || '').slice(0, 10);
+      return ds >= weekFrom && ds <= today;
+    }) : [];
+
+    // Client-side: expenses for this shift date only, exclude sentinels
+    const todayExpRaw = Array.isArray(allExpRaw) ? allExpRaw.filter(r => {
+      const cat = String(r['Date'] || r['Category'] || '').trim();
+      if (cat === '__EOD__' || cat === 'Shift Log') return false;
+      const raw = String(r['Record ID'] || r['Date'] || '').trim();
+      if (!raw) return false;
+      return raw.slice(0, 10) === today;
+    }) : [];
 
     // ── Cost helpers (same as generateSalesReport) ──────────────
     const sample = (Array.isArray(todaySales) && todaySales[0]) || (Array.isArray(weekSales) && weekSales[0]);
     const col = sample
-      ? k => { const v=[k,k.toLowerCase(),k.replace(/ /g,'_'),k.replace(/ /g,'_').toLowerCase()]; return v.find(x=>sample[x]!==undefined)||k; }
+      ? k => {
+          const v = [k, k.toLowerCase(), k.replace(/ /g,'_'), k.replace(/ /g,'_').toLowerCase()];
+          const exact = v.find(x => sample[x] !== undefined && sample[x] !== '');
+          if (exact) return exact;
+          const fuzzy = Object.keys(sample).find(x => x.toLowerCase().includes(k.toLowerCase()));
+          return fuzzy || k;
+        }
       : k => k;
 
     const costMap = {};
@@ -6241,7 +6462,11 @@ async function loadDashboard() {
 
     // ── Today KPIs ──────────────────────────────────────────────
     const tSales = Array.isArray(todaySales) ? todaySales : [];
-    const todayRev    = tSales.reduce((s,r) => s + (parseFloat(r[col('Total')])||0), 0);
+    // Pick whichever column has actual money values (Total preferred, Subtotal fallback)
+    const totalKey = (['Total','Subtotal','Grand Total'].find(k =>
+      allSales.some(r => parseFloat(r[k]) > 0)
+    )) || col('Total');
+    const todayRev    = tSales.reduce((s,r) => s + (parseFloat(r[totalKey])||0), 0);
     const todayOrders = tSales.length;
 
     let todayCOGS = 0;
@@ -6265,6 +6490,8 @@ async function loadDashboard() {
     const margin      = todayRev > 0 ? ((netProfit / todayRev) * 100).toFixed(1) : '0.0';
 
     // ── KPI cards ───────────────────────────────────────────────
+    const _dashRole = String(authGetSession()?.role || '').toLowerCase();
+    const _isAdmin  = _dashRole === 'admin';
     document.getElementById('dash-kpis').innerHTML = `
       <div class="dash-kpi-card">
         <div class="dash-kpi-glow" style="background:var(--amber)"></div>
@@ -6273,6 +6500,7 @@ async function loadDashboard() {
         <div class="dash-kpi-num kpi-amber">${fmt(todayRev)}</div>
         <div class="dash-kpi-hint">${todayOrders} order${todayOrders!==1?'s':''}</div>
       </div>
+      ${_isAdmin ? `
       <div class="dash-kpi-card">
         <div class="dash-kpi-glow" style="background:#a855f7"></div>
         <div class="dash-kpi-icon">📦</div>
@@ -6281,21 +6509,16 @@ async function loadDashboard() {
           ${hasRecipes ? fmt(todayCOGS) : '—'}
         </div>
         <div class="dash-kpi-hint">${hasRecipes ? 'est. cost of goods' : 'set up recipes to track'}</div>
-      </div>
-      <div class="dash-kpi-card">
-        <div class="dash-kpi-glow" style="background:var(--red)"></div>
-        <div class="dash-kpi-icon">💸</div>
-        <div class="dash-kpi-lbl">Expenses</div>
-        <div class="dash-kpi-num kpi-red">${fmt(todayExpAmt)}</div>
-        <div class="dash-kpi-hint">${realExp.length} item${realExp.length!==1?'s':''}</div>
-      </div>
+      </div>` : ''}
+
+      ${_isAdmin ? `
       <div class="dash-kpi-card">
         <div class="dash-kpi-glow" style="background:${netProfit>=0?'var(--green)':'var(--red)'}"></div>
         <div class="dash-kpi-icon">${netProfit>=0?'📈':'📉'}</div>
         <div class="dash-kpi-lbl">Net Profit</div>
         <div class="dash-kpi-num ${netProfit>=0?'kpi-green':'kpi-red'}">${fmt(netProfit)}</div>
         <div class="dash-kpi-hint">${hasRecipes ? margin+'% margin' : 'excl. COGS'}</div>
-      </div>`;
+      </div>` : ''}`;
 
     // ── Week top items bar chart ─────────────────────────────────
     const wSales = Array.isArray(weekSales) ? weekSales : [];
@@ -6323,41 +6546,57 @@ async function loadDashboard() {
           </div>`).join('')
       : `<div style="font-size:11px;color:var(--muted);padding:12px 0">No sales data for this week</div>`;
 
-    // ── P&L summary card ────────────────────────────────────────
-    const plRows = hasRecipes
-      ? `<div class="dash-pl-row"><span class="dash-pl-lbl">Revenue</span><span class="dash-pl-val kpi-amber" style="color:var(--amber)">${fmt(todayRev)}</span></div>
-         <div class="dash-pl-row"><span class="dash-pl-lbl">COGS</span><span class="dash-pl-val kpi-red" style="color:var(--red)">− ${fmt(todayCOGS)}</span></div>
-         <div class="dash-pl-row"><span class="dash-pl-lbl">Expenses</span><span class="dash-pl-val kpi-red" style="color:var(--red)">− ${fmt(todayExpAmt)}</span></div>`
-      : `<div class="dash-pl-row"><span class="dash-pl-lbl">Revenue</span><span class="dash-pl-val" style="color:var(--amber)">${fmt(todayRev)}</span></div>
-         <div class="dash-pl-row"><span class="dash-pl-lbl">Expenses</span><span class="dash-pl-val" style="color:var(--red)">− ${fmt(todayExpAmt)}</span></div>
-         <div class="dash-pl-row"><span class="dash-pl-lbl" style="opacity:.5">COGS</span><span class="dash-pl-val" style="color:var(--muted)">no recipes</span></div>`;
-    const netLabel = hasRecipes ? 'Net Profit' : 'Gross (excl. COGS)';
-    document.getElementById('dash-pl').innerHTML = `
-      ${plRows}
-      <div class="dash-pl-total">
-        <span class="dash-pl-total-lbl">${netLabel}</span>
-        <span class="dash-pl-total-val" style="color:${netProfit>=0?'var(--green)':'var(--red)'}">${fmt(netProfit)}</span>
-      </div>`;
+    // ── P&L summary card (admin only) ───────────────────────────
+    const plEl = document.getElementById('dash-pl');
+    if (!_isAdmin) {
+      plEl.closest('.dash-card') && (plEl.closest('.dash-card').style.display = 'none');
+    } else {
+      plEl.closest('.dash-card') && (plEl.closest('.dash-card').style.display = '');
+      const plRows = hasRecipes
+        ? `<div class="dash-pl-row"><span class="dash-pl-lbl">Revenue</span><span class="dash-pl-val kpi-amber" style="color:var(--amber)">${fmt(todayRev)}</span></div>
+           <div class="dash-pl-row"><span class="dash-pl-lbl">COGS</span><span class="dash-pl-val kpi-red" style="color:var(--red)">− ${fmt(todayCOGS)}</span></div>
+           <div class="dash-pl-row"><span class="dash-pl-lbl">Expenses</span><span class="dash-pl-val kpi-red" style="color:var(--red)">− ${fmt(todayExpAmt)}</span></div>`
+        : `<div class="dash-pl-row"><span class="dash-pl-lbl">Revenue</span><span class="dash-pl-val" style="color:var(--amber)">${fmt(todayRev)}</span></div>
+           <div class="dash-pl-row"><span class="dash-pl-lbl">Expenses</span><span class="dash-pl-val" style="color:var(--red)">− ${fmt(todayExpAmt)}</span></div>
+           <div class="dash-pl-row"><span class="dash-pl-lbl" style="opacity:.5">COGS</span><span class="dash-pl-val" style="color:var(--muted)">no recipes</span></div>`;
+      const netLabel = hasRecipes ? 'Net Profit' : 'Gross (excl. COGS)';
+      plEl.innerHTML = `
+        ${plRows}
+        <div class="dash-pl-total">
+          <span class="dash-pl-total-lbl">${netLabel}</span>
+          <span class="dash-pl-total-val" style="color:${netProfit>=0?'var(--green)':'var(--red)'}">${fmt(netProfit)}</span>
+        </div>`;
+    }
 
     // ── 7-day sparkline ─────────────────────────────────────────
     const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const days = [];
     const dayTotals = {};
+    const pad2 = n => String(n).padStart(2,'0');
     for (let i = 6; i >= 0; i--) {
-      const d  = new Date();
+      const d  = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
       d.setDate(d.getDate() - i);
-      const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const ds = `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
       days.push({ ds, dow: d.getDay() });
       dayTotals[ds] = 0;
     }
-    wSales.forEach(sale => {
-      const ds = String(sale[col('Date')]||'').slice(0,10);
-      if (dayTotals[ds] !== undefined) dayTotals[ds] += parseFloat(sale[col('Total')])||0;
-    });
-    // Also include today's sales in the sparkline
-    tSales.forEach(sale => {
-      const ds = String(sale[col('Date')]||today).slice(0,10);
-      if (dayTotals[ds] !== undefined) dayTotals[ds] += parseFloat(sale[col('Total')])||0;
+    // Populate sparkline: derive each sale's shift-date from its Timestamp
+    // (same hour<16→previous-day rule as shiftDate()).
+    // This correctly handles post-midnight orders regardless of what's in Date column.
+    // Falls back to Date column only when Timestamp is missing/invalid.
+    const spark7From = days[0].ds;
+    allSales.forEach(sale => {
+      const ts = new Date(String(sale['Timestamp']||'').trim());
+      let ds;
+      if (!isNaN(ts.getTime())) {
+        const m = new Date(ts.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+        if (m.getHours() < 16) m.setDate(m.getDate() - 1);
+        ds = `${m.getFullYear()}-${pad2(m.getMonth()+1)}-${pad2(m.getDate())}`;
+      } else {
+        ds = String(sale[col('Date')]||'').slice(0,10);
+      }
+      if (!ds || ds < spark7From || ds > today || dayTotals[ds] === undefined) return;
+      dayTotals[ds] += parseFloat(sale[totalKey])||0;
     });
     const maxDay = Math.max(...Object.values(dayTotals), 1);
 

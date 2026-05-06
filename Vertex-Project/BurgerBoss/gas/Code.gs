@@ -33,9 +33,26 @@ function sheetToObjects(sheet) {
   var headers = data[0].map(function(h) { return String(h).trim(); });
   return data.slice(1).map(function(row) {
     var obj = {};
-    headers.forEach(function(h, i) { obj[h] = row[i]; });
+    headers.forEach(function(h, i) {
+      var val = row[i];
+      // Serialize Date objects in Manila timezone to avoid UTC offset shifting the date
+      if (val instanceof Date) {
+        val = Utilities.formatDate(val, 'Asia/Manila', "yyyy-MM-dd'T'HH:mm:ss'+08:00'");
+      }
+      obj[h] = val;
+    });
     return obj;
   });
+}
+
+// Find a column index by trying multiple possible header names
+function findCol(headers) {
+  var names = Array.prototype.slice.call(arguments, 1);
+  for (var i = 0; i < names.length; i++) {
+    var idx = headers.indexOf(names[i]);
+    if (idx >= 0) return idx;
+  }
+  return -1;
 }
 
 // Always use Manila timezone so dates are consistent across devices
@@ -58,8 +75,10 @@ function doGet(e) {
       case 'expenses':      return okJson(getExpenses());
       case 'recipes':       return okJson(getRecipes());
       case 'get_eod_state': return okJson(gasGetEodState());
-      case 'get_users':     return okJson(getUsers());
-      case 'ping':          return okJson({ ok: true, time: nowPH(), today: todayISO() });
+      case 'get_users':       return okJson(getUsers());
+      case 'get_shift_logs':  return okJson(getShiftLogs());
+      case 'stock_log':       return okJson(getStockLog());
+      case 'ping':            return okJson({ ok: true, time: nowPH(), today: todayISO() });
       default:              return okJson({ error: 'Unknown GET action: ' + action });
     }
   } catch (err) {
@@ -81,6 +100,7 @@ function doPost(e) {
       case 'adjust_stock':    return okJson(adjustStock(payload));
       case 'log_purchase':    return okJson(logPurchase(payload));
       case 'log_expense':     return okJson(logExpense(payload));
+      case 'log_shift':       return okJson(logShift(payload));
       case 'log_eod':         return okJson(logEOD(payload));
       case 'reconcile_stock': return okJson(reconcileStock(payload.deductions || []));
       case 'start_day':       return okJson(gasStartDay(payload));
@@ -202,13 +222,12 @@ function deductStock(itemsSummary) {
   var recHeaders   = recipeData[0].map(function(h) { return String(h).trim(); });
   var invHeaders   = invData[0].map(function(h) { return String(h).trim(); });
 
-  // Support both old and new column names
-  var menuCol    = recHeaders.indexOf('Menu Item Name') >= 0 ? recHeaders.indexOf('Menu Item Name') : recHeaders.indexOf('Item');
-  var ingCol     = recHeaders.indexOf('Ingredient')     >= 0 ? recHeaders.indexOf('Ingredient')     : recHeaders.indexOf('ingredient');
-  var qtyUsedCol = recHeaders.indexOf('Qty Used')       >= 0 ? recHeaders.indexOf('Qty Used')       : recHeaders.indexOf('qtyUsed');
-  var itemCol    = invHeaders.indexOf('Item Name')         >= 0 ? invHeaders.indexOf('Item Name')         : invHeaders.indexOf('Item');
-  var stockCol   = invHeaders.indexOf('Stock (Base Unit)') >= 0 ? invHeaders.indexOf('Stock (Base Unit)') : invHeaders.indexOf('Stock');
-  var updatedCol = invHeaders.indexOf('Last Updated');
+  var menuCol    = findCol(recHeaders, 'Menu Item Name', 'Item', 'name', 'Name');
+  var ingCol     = findCol(recHeaders, 'Ingredient', 'ingredient');
+  var qtyUsedCol = findCol(recHeaders, 'Qty Used', 'qtyUsed', 'qty_used');
+  var itemCol    = findCol(invHeaders,  'Item Name', 'Item', 'name', 'Name');
+  var stockCol   = findCol(invHeaders,  'Available Qty', 'Stock (Base Unit)', 'Stock', 'stock', 'Qty');
+  var updatedCol = findCol(invHeaders,  'Last Restocked', 'Last Updated', 'lastUpdated', 'Updated');
 
   if (menuCol < 0 || ingCol < 0 || qtyUsedCol < 0 || itemCol < 0 || stockCol < 0) return;
 
@@ -256,9 +275,9 @@ function reconcileStock(deductions) {
 
   var invData    = invSheet.getDataRange().getValues();
   var invHeaders = invData[0].map(function(h) { return String(h).trim(); });
-  var itemCol    = invHeaders.indexOf('Item Name')         >= 0 ? invHeaders.indexOf('Item Name')         : invHeaders.indexOf('Item');
-  var stockCol   = invHeaders.indexOf('Stock (Base Unit)') >= 0 ? invHeaders.indexOf('Stock (Base Unit)') : invHeaders.indexOf('Stock');
-  var updatedCol = invHeaders.indexOf('Last Updated');
+  var itemCol    = findCol(invHeaders, 'Item Name', 'Item', 'name', 'Name');
+  var stockCol   = findCol(invHeaders, 'Available Qty', 'Stock (Base Unit)', 'Stock', 'stock', 'Qty');
+  var updatedCol = findCol(invHeaders, 'Last Restocked', 'Last Updated', 'lastUpdated', 'Updated');
 
   var deductMap = {};
   deductions.forEach(function(d) {
@@ -279,31 +298,80 @@ function reconcileStock(deductions) {
   return { ok: true, updated: updated };
 }
 
-// ── Stock In ──────────────────────────────────────────────────────
+// ── Stock Adjustment (single or batch) ───────────────────────────
 function adjustStock(p) {
   var invSheet = ss().getSheetByName('Inventory');
   if (!invSheet) return { ok: false, error: 'No Inventory sheet' };
 
-  var invData    = invSheet.getDataRange().getValues();
-  var invHeaders = invData[0].map(function(h) { return String(h).trim(); });
-  var itemCol    = invHeaders.indexOf('Item Name')         >= 0 ? invHeaders.indexOf('Item Name')         : invHeaders.indexOf('Item');
-  var stockCol   = invHeaders.indexOf('Stock (Base Unit)') >= 0 ? invHeaders.indexOf('Stock (Base Unit)') : invHeaders.indexOf('Stock');
-  var updatedCol = invHeaders.indexOf('Last Updated');
+  var data    = invSheet.getDataRange().getValues();
+  if (data.length < 2) return { ok: false, error: 'Inventory sheet has no data rows' };
 
-  var target = String(p.itemName || p.name || '').trim().toLowerCase();
-  var qty    = parseFloat(p.qty)  || 0;
-  var mode   = p.mode || 'add';
-  var now    = nowPH();
+  var headers    = data[0].map(function(h) { return String(h).trim(); });
+  var itemCol    = findCol(headers, 'Item Name', 'Item', 'name', 'Name');
+  var stockCol   = findCol(headers, 'Available Qty', 'Stock (Base Unit)', 'Stock', 'stock', 'Qty');
+  var updatedCol = findCol(headers, 'Last Restocked', 'Last Updated', 'lastUpdated', 'Updated');
 
-  for (var i = 1; i < invData.length; i++) {
-    if (String(invData[i][itemCol]).trim().toLowerCase() !== target) continue;
-    var current  = parseFloat(invData[i][stockCol]) || 0;
-    var newStock = mode === 'set' ? qty : Math.max(0, current + qty);
-    invSheet.getRange(i + 1, stockCol + 1).setValue(newStock);
-    if (updatedCol >= 0) invSheet.getRange(i + 1, updatedCol + 1).setValue(now);
-    return { ok: true, newStock: newStock };
+  if (itemCol  < 0) return { ok: false, error: 'No name column. Found: ' + headers.join(', ') };
+  if (stockCol < 0) return { ok: false, error: 'No stock column. Found: ' + headers.join(', ') };
+
+  // Build name → sheet-row (1-based) map for fast lookup
+  var nameMap = {};
+  for (var r = 1; r < data.length; r++) {
+    var n = String(data[r][itemCol]).trim();
+    if (n) nameMap[n.toLowerCase()] = r + 1; // +1 because sheet rows are 1-based
   }
-  return { ok: false, error: 'Item not found: ' + (p.itemName || p.name) };
+
+  var now    = nowPH();
+  var today  = todayISO();
+  var reason = p.reason || '';
+  var doneBy = p.doneBy || 'POS';
+  var mode   = p.mode   || 'add';
+
+  // Normalise to array — handles both batch { items:[...] } and single { name, qty }
+  var items = Array.isArray(p.items) && p.items.length
+    ? p.items
+    : [{ name: p.itemName || p.name || '', delta: parseFloat(p.qty) || 0 }];
+
+  var logRows = [];
+  var updated = 0;
+
+  items.forEach(function(item) {
+    var name  = String(item.name || item.itemName || '').trim();
+    var delta = parseFloat(item.delta !== undefined ? item.delta : item.qty) || 0;
+    if (!name || delta === 0) return;
+
+    var sheetRow = nameMap[name.toLowerCase()];
+    if (!sheetRow) return; // item not found in sheet
+
+    var current  = parseFloat(data[sheetRow - 1][stockCol]) || 0;
+    var newStock = mode === 'set' ? delta : Math.max(0, current + delta);
+
+    invSheet.getRange(sheetRow, stockCol + 1).setValue(newStock);
+    if (updatedCol >= 0) invSheet.getRange(sheetRow, updatedCol + 1).setValue(now);
+
+    logRows.push([today, now, name, delta > 0 ? 'Stock In' : 'Adjustment', delta, current, newStock, doneBy, reason]);
+    updated++;
+  });
+
+  if (updated > 0) {
+    SpreadsheetApp.flush(); // force-commit all setValue calls before returning
+    appendStockLog(logRows);
+  }
+
+  return { ok: true, updated: updated };
+}
+
+function appendStockLog(rows) {
+  var sheet = getSheet('Stock Log');
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Date','Time','Item','Adjustment Type','Qty Changed','Old Stock','New Stock','Done By','Reason']);
+    sheet.getRange(1, 1, 1, 9).setFontWeight('bold');
+  }
+  rows.forEach(function(r) { sheet.appendRow(r); });
+}
+
+function getStockLog() {
+  return sheetToObjects(getSheet('Stock Log'));
 }
 
 // ── Log Purchase ──────────────────────────────────────────────────
@@ -312,26 +380,42 @@ function logPurchase(p) {
   var lr    = sheet.getLastRow();
   var headers;
   if (lr === 0) {
-    headers = ['Date','Supplier','Item Name','Quantity','Unit','Unit Cost','Line Total','Notes','Timestamp'];
+    headers = ['Date','Supplier','Receipt No','Item Name','Quantity','Unit','Unit Cost','Line Total','Grand Total','Timestamp'];
     sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
   } else {
     headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   }
 
+  var now  = new Date();
   var rows = Array.isArray(p.items) ? p.items : [p];
   rows.forEach(function(item) {
+    var lineTotal = parseFloat(item.lineTotal) || (parseFloat(item.qty || 0) * parseFloat(item.unitCost || 0));
     var row = headers.map(function(h) {
       switch (String(h).trim()) {
-        case 'Date':       return p.date      || todayISO();
-        case 'Supplier':   return p.supplier  || item.supplier || '';
-        case 'Item Name':  return item.itemName || item.name   || '';
-        case 'Quantity':   return parseFloat(item.qty)      || 0;
-        case 'Unit':       return item.unit   || '';
-        case 'Unit Cost':  return parseFloat(item.unitCost) || 0;
-        case 'Line Total': return parseFloat(item.lineTotal) || (parseFloat(item.qty || 0) * parseFloat(item.unitCost || 0));
-        case 'Notes':      return p.notes     || item.notes || '';
-        case 'Timestamp':  return new Date();
-        default:           return '';
+        // Standard columns
+        case 'Date':         return p.date        || todayISO();
+        case 'Supplier':     return p.supplier    || item.supplier || '';
+        case 'Receipt No':   return p.receiptNo   || p.receipt_no  || '';
+        case 'Item Name':    return item.itemName  || item.name    || '';
+        case 'Quantity':     return parseFloat(item.qty)       || 0;
+        case 'Unit':         return item.unit     || '';
+        case 'Unit Cost':    return parseFloat(item.unitCost)  || 0;
+        case 'Line Total':   return lineTotal;
+        case 'Grand Total':  return parseFloat(p.grandTotal)   || 0;
+        case 'Timestamp':    return now;
+        // Alternative column names used in some sheets
+        case 'Record ID':    return p.receiptNo   || Utilities.formatDate(now, 'Asia/Manila', 'yyyyMMdd-HHmmss');
+        case 'Category':     return p.category    || 'Purchases';
+        case 'Item':
+        case 'Description':  return item.itemName  || item.name    || '';
+        case 'Qty':          return parseFloat(item.qty)       || 0;
+        case 'Subtotal':
+        case 'Sub Total':    return lineTotal;
+        case 'Total Amount':
+        case 'Total':        return parseFloat(p.grandTotal)   || 0;
+        case 'Notes':        return p.receiptNo   || p.notes || item.notes || '';
+        default:             return '';
       }
     });
     sheet.appendRow(row);
@@ -341,25 +425,32 @@ function logPurchase(p) {
 
 // ── Log Expense ───────────────────────────────────────────────────
 function logExpense(p) {
+  if (!p) return { ok: false, error: 'No payload' };
   var sheet = getSheet('Expenses');
   var lr    = sheet.getLastRow();
   var headers;
   if (lr === 0) {
-    headers = ['Date','Category','Description','Amount','Paid By','Notes','Timestamp'];
+    headers = ['Record ID','Date','Category','Description','Ref No','Amount','Logged By','Timestamp'];
     sheet.appendRow(headers);
+    sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
   } else {
     headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   }
 
+  var now = new Date();
   var row = headers.map(function(h) {
     switch (String(h).trim()) {
+      case 'Record ID':   return Utilities.formatDate(now, 'Asia/Manila', 'yyyyMMdd-HHmmss');
       case 'Date':        return p.date        || todayISO();
-      case 'Category':    return p.category    || 'General';
+      case 'Category':    return p.category    || 'Miscellaneous';
       case 'Description': return p.description || p.desc || '';
+      case 'Ref No':      return p.refNo       || p.ref_no  || '';
+      case 'Vendor':      return p.refNo       || p.vendor  || '';
       case 'Amount':      return parseFloat(p.amount) || 0;
-      case 'Paid By':     return p.paidBy      || '';
+      case 'Logged By':   return p.doneBy      || p.loggedBy || 'POS';
+      case 'Paid By':     return p.doneBy      || p.paidBy   || '';
       case 'Notes':       return p.notes       || '';
-      case 'Timestamp':   return new Date();
+      case 'Timestamp':   return now;
       default:            return '';
     }
   });
@@ -490,4 +581,53 @@ function deleteUserGAS(data) {
     }
   }
   return { ok: false, error: 'User not found' };
+}
+
+// ── Shift Logs ───────────────────────────────────────────────────
+var SHIFT_LOG_SHEET = 'Shift Logs';
+
+function getShiftLogs() {
+  var sheet = ss().getSheetByName(SHIFT_LOG_SHEET);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+  var data    = sheet.getDataRange().getValues();
+  var headers = data[0].map(function(h) { return String(h).trim(); });
+  return data.slice(1).map(function(row) {
+    var obj = {};
+    headers.forEach(function(h, i) {
+      var val = row[i];
+      if (val instanceof Date) {
+        if (h === 'Date') {
+          val = Utilities.formatDate(val, 'Asia/Manila', 'yyyy-MM-dd');
+        } else if (h === 'Time') {
+          val = Utilities.formatDate(val, 'Asia/Manila', 'hh:mm a');
+        } else {
+          val = String(val);
+        }
+      }
+      obj[h] = val;
+    });
+    return obj;
+  }).reverse();
+}
+
+function logShift(p) {
+  var spreadsheet = ss();
+  var sheet = spreadsheet.getSheetByName(SHIFT_LOG_SHEET);
+  if (!sheet) {
+    sheet = spreadsheet.insertSheet(SHIFT_LOG_SHEET);
+    sheet.appendRow(['Date', 'Time', 'Action', 'Username', 'Amount']);
+    sheet.getRange(1, 1, 1, 5).setFontWeight('bold');
+    sheet.setColumnWidth(1, 110);
+    sheet.setColumnWidth(2, 90);
+    sheet.setColumnWidth(3, 80);
+    sheet.setColumnWidth(4, 120);
+    sheet.setColumnWidth(5, 100);
+  }
+  var date   = p.date   || Utilities.formatDate(new Date(), 'Asia/Manila', 'yyyy-MM-dd');
+  var time   = p.time   || Utilities.formatDate(new Date(), 'Asia/Manila', 'hh:mm a');
+  var action = p.action_type || '';   // 'Start' or 'End'
+  var uname  = p.username || '';
+  var amount = parseFloat(p.amount) || 0;
+  sheet.appendRow([date, time, action, uname, amount]);
+  return { ok: true };
 }
