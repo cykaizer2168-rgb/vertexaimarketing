@@ -1448,7 +1448,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
       <button class="view-tab" data-view="adjust"><span class="tab-icon">📥</span><span class="tab-label">Stock In</span></button>
       <button class="view-tab" data-view="purchases-entry"><span class="tab-icon">🛒</span><span class="tab-label">Purchases</span></button>
       <button class="view-tab" data-view="expenses-entry"><span class="tab-icon">💸</span><span class="tab-label">Expenses</span></button>
-      <button class="view-tab" data-view="eod"><span class="tab-icon">📋</span><span class="tab-label">EOD</span></button>
+      <button class="view-tab" data-view="eod"><span class="tab-icon">📒</span><span class="tab-label">GL Report</span></button>
       <button class="view-tab" data-view="shift"><span class="tab-icon">⏱</span><span class="tab-label">Shift</span></button>
       <button class="view-tab" data-view="bom"><span class="tab-icon">🧪</span><span class="tab-label">Recipes</span></button>
       <button class="view-tab" data-view="users" id="tab-users"><span class="tab-icon">👥</span><span class="tab-label">Users</span></button>
@@ -1732,16 +1732,13 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);display:f
   <!-- EOD ZONE -->
   <div id="eod-zone" style="flex:1;display:none;flex-direction:column;overflow:hidden;order:3;min-width:0">
     <div class="inv-toolbar">
-      <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase">End of Day Report</span>
+      <span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase">GL Report</span>
       <div style="flex:1"></div>
-      <div class="eod-day-badge">
-        <div class="eod-day-dot idle" id="eod-status-dot"></div>
-        <span id="eod-status-lbl">No active day</span>
-      </div>
-      <button class="inv-refresh-btn" onclick="loadEOD()">🔄 Refresh</button>
+      <input type="date" id="gl-date" style="background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:5px 8px;font-size:12px;color:var(--text);outline:none;max-width:140px"/>
+      <button class="inv-refresh-btn" onclick="loadGLReport()">📊 Generate</button>
     </div>
     <div class="eod-wrap" id="eod-wrap">
-      <div class="inv-empty"><div style="font-size:28px;opacity:.3">📋</div><div style="font-size:12px">Loading…</div></div>
+      <div class="inv-empty"><div style="font-size:28px;opacity:.3">📒</div><div style="font-size:12px">Pick a date and tap Generate</div></div>
     </div>
   </div>
 
@@ -4423,348 +4420,230 @@ function computeEODData() {
   return { cashRow, stockRows, debugInfo };
 }
 
-async function loadEOD() {
-  const url   = localStorage.getItem(LS.GAS);
-  const wrap  = document.getElementById('eod-wrap');
-  const dot   = document.getElementById('eod-status-dot');
-  const lbl   = document.getElementById('eod-status-lbl');
+async function loadGLReport() {
+  const url  = localStorage.getItem(LS.GAS);
+  const wrap = document.getElementById('eod-wrap');
+  const selDate = document.getElementById('gl-date')?.value || todayManila();
 
-  // Sync EOD state from expenses sheet sentinels — works with existing GAS, no new actions needed
-  if (url) {
-    try {
-      const res = await fetch(url + '?action=expenses&t=' + Date.now());
-      if (res.ok) {
-        const allExp = await res.json();
-        if (Array.isArray(allExp)) {
-          const today = shiftDate();
-          // Column names are shifted in this sheet: Record ID=date, Date=category, Category=desc, Description=amount, Amount=paidBy
-          const sentinels = allExp.filter(e => {
-            // Category value is stored in the 'Date' key due to column misalignment
-            const cat = String(e['Date'] || e['Category'] || e['category'] || '').trim();
-            // Date value is stored in 'Record ID' key
-            const dt  = String(e['Record ID'] || e['Date'] || e['date'] || '').trim();
-            return cat === '__EOD__' && (dt === today || dt.startsWith(today));
-          });
-          if (sentinels.length) {
-            // GAS overwrites paidBy with shop name in Amount — can't rely on Amount for start/end detection.
-            // Start sentinel: Category = non-empty inventory JSON array. End sentinel: Category = '[]'.
-            const startSen    = sentinels.find(s => { const inv = String(s['Category'] || '').trim(); return inv.startsWith('[') && inv !== '[]'; });
-            const endSen      = sentinels.find(s => String(s['Category'] || '').trim() === '[]');
-            const status      = endSen ? 'ended' : 'started';
-            // begCash is in 'Description' column (stores amount value)
-            const begCash     = startSen ? parseFloat(startSen['Description'] || 0) : 0;
-            // begInv is in 'Category' column (stores inventory JSON snapshot)
-            const begInv      = startSen ? String(startSen['Category'] || '[]') : '[]';
-            localStorage.setItem(EOD_LS.DATE,     today);
-            localStorage.setItem(EOD_LS.STATUS,   status);
-            localStorage.setItem(EOD_LS.BEG_CASH, begCash);
-            localStorage.setItem(EOD_LS.BEG_INV,  begInv);
-          }
-        }
-      }
-    } catch {}
+  if (!url) {
+    wrap.innerHTML = `<div class="inv-empty"><div style="font-size:32px">⚠️</div><div style="font-size:13px;font-weight:700">No Sheets connected</div><div style="font-size:11px">Add your Apps Script URL in Settings</div></div>`;
+    return;
   }
+  wrap.innerHTML = `<div class="inv-empty"><div style="font-size:24px;opacity:.4">📒</div><div style="font-size:12px">Fetching data…</div></div>`;
 
-  const state = getEODState();
-  const today = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
-
-  if (state === 'none') {
-    dot.className = 'eod-day-dot idle';
-    lbl.textContent = 'No active day';
-    // Fetch inventory for snapshot
-    if (url) {
-      wrap.innerHTML = `<div class="inv-empty"><div style="font-size:24px;opacity:.4">📋</div><div style="font-size:12px">Loading inventory…</div></div>`;
-      try {
-        const res = await fetch(url + '?action=inventory&t=' + Date.now());
-        if (res.ok) { const d = await res.json(); if (Array.isArray(d)) inventoryCache = normalizeInv(d); }
-      } catch {}
-    }
-    wrap.innerHTML = `
-      <div class="eod-start-card">
-        <div class="eod-day-badge"><div class="eod-day-dot idle"></div><span>${today}</span></div>
-        <div>
-          <div class="eod-cash-label" style="margin-bottom:6px">Beginning Cash</div>
-          <div class="eod-beg-cash-row">
-            <span style="font-size:14px;color:var(--muted2)">₱</span>
-            <input class="eod-beg-cash-inp" id="eod-beg-cash-inp" type="number" min="0" step="any" placeholder="0.00"/>
-          </div>
-        </div>
-        <button class="eod-start-btn" onclick="startDay()">▶ Start Day</button>
-        <div style="font-size:10px;color:var(--muted)">This will snapshot current inventory levels as Beginning stock.</div>
-      </div>`;
+  let allSales = [];
+  try {
+    const [invRes, purchRes, salesRes, recRes, expRes] = await Promise.all([
+      fetch(url + '?action=inventory&t=' + Date.now()),
+      fetch(url + '?action=purchases&t=' + Date.now()),
+      fetch(url + '?action=sales&t='     + Date.now()),
+      fetch(url + '?action=recipes&t='   + Date.now()),
+      fetch(url + '?action=expenses&t='  + Date.now())
+    ]);
+    if (invRes.ok)   { const d = await invRes.json();   if (Array.isArray(d)) inventoryCache  = normalizeInv(d); }
+    if (purchRes.ok) { const d = await purchRes.json(); if (Array.isArray(d)) purchasesCache  = d; }
+    if (recRes.ok)   { const d = await recRes.json();   if (Array.isArray(d)) recipesCache    = d; }
+    if (expRes.ok)   { const d = await expRes.json();   if (Array.isArray(d)) expensesCache   = d.filter(r => { const c = String(r['Category']||r['category']||'').trim(); return c !== '__EOD__' && c !== 'Shift Log'; }); }
+    if (salesRes.ok) { const d = await salesRes.json(); if (Array.isArray(d)) allSales = d; }
+  } catch(e) {
+    wrap.innerHTML = `<div class="inv-empty"><div style="font-size:28px">❌</div><div style="font-size:11px">${e.message}</div></div>`;
     return;
   }
 
-  dot.className = state === 'started' ? 'eod-day-dot' : 'eod-day-dot idle';
-  lbl.textContent = state === 'started' ? `${today} · Active` : `${today} · Ended`;
-  wrap.innerHTML = `<div class="inv-empty"><div style="font-size:24px;opacity:.3">📋</div><div style="font-size:12px">Fetching live data…</div></div>`;
+  // Helper: does a date/timestamp value match the selected date string (YYYY-MM-DD)?
+  const matchDate = val => {
+    if (!val) return false;
+    const s = String(val).trim();
+    if (s.startsWith(selDate)) return true;
+    try { const d = new Date(s); if (!isNaN(d)) return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Manila' }) === selDate; } catch {}
+    return false;
+  };
 
-  // Always fetch fresh data — ignore caches for EOD accuracy
-  if (url) {
-    try {
-      const [invRes, purchRes, salesRes, recRes, expRes] = await Promise.all([
-        fetch(url + '?action=inventory&t=' + Date.now()),
-        fetch(url + '?action=purchases&t=' + Date.now()),
-        fetch(url + '?action=sales&t='     + Date.now()),
-        fetch(url + '?action=recipes&t='   + Date.now()),
-        fetch(url + '?action=expenses&t='  + Date.now())
-      ]);
+  const totalKey = (['Total','Subtotal','Grand Total'].find(k => allSales.some(r => parseFloat(r[k]) > 0))) || 'Total';
+  const daySales = allSales.filter(r => matchDate(r['Timestamp'] || r['Date']));
+  const dayPurch = purchasesCache.filter(r => matchDate(r['Date'] || r['Timestamp']));
+  const dayExp   = expensesCache.filter(r => matchDate(r['Date'] || r['Timestamp']));
 
-      if (invRes.ok)  { const d = await invRes.json();  if (Array.isArray(d)) inventoryCache  = d; }
-      if (purchRes.ok){ const d = await purchRes.json(); if (Array.isArray(d)) purchasesCache  = d; }
-      if (recRes && recRes.ok){ const d = await recRes.json(); if (Array.isArray(d)) recipesCache = d; }
-      if (expRes.ok)  { const d = await expRes.json();  if (Array.isArray(d)) expensesCache   = d.filter(r => String(r['Category']||r['category']||'').trim() !== '__EOD__'); }
-      if (salesRes.ok){
-        const sales = await salesRes.json();
-        if (Array.isArray(sales)) {
-          const todaySales = sales.filter(r => dateMatchesToday(r['Timestamp'] || r['Date']));
-          // detect which column holds the revenue value (sheet may use 'Subtotal' instead of 'Total')
-          const _eodTotalKey = (['Total','Subtotal','Grand Total'].find(k =>
-            sales.some(r => parseFloat(r[k]) > 0)
-          )) || 'Total';
-          window._eodTotalKey      = _eodTotalKey;
-          window._eodTodayOrders   = todaySales.length;
-          window._eodTodaySales    = todaySales.reduce((s,r) => s + (parseFloat(r[_eodTotalKey])||0), 0);
-          window._eodCashSales     = todaySales
-            .filter(r => String(r['Payment Method']||'').toLowerCase().includes('cash'))
-            .reduce((s,r) => s + (parseFloat(r[_eodTotalKey])||0), 0);
-          window._eodTodaySalesRaw = todaySales;
-        }
-      }
-    } catch(e) {
-      wrap.innerHTML = `<div class="inv-empty"><div style="font-size:28px">❌</div><div style="font-size:11px">${e.message}</div></div>`;
-      return;
+  const totalSales = daySales.reduce((s,r) => s + (parseFloat(r[totalKey])||0), 0);
+  const cashSales  = daySales.filter(r => String(r['Payment Method']||'').toLowerCase().includes('cash')).reduce((s,r) => s + (parseFloat(r[totalKey])||0), 0);
+  const totalPurch = dayPurch.reduce((s,r) => s + (parseFloat(r['Line Total'] || r['Subtotal'] || r['Total'])||0), 0);
+  const totalExp   = dayExp.reduce((s,r) => s + (parseFloat(r['Amount'])||0), 0);
+
+  // COGS via recipes
+  const _costMap = {};
+  inventoryCache.forEach(m => { if (m.name) _costMap[m.name.trim().toLowerCase()] = parseFloat(m.unitCost) || 0; });
+  const _recipeMap = {};
+  recipesCache.forEach(r => {
+    const key = (r.menuItemName || r['Menu Item Name'] || '').trim().toLowerCase();
+    if (!key) return;
+    if (!_recipeMap[key]) _recipeMap[key] = [];
+    const _qty = parseFloat(r.qtyUsed || r['Qty Used']) || 1;
+    const _colF = parseFloat(r['Unit Cost'] ?? r.unitCost);
+    _recipeMap[key].push({
+      ingredient: (r.ingredient || r['Ingredient'] || '').trim().toLowerCase(),
+      qtyUsed: _qty,
+      unitCost: isNaN(_colF) ? null : _colF / _qty,
+      unit: (r.unit || r['Unit'] || '')
+    });
+  });
+
+  // Build GL groups
+  const groups = [];
+  daySales.forEach(r => {
+    const amt      = parseFloat(r[totalKey]) || 0;
+    const orderId  = r['Order ID'] || '—';
+    const time     = r['Time'] || r['Timestamp'] || '';
+    const pm       = r['Payment Method'] || 'Cash';
+    const itemsStr = r['Items'] || r['items_summary'] || '—';
+    const ingUsage = {};
+    String(itemsStr).split(',').forEach(part => {
+      const m = part.trim().match(/^(.+)\s+x(\d+)$/i);
+      if (!m) return;
+      const menuKey = m[1].trim().toLowerCase();
+      const qty = parseInt(m[2]) || 0;
+      (_recipeMap[menuKey] || []).forEach(({ ingredient, qtyUsed, unitCost, unit }) => {
+        if (!ingUsage[ingredient]) ingUsage[ingredient] = { qty: 0, unitCost, unit };
+        ingUsage[ingredient].qty += qtyUsed * qty;
+      });
+    });
+    const orderCOGS = Object.entries(ingUsage).map(([ing, info]) => {
+      const uc  = info.unitCost !== null ? info.unitCost : (_costMap[ing] || 0);
+      const unit = info.unit || (inventoryCache.find(m => m.name.trim().toLowerCase() === ing)?.unit) || 'pcs';
+      const inv  = inventoryCache.find(m => m.name.trim().toLowerCase() === ing);
+      return { name: inv ? inv.name : ing, unit, qtyUsed: info.qty, unitCost: uc, totalCost: info.qty * uc };
+    }).filter(x => x.qtyUsed > 0);
+    const orderTotalCOGS = orderCOGS.reduce((s, x) => s + x.totalCost, 0);
+    const profit = amt - orderTotalCOGS;
+    const lines = [];
+    lines.push({ isDebit: true, account: 'Cash on Hand', debit: amt, credit: 0, memo: `Total received · ${pm} · Ref #${orderId}` });
+    if (orderTotalCOGS > 0) {
+      orderCOGS.forEach(x => lines.push({ isDebit: false, account: 'Raw Materials', debit: 0, credit: x.totalCost, memo: `${x.name}: ${x.qtyUsed % 1 === 0 ? x.qtyUsed : x.qtyUsed.toFixed(2)} ${x.unit} × ₱${x.unitCost.toFixed(2)}` }));
+      lines.push({ isDebit: false, account: 'Sales Revenue (Profit)', debit: 0, credit: profit, memo: `Net gain · ${itemsStr}` });
+    } else {
+      lines.push({ isDebit: false, account: 'Sales Revenue', debit: 0, credit: amt, memo: itemsStr });
     }
+    groups.push({ sortKey: time, lines });
+  });
+  dayPurch.forEach(r => {
+    const amt = parseFloat(r['Line Total'] || r['Subtotal'] || r['Sub Total'] || r['Total']) || 0;
+    groups.push({ sortKey: r['Time'] || r['Date'] || '55-p', lines: [
+      { isDebit: true,  account: 'Purchases',    debit: amt, credit: 0,   memo: `${r['Item Name'] || r['Item'] || '—'} · ${r['Supplier'] || '—'}` },
+      { isDebit: false, account: 'Cash on Hand', debit: 0,   credit: amt, memo: `Ref #${r['Receipt No'] || r['Notes'] || '—'}` }
+    ]});
+  });
+  dayExp.forEach(r => {
+    const amt = parseFloat(r['Amount']) || 0;
+    groups.push({ sortKey: r['Time'] || r['Date'] || '66-e', lines: [
+      { isDebit: true,  account: `${r['Category'] || 'Expense'} Expense`, debit: amt, credit: 0,   memo: r['Description'] || '—' },
+      { isDebit: false, account: 'Cash on Hand',                           debit: 0,   credit: amt, memo: `Ref #${r['Ref No'] || r['Vendor'] || '—'}` }
+    ]});
+  });
+  groups.sort((a, b) => String(a.sortKey).localeCompare(String(b.sortKey)));
+
+  // Compute total COGS for summary
+  const ingTotals = {};
+  daySales.forEach(r => {
+    String(r['Items'] || r['items_summary'] || '').split(',').forEach(part => {
+      const m = part.trim().match(/^(.+)\s+x(\d+)$/i);
+      if (!m) return;
+      const menuKey = m[1].trim().toLowerCase();
+      const qty = parseInt(m[2]) || 0;
+      (_recipeMap[menuKey] || []).forEach(({ ingredient, qtyUsed, unitCost }) => {
+        const uc = unitCost !== null ? unitCost : (_costMap[ingredient] || 0);
+        ingTotals[ingredient] = (ingTotals[ingredient] || 0) + qtyUsed * qty * uc;
+      });
+    });
+  });
+  const totalCOGS = Object.values(ingTotals).reduce((s, v) => s + v, 0);
+  const grossProfit = totalSales - totalCOGS;
+  const margin = totalSales > 0 ? ((grossProfit / totalSales) * 100).toFixed(1) : '0.0';
+  const profitColor = grossProfit >= 0 ? 'var(--green)' : 'var(--red)';
+  const displayDate = (() => { try { return new Date(selDate + 'T12:00:00').toLocaleDateString('en-PH', {year:'numeric',month:'long',day:'numeric'}); } catch { return selDate; } })();
+
+  let glSection = '';
+  if (!groups.length) {
+    glSection = `<div class="eod-section-title">📒 General Ledger</div><div class="gl-empty" style="margin-top:10px">No transactions for this date</div>`;
+  } else {
+    let totalDebit = 0, totalCredit = 0;
+    groups.forEach(g => g.lines.forEach(l => { totalDebit += (l.debit||0); totalCredit += (l.credit||0); }));
+    const rows = groups.map((g, gi) => {
+      const altBg = gi % 2 !== 0 ? 'background:rgba(255,255,255,.018)' : '';
+      return g.lines.map((l, li) => {
+        const isLast = li === g.lines.length - 1;
+        return `<tr style="${altBg}${isLast ? ';border-bottom:1px solid var(--border)' : ''}">
+          <td style="font-family:var(--font-mono);font-size:10px;color:var(--muted);white-space:nowrap;vertical-align:top;padding-top:7px">${li === 0 ? selDate : ''}</td>
+          <td style="padding-left:${l.isDebit ? '0' : '20'}px;font-weight:${l.isDebit ? '600' : '400'};font-size:11px">${l.account}</td>
+          <td style="font-family:var(--font-mono);font-weight:600;color:var(--green);text-align:right;white-space:nowrap">${l.debit > 0 ? '₱' + l.debit.toFixed(2) : ''}</td>
+          <td style="font-family:var(--font-mono);font-weight:600;color:var(--red);text-align:right;white-space:nowrap">${l.credit > 0 ? '₱' + l.credit.toFixed(2) : ''}</td>
+          <td style="font-size:10px;color:var(--muted)">${l.memo}</td>
+        </tr>`;
+      }).join('');
+    }).join('');
+    glSection = `
+      <div class="eod-section-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+        <span>📒 General Ledger</span>
+        <span style="font-size:11px;color:var(--muted);font-family:var(--font-mono)">${groups.length} entries</span>
+      </div>
+      <div style="overflow-x:auto;margin-top:10px">
+        <table class="gl-table">
+          <thead><tr>
+            <th>Date</th><th>Account</th>
+            <th style="text-align:right">Debit (DR)</th>
+            <th style="text-align:right">Credit (CR)</th>
+            <th>Memo / Context</th>
+          </tr></thead>
+          <tbody>
+            ${rows}
+            <tr class="gl-summary-row">
+              <td colspan="2" style="font-family:var(--font-ui);font-size:11px;color:var(--muted)">TOTALS</td>
+              <td style="font-family:var(--font-mono);font-weight:700;text-align:right;color:var(--green)">₱${totalDebit.toFixed(2)}</td>
+              <td style="font-family:var(--font-mono);font-weight:700;text-align:right;color:var(--red)">₱${totalCredit.toFixed(2)}</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>`;
   }
 
-  const { cashRow, stockRows, debugInfo } = computeEODData();
-
   wrap.innerHTML = `
-    ${state === 'started' ? `
-    <div class="eod-action-row">
-      <button class="eod-end-btn" onclick="endDay()">🔚 End Day & Save</button>
-      <button class="inv-refresh-btn" onclick="loadEOD()">🔄 Refresh</button>
-    </div>` : `<div style="font-size:11px;color:var(--green);font-weight:700">✅ Day ended — report saved to GSheet</div>`}
-    <details style="font-size:10px;color:var(--muted);margin-bottom:8px;cursor:pointer">
-      <summary style="user-select:none">🔍 Debug info (tap to expand)</summary>
-      <pre style="font-size:9px;overflow:auto;max-height:120px;background:rgba(0,0,0,.3);padding:6px;border-radius:6px;margin-top:4px">${debugInfo}</pre>
-    </details>
-
+    <div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-align:center;padding:2px 0 10px">${displayDate}</div>
     <div>
-      <div class="eod-section-title">💰 Cash Summary</div>
+      <div class="eod-section-title">💰 Summary</div>
       <div class="eod-cash-grid" style="margin-top:10px">
         <div class="eod-cash-card">
-          <div class="eod-cash-label">Beginning Cash</div>
-          <div class="eod-cash-val muted">${fmt(cashRow.beginning)}</div>
-        </div>
-        <div class="eod-cash-card">
-          <div class="eod-cash-label">Total Sales Today</div>
-          <div class="eod-cash-val green">${fmt(window._eodTodaySales||0)}</div>
-          <div class="eod-cash-sub">${window._eodTodayOrders||0} order${(window._eodTodayOrders||0)!==1?'s':''}</div>
+          <div class="eod-cash-label">Total Sales</div>
+          <div class="eod-cash-val green">${fmt(totalSales)}</div>
+          <div class="eod-cash-sub">${daySales.length} order${daySales.length !== 1 ? 's' : ''}</div>
         </div>
         <div class="eod-cash-card">
           <div class="eod-cash-label">Cash Sales</div>
-          <div class="eod-cash-val green">${fmt(cashRow.cashSales)}</div>
+          <div class="eod-cash-val green">${fmt(cashSales)}</div>
           <div class="eod-cash-sub">Cash payments only</div>
         </div>
         <div class="eod-cash-card">
-          <div class="eod-cash-label">Purchases Today</div>
-          <div class="eod-cash-val red">${fmt(cashRow.purchases)}</div>
-          <div class="eod-cash-sub">Cash out</div>
+          <div class="eod-cash-label">Purchases</div>
+          <div class="eod-cash-val red">${fmt(totalPurch)}</div>
+          <div class="eod-cash-sub">Stock in (cost)</div>
         </div>
-        <div class="eod-cash-card" style="border-color:var(--amber)">
-          <div class="eod-cash-label">Ending Cash</div>
-          <div class="eod-cash-val">${fmt(cashRow.ending)}</div>
-          <div class="eod-cash-sub">Beg + Cash Sales − Purchases</div>
+        <div class="eod-cash-card">
+          <div class="eod-cash-label">Expenses</div>
+          <div class="eod-cash-val red">${fmt(totalExp)}</div>
+          <div class="eod-cash-sub">Operational</div>
         </div>
-        ${(() => {
-          const { breakdown, totalCOGS } = computeCOGS();
-          const totalSales = window._eodTodaySales || 0;
-          const grossProfit = totalSales - totalCOGS;
-          const margin = totalSales > 0 ? ((grossProfit / totalSales) * 100).toFixed(1) : '0.0';
-          const profitColor = grossProfit >= 0 ? 'var(--green)' : 'var(--red)';
-          return `
         <div class="eod-cash-card" style="border-color:rgba(168,85,247,.35)">
           <div class="eod-cash-label">Total COGS</div>
           <div class="eod-cash-val" style="color:#c084fc">${fmt(totalCOGS)}</div>
-          <div class="eod-cash-sub">${breakdown.length} ingredient${breakdown.length !== 1 ? 's' : ''}</div>
+          <div class="eod-cash-sub">Recipe-based</div>
         </div>
         <div class="eod-cash-card" style="border-color:${grossProfit >= 0 ? 'rgba(16,185,129,.35)' : 'rgba(239,68,68,.3)'}">
           <div class="eod-cash-label">Gross Profit</div>
           <div class="eod-cash-val" style="color:${profitColor}">${fmt(grossProfit)}</div>
           <div class="eod-cash-sub">Margin: ${margin}%</div>
-        </div>`;
-        })()}
+        </div>
       </div>
     </div>
-
-    ${(() => {
-      // ── GENERAL LEDGER (Compound Journal Entries) ──
-      const todayStr = todayManila();
-      const groups = [];
-      const rawSales   = window._eodTodaySalesRaw || [];
-      const _totalKey  = window._eodTotalKey || 'Total';
-
-      // ── Per-order compound entry: DR Cash + DR COGS / CR Sales Revenue + CR Raw Materials
-      // Build lookup maps once for COGS computation
-      // Inventory cost map as fallback only
-      const _costMap = {};
-      inventoryCache.forEach(m => { if (m.name) _costMap[m.name.trim().toLowerCase()] = parseFloat(m.unitCost) || 0; });
-      const _recipeMap = {};
-      recipesCache.forEach(r => {
-        const key = (r.menuItemName || r['Menu Item Name'] || '').trim().toLowerCase();
-        if (!key) return;
-        if (!_recipeMap[key]) _recipeMap[key] = [];
-        const _qty3 = parseFloat(r.qtyUsed || r['Qty Used']) || 1;
-        const _colF3 = parseFloat(r['Unit Cost'] ?? r.unitCost);
-        _recipeMap[key].push({
-          ingredient: (r.ingredient || r['Ingredient'] || '').trim().toLowerCase(),
-          qtyUsed:    _qty3,
-          unitCost:   isNaN(_colF3) ? null : _colF3 / _qty3, // col F = total per serving; derive per-unit
-          unit:       (r.unit || r['Unit'] || '')
-        });
-      });
-
-      rawSales.forEach(r => {
-        const amt      = parseFloat(r[_totalKey]) || 0;
-        const orderId  = r['Order ID'] || '—';
-        const time     = r['Time'] || r['Timestamp'] || '';
-        const pm       = r['Payment Method'] || 'Cash';
-        const itemsStr = r['Items'] || r['items_summary'] || '—';
-
-        // Compute per-order ingredient usage
-        const ingUsage = {};
-        String(itemsStr).split(',').forEach(part => {
-          const m = part.trim().match(/^(.+)\s+x(\d+)$/i);
-          if (!m) return;
-          const menuKey = m[1].trim().toLowerCase();
-          const qty = parseInt(m[2]) || 0;
-          (_recipeMap[menuKey] || []).forEach(({ ingredient, qtyUsed, unitCost, unit }) => {
-            if (!ingUsage[ingredient]) ingUsage[ingredient] = { qty: 0, unitCost, unit };
-            ingUsage[ingredient].qty += qtyUsed * qty;
-          });
-        });
-        const orderCOGS = Object.entries(ingUsage).map(([ing, info]) => {
-          // Use recipe unitCost first, fall back to inventory costMap
-          const uc   = info.unitCost !== null ? info.unitCost : (_costMap[ing] || 0);
-          const unit = info.unit || (inventoryCache.find(m => m.name.trim().toLowerCase() === ing)?.unit) || 'pcs';
-          const inv  = inventoryCache.find(m => m.name.trim().toLowerCase() === ing);
-          return { name: inv ? inv.name : ing, unit, qtyUsed: info.qty, unitCost: uc, totalCost: info.qty * uc };
-        }).filter(x => x.qtyUsed > 0);
-        const orderTotalCOGS = orderCOGS.reduce((s, x) => s + x.totalCost, 0);
-
-        // Single balanced entry: DR Cash = CR Raw Materials + CR Sales Revenue (Profit)
-        const profit = amt - orderTotalCOGS;
-        const lines = [];
-        lines.push({ isDebit: true, account: 'Cash on Hand', debit: amt, credit: 0,
-          memo: `Total received from customer · ${pm} · Ref #${orderId}` });
-        if (orderTotalCOGS > 0) {
-          // CR Raw Materials — one line per ingredient
-          orderCOGS.forEach(x => lines.push({
-            isDebit: false, account: 'Raw Materials', debit: 0, credit: x.totalCost,
-            memo: `${x.name}: ${x.qtyUsed % 1 === 0 ? x.qtyUsed : x.qtyUsed.toFixed(2)} ${x.unit} × ₱${x.unitCost.toFixed(2)} — credit to reduce inventory at cost`
-          }));
-          // CR Sales Revenue (Profit) — the markup
-          lines.push({ isDebit: false, account: 'Sales Revenue (Profit)', debit: 0, credit: profit,
-            memo: `Net Gain / Markup realized · ${itemsStr}` });
-        } else {
-          // No recipe — full amount is revenue
-          lines.push({ isDebit: false, account: 'Sales Revenue', debit: 0, credit: amt, memo: itemsStr });
-        }
-        groups.push({ sortKey: time, lines });
-      });
-
-      // ── INDIVIDUAL: Purchases → DR Purchases / CR Cash (one per receipt)
-      purchasesCache.filter(r => dateMatchesToday(r['Date'] || r['Timestamp'])).forEach(r => {
-        const amt = parseFloat(r['Line Total'] || r['Subtotal'] || r['Sub Total'] || r['Total']) || 0;
-        groups.push({
-          sortKey: r['Time'] || r['Date'] || '55-purch',
-          lines: [
-            { isDebit: true,  account: 'Purchases',    debit: amt, credit: 0,   memo: `${r['Item Name'] || r['Item'] || r['Description'] || '—'} · ${r['Supplier'] || '—'}` },
-            { isDebit: false, account: 'Cash on Hand', debit: 0,   credit: amt, memo: `Ref #${r['Receipt No'] || r['Notes'] || r['Receipt #'] || '—'}` }
-          ]
-        });
-      });
-
-      // ── INDIVIDUAL: Expenses → DR Expense / CR Cash (one per expense)
-      expensesCache.filter(r => dateMatchesToday(r['Date'] || r['Timestamp'])).forEach(r => {
-        const amt = parseFloat(r['Amount']) || 0;
-        groups.push({
-          sortKey: r['Time'] || r['Date'] || '66-exp',
-          lines: [
-            { isDebit: true,  account: `${r['Category'] || 'Expense'} Expense`, debit: amt, credit: 0,   memo: r['Description'] || '—' },
-            { isDebit: false, account: 'Cash on Hand',                           debit: 0,   credit: amt, memo: `Ref #${r['Ref No'] || r['Vendor'] || r['Reference'] || '—'}` }
-          ]
-        });
-      });
-
-      groups.sort((a, b) => String(a.sortKey).localeCompare(String(b.sortKey)));
-
-      if (!groups.length) {
-        return `<div>
-          <div class="eod-section-title">📒 General Ledger</div>
-          <div class="gl-empty" style="margin-top:10px">No transactions logged today</div>
-        </div>`;
-      }
-
-      let totalDebit = 0, totalCredit = 0;
-      groups.forEach(g => g.lines.forEach(l => { totalDebit += (l.debit||0); totalCredit += (l.credit||0); }));
-
-      const rows = groups.map((g, gi) => {
-        const altBg = gi % 2 !== 0 ? 'background:rgba(255,255,255,.018)' : '';
-        return g.lines.map((l, li) => {
-          const isLast = li === g.lines.length - 1;
-          // Gross Profit row
-          if (l.isGP) {
-            const gpPos = l.gp >= 0;
-            const gpColor = gpPos ? 'var(--green)' : 'var(--red)';
-            return `<tr style="${altBg};border-bottom:1px solid var(--border)">
-              <td></td>
-              <td colspan="3" style="font-size:10px;font-weight:700;color:${gpColor};padding:4px 0 6px 0;letter-spacing:.04em">
-                Gross Profit: ${gpPos ? '+' : '−'}₱${Math.abs(l.gp).toFixed(2)}
-              </td>
-              <td style="font-size:10px;color:var(--muted)">${gpPos ? 'margin ✓' : 'negative margin ⚠️'}</td>
-            </tr>`;
-          }
-          return `<tr style="${altBg}${isLast ? ';border-bottom:1px solid var(--border)' : ''}">
-            <td style="font-family:var(--font-mono);font-size:10px;color:var(--muted);white-space:nowrap;vertical-align:top;padding-top:7px">${li === 0 ? todayStr : ''}</td>
-            <td style="padding-left:${l.isDebit ? '0' : '20'}px;font-weight:${l.isDebit ? '600' : '400'};font-size:11px">${l.account}</td>
-            <td style="font-family:var(--font-mono);font-weight:600;color:var(--green);text-align:right;white-space:nowrap">${l.debit > 0 ? '₱' + l.debit.toFixed(2) : ''}</td>
-            <td style="font-family:var(--font-mono);font-weight:600;color:var(--red);text-align:right;white-space:nowrap">${l.credit > 0 ? '₱' + l.credit.toFixed(2) : ''}</td>
-            <td style="font-size:10px;color:var(--muted)">${l.memo}</td>
-          </tr>`;
-        }).join('');
-      }).join('');
-
-      return `<div>
-        <div class="eod-section-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
-          <span>📒 General Ledger</span>
-          <span style="font-size:11px;color:var(--muted);font-family:var(--font-mono)">${groups.length} entries</span>
-        </div>
-        <div style="overflow-x:auto;margin-top:10px">
-          <table class="gl-table">
-            <thead><tr>
-              <th>Date</th>
-              <th>Account</th>
-              <th style="text-align:right">Debit (DR)</th>
-              <th style="text-align:right">Credit (CR)</th>
-              <th>Memo / Context</th>
-            </tr></thead>
-            <tbody>
-              ${rows}
-              <tr class="gl-summary-row">
-                <td colspan="2" style="font-family:var(--font-ui);font-size:11px;color:var(--muted)">TOTALS</td>
-                <td style="font-family:var(--font-mono);font-weight:700;text-align:right;color:var(--green)">₱${totalDebit.toFixed(2)}</td>
-                <td style="font-family:var(--font-mono);font-weight:700;text-align:right;color:var(--red)">₱${totalCredit.toFixed(2)}</td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>`;
-    })()}
-
-    `;
+    <div>${glSection}</div>
+  `;
 }
 
 // ── STOCK LEDGER (Reports tab) ─────────────
@@ -4951,7 +4830,7 @@ function switchView(view) {
   if (isInventory)  loadInventory();
   if (isReports)    switchReport(currentReport, false);
   if (isAdjust)     { loadStockAdjust(); loadAdjLog(); }
-  if (isEOD)        loadEOD();
+  if (isEOD)        { const dp = document.getElementById('gl-date'); if (dp && !dp.value) dp.value = todayManila(); }
   if (isShift)      loadShiftZone();
   if (isBOM)        loadBOM();
   if (isPurchEntry) loadPurchases();
