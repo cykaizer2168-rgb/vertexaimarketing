@@ -1,5 +1,8 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install"
+  "buildCommand": "next build",
+  "outputDirectory": "out",
+  "rewrites": [
+    { "source": "/", "destination": "/vertex-light.html" },
+    { "source": "/vertex-partner", "destination": "/vertex-partner.html" }
+  ]
 }

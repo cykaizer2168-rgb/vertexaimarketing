@@ -31,3 +31,7 @@ next-env.d.ts
 
 # settings
 settings.json
+
+# Google service account key — never commit
+src/lib/google-credentials.json
+.vercel

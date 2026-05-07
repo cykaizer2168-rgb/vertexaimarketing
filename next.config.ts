@@ -1,13 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: '/',
-        destination: '/vertex-light.html',
-      },
-    ];
-  },
+  output: 'export',
 };
 
 export default nextConfig;
