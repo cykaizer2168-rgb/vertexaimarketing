@@ -1,4 +1,6 @@
+import { randomUUID } from 'crypto';
 import { google } from 'googleapis';
+import type { ErpUser } from '@/types';
 
 function getSheetsClient() {
   const auth = new google.auth.GoogleAuth({
@@ -96,4 +98,79 @@ export async function updateUserProfile(
   avatarUrl: string,
 ): Promise<void> {
   await updateRange(`erp_users!C${rowIndex}:D${rowIndex}`, [[fullName, avatarUrl]]);
+}
+
+export async function listUsers(): Promise<ErpUser[]> {
+  const [userRows, roleRows] = await Promise.all([
+    getSheetData('erp_users'),
+    getSheetData('erp_roles'),
+  ]);
+
+  const roleMap: Record<string, string> = {};
+  for (const role of roleRows) {
+    roleMap[role.id] = role.role_name;
+  }
+
+  return userRows.map(row => ({
+    id:        row.id,
+    email:     row.email,
+    fullName:  row.full_name  || null,
+    avatarUrl: row.avatar_url || null,
+    roleId:    row.role_id,
+    roleName:  roleMap[row.role_id] ?? 'Unknown',
+    status:    row.status as 'active' | 'disabled',
+    lastLogin: row.last_login || null,
+    createdAt: row.created_at,
+  }));
+}
+
+export async function addUser(
+  email: string,
+  fullName: string,
+  roleId: string,
+): Promise<ErpUser> {
+  const rows = await getSheetData('erp_users');
+  if (rows.some(r => r.email === email)) {
+    throw new Error('EMAIL_EXISTS');
+  }
+
+  const id        = 'usr-' + randomUUID().slice(0, 8);
+  const createdAt = new Date().toISOString();
+
+  await appendRow('erp_users', [id, email, fullName, '', roleId, 'active', '', createdAt]);
+
+  const role = await findRoleById(roleId);
+
+  return {
+    id,
+    email,
+    fullName,
+    avatarUrl: null,
+    roleId,
+    roleName:  role?.role_name ?? 'Unknown',
+    status:    'active',
+    lastLogin: null,
+    createdAt,
+  };
+}
+
+export async function updateUserById(
+  id: string,
+  fields: { fullName?: string; roleId?: string; status?: 'active' | 'disabled' },
+): Promise<void> {
+  const rows = await getSheetData('erp_users');
+  const idx  = rows.findIndex(r => r.id === id);
+  if (idx === -1) throw new Error('USER_NOT_FOUND');
+
+  const rowIndex = idx + 2;
+
+  if (fields.fullName !== undefined) {
+    await updateRange(`erp_users!C${rowIndex}`, [[fields.fullName]]);
+  }
+  if (fields.roleId !== undefined) {
+    await updateRange(`erp_users!E${rowIndex}`, [[fields.roleId]]);
+  }
+  if (fields.status !== undefined) {
+    await updateRange(`erp_users!F${rowIndex}`, [[fields.status]]);
+  }
 }
