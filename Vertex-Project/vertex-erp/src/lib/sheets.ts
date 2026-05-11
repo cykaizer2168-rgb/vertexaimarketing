@@ -118,7 +118,7 @@ export async function listUsers(): Promise<ErpUser[]> {
     avatarUrl: row.avatar_url || null,
     roleId:    row.role_id,
     roleName:  roleMap[row.role_id] ?? 'Unknown',
-    status:    row.status as 'active' | 'disabled',
+    status:    (row.status === 'disabled' ? 'disabled' : 'active') as 'active' | 'disabled',
     lastLogin: row.last_login || null,
     createdAt: row.created_at,
   }));
@@ -129,6 +129,8 @@ export async function addUser(
   fullName: string,
   roleId: string,
 ): Promise<ErpUser> {
+  // NOTE: duplicate check is best-effort — Sheets has no atomic operations,
+  // so concurrent inserts can race past this guard.
   const rows = await getSheetData('erp_users');
   if (rows.some(r => r.email === email)) {
     throw new Error('EMAIL_EXISTS');
