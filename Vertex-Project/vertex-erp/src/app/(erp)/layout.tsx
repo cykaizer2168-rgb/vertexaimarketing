@@ -56,6 +56,10 @@ export default function ErpLayout({ children }: { children: React.ReactNode }) {
         <main className="flex-1 overflow-y-auto p-5">
           {children}
         </main>
+        <footer className="shrink-0 border-t border-[#E5E7EB] bg-white px-5 py-2 flex items-center justify-between">
+          <span className="text-[10px] text-slate-400">Vertex ERP</span>
+          <span className="text-[10px] text-slate-400">© 2026 Vertex Consulting. All Rights Reserved.</span>
+        </footer>
       </div>
 
       <CommandPalette
