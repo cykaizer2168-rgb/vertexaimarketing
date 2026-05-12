@@ -4,10 +4,8 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Clock, Star, ChevronRight, X } from 'lucide-react';
-import { NAV_MODULES, flattenNav, type FlatNavItem } from './nav-data';
+import { flattenNav, type ErpNavModule, type FlatNavItem } from './nav-data';
 import { cn } from '@/lib/utils';
-
-const ALL_ITEMS = flattenNav(NAV_MODULES);
 
 interface RecentItem { href: string; label: string; breadcrumb: string; }
 
@@ -21,12 +19,15 @@ interface Props {
   open: boolean;
   onClose: () => void;
   favorites: string[];
+  modules: ErpNavModule[];
 }
 
-export function CommandPalette({ open, onClose, favorites }: Props) {
+export function CommandPalette({ open, onClose, favorites, modules }: Props) {
   const router    = useRouter();
   const inputRef  = useRef<HTMLInputElement>(null);
   const listRef   = useRef<HTMLDivElement>(null);
+
+  const allItems = useMemo(() => flattenNav(modules), [modules]);
 
   const [query, setQuery]       = useState('');
   const [selected, setSelected] = useState(0);
@@ -61,7 +62,7 @@ export function CommandPalette({ open, onClose, favorites }: Props) {
   }, [open]);
 
   const results: FlatNavItem[] = useMemo(() => query.trim()
-    ? ALL_ITEMS.filter(item => {
+    ? allItems.filter(item => {
         const q = query.toLowerCase();
         return (
           item.label.toLowerCase().includes(q) ||
@@ -70,15 +71,15 @@ export function CommandPalette({ open, onClose, favorites }: Props) {
         );
       }).slice(0, 12)
     : [],
-  [query]);
+  [query, allItems]);
 
   const favItems = useMemo(
-    () => ALL_ITEMS.filter(i => favorites.includes(i.href)).slice(0, 5),
-    [favorites]
+    () => allItems.filter(i => favorites.includes(i.href)).slice(0, 5),
+    [favorites, allItems]
   );
   const recentItems = useMemo(
-    () => recents.map(r => ALL_ITEMS.find(i => i.href === r.href)).filter(Boolean).slice(0, 5) as FlatNavItem[],
-    [recents]
+    () => recents.map(r => allItems.find(i => i.href === r.href)).filter(Boolean).slice(0, 5) as FlatNavItem[],
+    [recents, allItems]
   );
 
   const displayItems = useMemo(() => query.trim() ? results : [], [query, results]);
