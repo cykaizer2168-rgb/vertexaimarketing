@@ -5,6 +5,7 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { Topbar } from '@/components/layout/topbar';
 import { CommandPalette } from '@/components/layout/command-palette';
 import { Breadcrumbs } from '@/components/layout/breadcrumbs';
+import { Toaster } from '@/components/ui/sonner';
 import { NAV_MODULES } from '@/components/layout/nav-data';
 
 interface ErpShellProps {
@@ -82,6 +83,7 @@ export function ErpShell({ allowedIds, children }: ErpShellProps) {
         favorites={favorites}
         modules={filteredModules}
       />
+      <Toaster richColors position="top-right" />
     </div>
   );
 }
