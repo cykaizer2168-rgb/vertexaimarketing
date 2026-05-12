@@ -23,5 +23,11 @@ export default async function UsersPage() {
     createdAt:    r.created_at,
   }));
 
-  return <UsersClient initialUsers={users} roles={roles} />;
+  return (
+    <UsersClient
+      initialUsers={users}
+      roles={roles}
+      currentUserId={session.user.dbUserId ?? ''}
+    />
+  );
 }
