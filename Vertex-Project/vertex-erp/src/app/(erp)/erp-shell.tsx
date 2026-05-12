@@ -1,18 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Topbar } from '@/components/layout/topbar';
 import { CommandPalette } from '@/components/layout/command-palette';
 import { Breadcrumbs } from '@/components/layout/breadcrumbs';
-import type { ErpNavModule } from '@/components/layout/nav-data';
+import { NAV_MODULES } from '@/components/layout/nav-data';
 
 interface ErpShellProps {
-  filteredModules: ErpNavModule[];
+  allowedIds: string[];
   children: React.ReactNode;
 }
 
-export function ErpShell({ filteredModules, children }: ErpShellProps) {
+export function ErpShell({ allowedIds, children }: ErpShellProps) {
+  const filteredModules = useMemo(() => {
+    if (allowedIds.length === 0) return NAV_MODULES;
+    return NAV_MODULES
+      .map(mod => ({
+        ...mod,
+        categories: mod.categories.filter(cat => allowedIds.includes(cat.id)),
+      }))
+      .filter(mod => mod.categories.length > 0);
+  }, [allowedIds]);
   const [mobileOpen, setMobileOpen]   = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [favorites, setFavorites]     = useState<string[]>([]);
