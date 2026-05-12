@@ -77,3 +77,5 @@ export interface ErpRole {
   isSystemRole: boolean;
   createdAt: string;
 }
+
+export type AccessLevel = 'full' | 'edit' | 'view' | 'none';
