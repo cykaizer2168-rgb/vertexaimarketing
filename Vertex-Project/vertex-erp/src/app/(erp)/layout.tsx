@@ -1,72 +1,30 @@
-'use client';
+import { auth } from '@/lib/auth';
+import { listRolePermissions } from '@/lib/sheets';
+import { NAV_MODULES, type ErpNavModule } from '@/components/layout/nav-data';
+import { ErpShell } from './erp-shell';
+import type { AccessLevel } from '@/types';
 
-import { useState, useEffect } from 'react';
-import { Sidebar } from '@/components/layout/sidebar';
-import { Topbar } from '@/components/layout/topbar';
-import { CommandPalette } from '@/components/layout/command-palette';
-import { Breadcrumbs } from '@/components/layout/breadcrumbs';
+function filterModules(
+  modules: ErpNavModule[],
+  rolePerms: Record<string, AccessLevel>,
+): ErpNavModule[] {
+  return modules
+    .map(mod => ({
+      ...mod,
+      categories: mod.categories.filter(
+        cat => (rolePerms[cat.id] ?? 'none') !== 'none',
+      ),
+    }))
+    .filter(mod => mod.categories.length > 0);
+}
 
-export default function ErpLayout({ children }: { children: React.ReactNode }) {
-  const [mobileOpen, setMobileOpen]   = useState(false);
-  const [paletteOpen, setPaletteOpen] = useState(false);
-  const [favorites, setFavorites]     = useState<string[]>([]);
+export default async function ErpLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+  const roleId = session?.user?.roleId ?? '';
 
-  // Load favorites from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('erp-v2-favorites');
-      if (stored) setFavorites(JSON.parse(stored));
-    } catch { /* ignore */ }
-  }, []);
+  const allPerms = await listRolePermissions();
+  const rolePerms = allPerms[roleId] ?? {};
+  const filteredModules = filterModules(NAV_MODULES, rolePerms);
 
-  // Global ⌘K handler
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setPaletteOpen(o => !o);
-      }
-    };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, []);
-
-  function handleFavoritesChange(favs: string[]) {
-    setFavorites(favs);
-    try {
-      localStorage.setItem('erp-v2-favorites', JSON.stringify(favs));
-    } catch { /* ignore */ }
-  }
-
-  return (
-    <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
-      <Sidebar
-        mobileOpen={mobileOpen}
-        onMobileClose={() => setMobileOpen(false)}
-        favorites={favorites}
-        onFavoritesChange={handleFavoritesChange}
-        onOpenPalette={() => setPaletteOpen(true)}
-      />
-      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
-        <Topbar
-          onMenuToggle={() => setMobileOpen(o => !o)}
-          onOpenPalette={() => setPaletteOpen(true)}
-        />
-        <Breadcrumbs />
-        <main className="flex-1 overflow-y-auto p-5">
-          {children}
-        </main>
-        <footer className="shrink-0 border-t border-[#E5E7EB] bg-white px-5 py-2 flex items-center justify-between">
-          <span className="text-[10px] text-slate-400">Vertex ERP</span>
-          <span className="text-[10px] text-slate-400">© 2026 Vertex Consulting. All Rights Reserved.</span>
-        </footer>
-      </div>
-
-      <CommandPalette
-        open={paletteOpen}
-        onClose={() => setPaletteOpen(false)}
-        favorites={favorites}
-      />
-    </div>
-  );
+  return <ErpShell filteredModules={filteredModules}>{children}</ErpShell>;
 }
