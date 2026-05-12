@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { google } from 'googleapis';
-import type { ErpUser } from '@/types';
+import type { ErpUser, AccessLevel } from '@/types';
 
 function getSheetsClient() {
   const auth = new google.auth.GoogleAuth({
@@ -174,5 +174,56 @@ export async function updateUserById(
   }
   if (fields.status !== undefined) {
     await updateRange(`erp_users!F${rowIndex}`, [[fields.status]]);
+  }
+}
+
+export async function listRolePermissions(): Promise<Record<string, Record<string, AccessLevel>>> {
+  const rows = await getSheetData('erp_role_permissions');
+  const result: Record<string, Record<string, AccessLevel>> = {};
+  for (const row of rows) {
+    if (!row.role_id || !row.category_id || !row.access_level) continue;
+    if (!result[row.role_id]) result[row.role_id] = {};
+    result[row.role_id][row.category_id] = row.access_level as AccessLevel;
+  }
+  return result;
+}
+
+export async function setRolePermissions(
+  roleId: string,
+  perms: Record<string, AccessLevel>,
+): Promise<void> {
+  // NOTE: clear-and-rewrite is not atomic — concurrent saves to the same
+  // role can interleave. Acceptable at SME scale.
+  const sheetsClient = getSheetsClient();
+
+  // 1. Read all current rows
+  const allRows = await getSheetData('erp_role_permissions');
+
+  // 2. Keep rows for other roles
+  const otherRows = allRows
+    .filter(r => r.role_id !== roleId)
+    .map(r => [r.role_id, r.category_id, r.access_level]);
+
+  // 3. Build new rows for this role (skip 'none' — absence means no access)
+  const newRows = Object.entries(perms)
+    .filter(([, level]) => level !== 'none')
+    .map(([categoryId, level]) => [roleId, categoryId, level]);
+
+  const allNewRows = [...otherRows, ...newRows];
+
+  // 4. Clear data range (A2:C), preserving the header row
+  await sheetsClient.spreadsheets.values.clear({
+    spreadsheetId: SHEET_ID,
+    range: 'erp_role_permissions!A2:C',
+  });
+
+  // 5. Write all rows back (if any)
+  if (allNewRows.length > 0) {
+    await sheetsClient.spreadsheets.values.update({
+      spreadsheetId: SHEET_ID,
+      range: 'erp_role_permissions!A2',
+      valueInputOption: 'USER_ENTERED',
+      requestBody: { values: allNewRows },
+    });
   }
 }
