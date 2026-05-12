@@ -32,6 +32,7 @@ const BADGE_STYLE: Record<string, string> = {
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 interface SidebarProps {
+  modules:        ErpNavModule[];
   mobileOpen?:    boolean;
   onMobileClose?: () => void;
   favorites:      string[];
@@ -41,6 +42,7 @@ interface SidebarProps {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export function Sidebar({
+  modules,
   mobileOpen, onMobileClose,
   favorites, onFavoritesChange,
   onOpenPalette,
@@ -122,8 +124,8 @@ export function Sidebar({
   const isActive = (href: string) =>
     pathname === href || (href !== '/dashboard' && pathname.startsWith(href + '/'));
 
-  const currentModule = NAV_MODULES.find(m => m.id === activeModule) ?? NAV_MODULES[0];
-  const allFlat       = flattenNav(NAV_MODULES);
+  const currentModule = modules.find(m => m.id === activeModule) ?? modules[0];
+  const allFlat       = flattenNav(modules);
   const favItems      = allFlat.filter(i => favorites.includes(i.href));
 
   // ─── Render ──────────────────────────────────────────────────────────────
@@ -222,7 +224,7 @@ export function Sidebar({
         {/* ── Module Tabs ─────────────────────────────────────── */}
         {collapsed ? (
           <div className="shrink-0 border-b border-slate-800/70 pb-1">
-            {NAV_MODULES.map(mod => {
+            {modules.map(mod => {
               const Icon    = mod.icon;
               const isActive = mod.id === activeModule;
               return (
@@ -249,7 +251,7 @@ export function Sidebar({
           </div>
         ) : (
           <div className="flex shrink-0 border-b border-slate-800/70 px-2 py-1 gap-0.5">
-            {NAV_MODULES.map(mod => (
+            {modules.map(mod => (
               <button
                 key={mod.id}
                 onClick={() => switchModule(mod.id)}
