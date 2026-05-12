@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Plus, X } from 'lucide-react';
+import { Search, Plus, X, AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { ErpUser, ErpRole } from '@/types';
 
 interface UsersClientProps {
   initialUsers: ErpUser[];
   roles: ErpRole[];
+  currentUserId: string;
 }
 
 function getInitials(name: string | null, email: string): string {
@@ -22,19 +24,20 @@ function formatDate(iso: string | null): string {
   });
 }
 
-export function UsersClient({ initialUsers, roles }: UsersClientProps) {
-  const [users, setUsers]           = useState<ErpUser[]>(initialUsers);
-  const [search, setSearch]         = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [addOpen, setAddOpen]       = useState(false);
-  const [editTarget, setEditTarget] = useState<ErpUser | null>(null);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
-  const [addForm, setAddForm]       = useState({ email: '', fullName: '', roleId: '' });
-  const [editForm, setEditForm]     = useState({ fullName: '', roleId: '' });
-  const [addError, setAddError]     = useState('');
-  const [editError, setEditError]   = useState('');
-  const [saving, setSaving]         = useState(false);
+export function UsersClient({ initialUsers, roles, currentUserId }: UsersClientProps) {
+  const [users, setUsers]                 = useState<ErpUser[]>(initialUsers);
+  const [search, setSearch]               = useState('');
+  const [roleFilter, setRoleFilter]       = useState('');
+  const [statusFilter, setStatusFilter]   = useState('');
+  const [addOpen, setAddOpen]             = useState(false);
+  const [editTarget, setEditTarget]       = useState<ErpUser | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<ErpUser | null>(null);
+  const [togglingId, setTogglingId]       = useState<string | null>(null);
+  const [addForm, setAddForm]             = useState({ email: '', fullName: '', roleId: '' });
+  const [editForm, setEditForm]           = useState({ fullName: '', roleId: '' });
+  const [addError, setAddError]           = useState('');
+  const [editError, setEditError]         = useState('');
+  const [saving, setSaving]               = useState(false);
 
   async function refreshUsers() {
     const res = await fetch('/api/users');
@@ -71,6 +74,9 @@ export function UsersClient({ initialUsers, roles }: UsersClientProps) {
       setAddOpen(false);
       setAddForm({ email: '', fullName: '', roleId: '' });
       await refreshUsers();
+      toast.success('User added successfully');
+    } catch {
+      setAddError('Network error — please try again');
     } finally {
       setSaving(false);
     }
@@ -94,6 +100,9 @@ export function UsersClient({ initialUsers, roles }: UsersClientProps) {
       }
       setEditTarget(null);
       await refreshUsers();
+      toast.success('User updated successfully');
+    } catch {
+      setEditError('Network error — please try again');
     } finally {
       setSaving(false);
     }
@@ -101,17 +110,32 @@ export function UsersClient({ initialUsers, roles }: UsersClientProps) {
 
   async function handleToggleStatus(user: ErpUser) {
     setTogglingId(user.id);
+    setConfirmTarget(null);
     try {
-      await fetch(`/api/users/${user.id}`, {
+      const nextStatus = user.status === 'active' ? 'disabled' : 'active';
+      const res = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: user.status === 'active' ? 'disabled' : 'active' }),
+        body: JSON.stringify({ status: nextStatus }),
       });
+      if (!res.ok) {
+        toast.error('Failed to update user status');
+        return;
+      }
       await refreshUsers();
+      toast.success(
+        nextStatus === 'disabled'
+          ? `${user.fullName ?? user.email} has been disabled`
+          : `${user.fullName ?? user.email} has been re-enabled`,
+      );
+    } catch {
+      toast.error('Network error — please try again');
     } finally {
       setTogglingId(null);
     }
   }
+
+  const isSelf = (user: ErpUser) => user.id === currentUserId;
 
   return (
     <div className="space-y-4">
@@ -198,7 +222,12 @@ export function UsersClient({ initialUsers, roles }: UsersClientProps) {
                         {getInitials(user.fullName, user.email)}
                       </div>
                       <div>
-                        <p className="font-medium text-slate-800">{user.fullName ?? '—'}</p>
+                        <p className="font-medium text-slate-800">
+                          {user.fullName ?? '—'}
+                          {isSelf(user) && (
+                            <span className="ml-1.5 rounded bg-blue-50 px-1 py-0.5 text-[9px] font-semibold text-blue-600">You</span>
+                          )}
+                        </p>
                         <p className="text-[10px] text-slate-500">{user.email}</p>
                       </div>
                     </div>
@@ -231,20 +260,33 @@ export function UsersClient({ initialUsers, roles }: UsersClientProps) {
                       >
                         Edit
                       </button>
-                      <button
-                        onClick={() => handleToggleStatus(user)}
-                        disabled={togglingId === user.id}
-                        className={cn(
-                          'rounded px-2 py-1 text-[10px] font-medium transition-colors disabled:opacity-50',
-                          user.status === 'active'
-                            ? 'text-red-600 hover:bg-red-50'
-                            : 'text-emerald-600 hover:bg-emerald-50',
-                        )}
-                      >
-                        {togglingId === user.id
-                          ? '...'
-                          : user.status === 'active' ? 'Disable' : 'Enable'}
-                      </button>
+                      {isSelf(user) ? (
+                        <span
+                          title="You cannot disable your own account"
+                          className="rounded px-2 py-1 text-[10px] font-medium text-slate-300 cursor-not-allowed select-none"
+                        >
+                          Disable
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            user.status === 'active'
+                              ? setConfirmTarget(user)
+                              : handleToggleStatus(user)
+                          }
+                          disabled={togglingId === user.id}
+                          className={cn(
+                            'rounded px-2 py-1 text-[10px] font-medium transition-colors disabled:opacity-50',
+                            user.status === 'active'
+                              ? 'text-red-600 hover:bg-red-50'
+                              : 'text-emerald-600 hover:bg-emerald-50',
+                          )}
+                        >
+                          {togglingId === user.id
+                            ? '...'
+                            : user.status === 'active' ? 'Disable' : 'Enable'}
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -253,6 +295,41 @@ export function UsersClient({ initialUsers, roles }: UsersClientProps) {
           </tbody>
         </table>
       </div>
+
+      {/* Disable Confirmation modal */}
+      {confirmTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
+          <div className="w-full max-w-[380px] rounded-lg border border-[#E5E7EB] bg-white shadow-xl mx-4">
+            <div className="flex items-start gap-3 p-5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100">
+                <AlertTriangle className="h-4 w-4 text-red-600" />
+              </div>
+              <div>
+                <h2 className="text-[13px] font-semibold text-slate-900">Disable User?</h2>
+                <p className="mt-1 text-[11px] text-slate-600">
+                  <span className="font-medium">{confirmTarget.fullName ?? confirmTarget.email}</span> will
+                  be unable to log in until re-enabled.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-2 border-t border-[#F1F5F9] px-5 py-3">
+              <button
+                onClick={() => setConfirmTarget(null)}
+                className="rounded border border-[#E5E7EB] px-3 py-1.5 text-[11px] font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleToggleStatus(confirmTarget)}
+                disabled={togglingId === confirmTarget.id}
+                className="rounded bg-red-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60"
+              >
+                {togglingId === confirmTarget.id ? 'Disabling...' : 'Yes, Disable'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add User modal */}
       {addOpen && (
