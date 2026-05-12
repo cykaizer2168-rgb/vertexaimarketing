@@ -1,9 +1,15 @@
-import { LoginForm } from '@/components/auth/login-form';
+import { LoginHero } from '@/components/auth/login-hero';
+import { LoginCard } from '@/components/auth/login-card';
 
 export default function LoginPage({
   searchParams,
 }: {
   searchParams: { error?: string };
 }) {
-  return <LoginForm error={searchParams.error} />;
+  return (
+    <main className="flex min-h-screen">
+      <LoginHero />
+      <LoginCard error={searchParams.error} />
+    </main>
+  );
 }
