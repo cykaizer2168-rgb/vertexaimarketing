@@ -1,8 +1,8 @@
 {
-  "buildCommand": "next build",
+  "buildCommand": "next build && cp htmlpages/*.html out/ && cp htmlpages/logo.PNG htmlpages/poster.PNG htmlpages/myphoto.webp out/ && cp -r htmlpages/images out/images",
   "outputDirectory": "out",
   "rewrites": [
-    { "source": "/", "destination": "/vertex-light.html" },
-    { "source": "/vertex-partner", "destination": "/vertex-partner.html" }
+    { "source": "/vertex-partner", "destination": "/vertex-partner.html" },
+    { "source": "/les-collection", "destination": "/les-collection/les-collection-studio.html" }
   ]
 }
