@@ -154,14 +154,31 @@
     border-bottom: 1px solid var(--border);
   }
 
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
   .nav-logo {
-    height: 52px;
+    height: 48px;
     width: auto;
     display: block;
     mix-blend-mode: multiply;
-    cursor: default;
     flex-shrink: 0;
   }
+
+  .nav-brand-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--charcoal);
+    line-height: 1.2;
+  }
+
+  .nav-brand-name span { color: var(--gold); }
 
   .nav-links {
     display: flex;
@@ -2261,7 +2278,10 @@
 
 <!-- NAV -->
 <nav id="mainNav">
-  <img src="logo.png" alt="Les Collection Studio" class="nav-logo" />
+  <div class="nav-brand">
+    <img src="logo.png" alt="Les Collection Studio" class="nav-logo" />
+    <div class="nav-brand-name">Les <span>Collection</span> Studio</div>
+  </div>
   <ul class="nav-links">
     <li><a href="#how">How It Works</a></li>
     <li><a href="#samples">Samples</a></li>
