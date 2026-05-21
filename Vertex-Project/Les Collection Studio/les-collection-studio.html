@@ -155,14 +155,13 @@
   }
 
   .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--charcoal);
+    height: 52px;
+    width: auto;
+    display: block;
+    mix-blend-mode: multiply;
+    cursor: default;
+    flex-shrink: 0;
   }
-
-  .nav-logo span { color: var(--gold); }
 
   .nav-links {
     display: flex;
@@ -2102,6 +2101,18 @@
 
   .drawer-cta:hover { background: var(--cream) !important; }
 
+  .drawer-logo {
+    height: 72px;
+    width: auto;
+    display: block;
+    margin: 0 auto 32px;
+    mix-blend-mode: multiply;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.2s;
+  }
+
+  .mobile-drawer.open .drawer-logo { opacity: 1; }
+
   .drawer-socials {
     margin-top: auto;
     font-size: 11px;
@@ -2250,7 +2261,7 @@
 
 <!-- NAV -->
 <nav id="mainNav">
-  <div class="nav-logo">Les <span>Collection</span> Studio</div>
+  <img src="logo.png" alt="Les Collection Studio" class="nav-logo" />
   <ul class="nav-links">
     <li><a href="#how">How It Works</a></li>
     <li><a href="#samples">Samples</a></li>
@@ -2266,6 +2277,7 @@
 <div class="mobile-drawer" id="mobileDrawer">
   <div class="drawer-overlay" id="drawerOverlay"></div>
   <div class="drawer-panel">
+    <img src="logo.png" alt="Les Collection Studio" class="drawer-logo" />
     <a href="#how" class="drawer-link">How It Works</a>
     <a href="#samples" class="drawer-link">Samples</a>
     <a href="#pricing" class="drawer-link">Pricing</a>
