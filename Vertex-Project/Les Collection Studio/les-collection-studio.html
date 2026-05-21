@@ -3009,23 +3009,23 @@
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Full Name *</label>
-                <input class="form-input" type="text" placeholder="Juan dela Cruz" required />
+                <input class="form-input" type="text" name="name" placeholder="Juan dela Cruz" required />
               </div>
               <div class="form-group">
                 <label class="form-label">Phone / GCash *</label>
-                <input class="form-input" type="tel" placeholder="09XX XXX XXXX" required />
+                <input class="form-input" type="tel" name="phone" placeholder="09XX XXX XXXX" required />
               </div>
             </div>
 
             <div class="form-group">
               <label class="form-label">Email Address *</label>
-              <input class="form-input" type="email" placeholder="juan@email.com" required />
+              <input class="form-input" type="email" name="email" placeholder="juan@email.com" required />
             </div>
 
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Package</label>
-                <select class="form-select" id="packageSelect">
+                <select class="form-select" id="packageSelect" name="package">
                   <option value="" disabled selected>Select package</option>
                   <option value="Keepsake">Keepsake — ₱2,500</option>
                   <option value="Legacy">Legacy — ₱5,500</option>
@@ -3035,7 +3035,7 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Occasion</label>
-                <select class="form-select">
+                <select class="form-select" name="occasion">
                   <option value="" disabled selected>Select occasion</option>
                   <option>Milestone Birthday</option>
                   <option>Memorial Tribute</option>
@@ -3049,7 +3049,7 @@
 
             <div class="form-group">
               <label class="form-label">Message / Special Requests</label>
-              <textarea class="form-textarea" placeholder="Tell us about the occasion, who it's for, or any special details you'd like us to know…"></textarea>
+              <textarea class="form-textarea" name="message" placeholder="Tell us about the occasion, who it's for, or any special details you'd like us to know…"></textarea>
             </div>
 
             <button type="submit" class="form-submit"><span>Reserve My Slot →</span></button>
@@ -3606,10 +3606,24 @@
   });
 
   /* ─── LEAD FORM SUBMIT ─── */
+  const GSHEET_URL = 'https://script.google.com/macros/s/AKfycbysUQVH0AfG0G6aO5v2g9RsXV5GRfvEgmpfz17u0VsXFMBi_e4whe1bz7OcimdObetg9w/exec';
+
   function handleFormSubmit(e) {
     e.preventDefault();
     const form = document.getElementById('leadForm');
     const success = document.getElementById('formSuccess');
+
+    const data = {
+      name:     form.querySelector('[name="name"]').value,
+      phone:    form.querySelector('[name="phone"]').value,
+      email:    form.querySelector('[name="email"]').value,
+      package:  form.querySelector('[name="package"]').value,
+      occasion: form.querySelector('[name="occasion"]').value,
+      message:  form.querySelector('[name="message"]').value,
+    };
+
+    fetch(GSHEET_URL + '?' + new URLSearchParams(data), { mode: 'no-cors' }).catch(() => {});
+
     gsap.to(form, {
       opacity: 0,
       y: -16,
