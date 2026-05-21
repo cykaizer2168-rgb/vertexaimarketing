@@ -1,5 +1,5 @@
 {
-  "buildCommand": "next build && cp htmlpages/*.html out/ && cp htmlpages/logo.PNG htmlpages/poster.PNG htmlpages/myphoto.webp out/ && cp -r htmlpages/images out/images",
+  "buildCommand": "next build && cp htmlpages/*.html out/ && cp htmlpages/logo.PNG htmlpages/poster.PNG htmlpages/myphoto.webp out/ && cp -r htmlpages/images out/images && cp -r htmlpages/les-collection out/les-collection",
   "outputDirectory": "out",
   "rewrites": [
     { "source": "/vertex-partner", "destination": "/vertex-partner.html" },
