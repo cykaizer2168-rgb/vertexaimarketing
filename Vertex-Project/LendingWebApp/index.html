@@ -540,10 +540,15 @@
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Start Date *</label>
-        <input class="form-input" id="l-start" type="date" />
+        <label class="form-label">Repayment Start Date *</label>
+        <input class="form-input" id="l-start" type="date" oninput="calcLoan()" />
       </div>
       <div class="form-group">
+        <label class="form-label">Repayment End Date</label>
+        <input class="form-input" id="l-end" type="text" placeholder="Auto-calculated" readonly
+          style="background:var(--bg);color:var(--navy);font-weight:600;cursor:default;" />
+      </div>
+      <div class="form-group full">
         <label class="form-label">Notes</label>
         <input class="form-input" id="l-notes" placeholder="Optional" />
       </div>
@@ -944,15 +949,27 @@ function openNewLoanModal() {
   document.getElementById('l-term').value = '';
   document.getElementById('l-notes').value = '';
   document.getElementById('l-start').value = today();
+  document.getElementById('l-end').value = '';
   document.getElementById('loan-preview').style.display = 'none';
   openModal('modal-loan');
 }
 
 function calcLoan() {
-  const p    = parseFloat(document.getElementById('l-principal').value);
-  const r    = parseFloat(document.getElementById('l-rate').value);
-  const t    = parseInt(document.getElementById('l-term').value);
-  const prev = document.getElementById('loan-preview');
+  const p       = parseFloat(document.getElementById('l-principal').value);
+  const r       = parseFloat(document.getElementById('l-rate').value);
+  const t       = parseInt(document.getElementById('l-term').value);
+  const startVal = document.getElementById('l-start').value;
+  const prev    = document.getElementById('loan-preview');
+  const endEl   = document.getElementById('l-end');
+
+  // Auto-calculate repayment end date from start + term
+  if (startVal && t) {
+    const endDate = new Date(startVal);
+    endDate.setMonth(endDate.getMonth() + t);
+    endEl.value = fDate(endDate);
+  } else {
+    endEl.value = '';
+  }
 
   if (!p || !r || !t) { prev.style.display = 'none'; return; }
 
