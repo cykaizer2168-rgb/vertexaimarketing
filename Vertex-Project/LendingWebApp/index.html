@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lending Manager</title>
+<style>
+  :root {
+    --blue:      #2563EB;
+    --blue-d:    #1D4ED8;
+    --blue-50:   #EFF6FF;
+    --blue-100:  #DBEAFE;
+    --navy:      #0F172A;
+    --body:      #475569;
+    --muted:     #94A3B8;
+    --border:    #E2E8F0;
+    --bg:        #F8FAFC;
+    --card:      #FFFFFF;
+    --green:     #10B981;
+    --red:       #EF4444;
+    --orange:    #F59E0B;
+    --radius:    12px;
+    --bottom-nav-h: 64px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg); color: var(--body);
+    display: flex; flex-direction: column; height: 100dvh; overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--navy); color: #fff;
+    padding: 0 16px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0; position: relative; z-index: 10;
+  }
+  .topbar-brand { display: flex; align-items: center; gap: 8px; }
+  .topbar-brand-icon { font-size: 20px; }
+  .topbar-brand-text { font-size: 16px; font-weight: 700; color: #fff; }
+  .topbar-title { font-size: 16px; font-weight: 600; color: #fff; }
+  .topbar-actions { display: flex; align-items: center; gap: 8px; }
+
+  /* ── MAIN ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .content {
+    flex: 1; overflow-y: auto; padding: 16px 16px;
+    padding-bottom: calc(var(--bottom-nav-h) + 16px);
+  }
+
+  /* ── SECTION ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── STAT CARDS ── */
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--card); border-radius: var(--radius); padding: 16px;
+    border: 1px solid var(--border);
+  }
+  .stat-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .stat-value { font-size: 24px; font-weight: 800; color: var(--navy); line-height: 1; }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .stat-card.blue   .stat-value { color: var(--blue); }
+  .stat-card.green  .stat-value { color: var(--green); }
+  .stat-card.red    .stat-value { color: var(--red); }
+  .stat-card.orange .stat-value { color: var(--orange); }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card); border-radius: var(--radius);
+    border: 1px solid var(--border); overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .card-header {
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; flex-wrap: wrap;
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+
+  /* ── BUTTON ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 9px 16px; border-radius: 9px; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; transition: opacity 0.15s;
+    touch-action: manipulation; user-select: none;
+    min-height: 40px;
+  }
+  .btn:active { opacity: 0.75; }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-danger  { background: var(--red);  color: #fff; }
+  .btn-ghost   { background: var(--blue-50); color: var(--blue); }
+  .btn-sm      { padding: 6px 12px; font-size: 12px; min-height: 34px; }
+  .btn-icon    { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 50%; }
+
+  /* ── TABLE (mobile: card rows) ── */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    background: var(--bg); color: var(--muted);
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 10px 14px; text-align: left; white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--body); }
+  tbody tr:last-child td { border-bottom: none; }
+  .td-name { font-weight: 600; color: var(--navy); }
+  .td-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* ── MOBILE ROW CARDS ── */
+  .row-cards { display: flex; flex-direction: column; }
+  .row-card {
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .row-card:last-child { border-bottom: none; }
+  .row-card-top { display: flex; align-items: center; justify-content: space-between; }
+  .row-card-name { font-size: 15px; font-weight: 700; color: var(--navy); }
+  .row-card-meta { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 2px; }
+  .row-meta-item { display: flex; flex-direction: column; gap: 1px; }
+  .row-meta-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+  .row-meta-value { font-size: 13px; font-weight: 600; color: var(--body); }
+  .row-card-actions { display: flex; gap: 8px; margin-top: 6px; }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 99px;
+    font-size: 11px; font-weight: 700;
+  }
+  .badge-green  { background: #D1FAE5; color: #065F46; }
+  .badge-blue   { background: var(--blue-100); color: var(--blue-d); }
+  .badge-red    { background: #FEE2E2; color: #991B1B; }
+  .badge-orange { background: #FEF3C7; color: #92400E; }
+  .badge-grey   { background: #F1F5F9; color: #64748B; }
+
+  /* ── MODAL ── */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,0.6);
+    display: none; align-items: flex-end; justify-content: center; z-index: 100;
+  }
+  .overlay.open { display: flex; }
+  .modal {
+    background: var(--card);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 20px 32px;
+    width: 100%; max-height: 92dvh; overflow-y: auto;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+    animation: slideUp 0.28s cubic-bezier(0.32,0.72,0,1);
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-drag { width: 40px; height: 4px; background: #CBD5E1; border-radius: 2px; margin: 0 auto 18px; }
+  .modal-title { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 18px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-grid .full { grid-column: 1 / -1; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--navy); }
+  .form-input, .form-select, .form-textarea {
+    padding: 11px 13px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 16px; color: var(--navy); background: #fff;
+    transition: border-color 0.15s; outline: none; width: 100%;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--blue); }
+  .form-textarea { resize: vertical; min-height: 72px; }
+  .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-footer .btn { flex: 1; justify-content: center; }
+
+  /* ── SEARCH ── */
+  .search-wrap { position: relative; width: 100%; }
+  .search-wrap input {
+    padding: 10px 12px 10px 36px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 14px; outline: none; width: 100%; background: var(--bg);
+  }
+  .search-wrap input:focus { border-color: var(--blue); background: #fff; }
+  .search-wrap .search-icon {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); pointer-events: none;
+  }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; gap: 10px;
+  }
+  .section-header-title { font-size: 16px; font-weight: 700; color: var(--navy); }
+
+  /* ── EMPTY ── */
+  .empty { padding: 40px 20px; text-align: center; color: var(--muted); }
+  .empty-icon { font-size: 32px; margin-bottom: 8px; }
+  .empty p { font-size: 14px; }
+
+  /* ── DASHBOARD GRIDS ── */
+  .dash-bottom { display: flex; flex-direction: column; gap: 0; }
+
+  /* ── FAB ── */
+  .fab {
+    position: fixed; bottom: calc(var(--bottom-nav-h) + 16px); right: 16px;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--blue); color: #fff; border: none;
+    font-size: 24px; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(37,99,235,0.4);
+    cursor: pointer; z-index: 50; transition: transform 0.15s;
+    display: none;
+  }
+  .fab:active { transform: scale(0.92); }
+  .fab.visible { display: flex; }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    height: var(--bottom-nav-h); background: var(--card);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: stretch;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .bnav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; border: none; background: none; cursor: pointer;
+    color: var(--muted); font-size: 10px; font-weight: 600;
+    transition: color 0.15s; padding: 8px 0;
+    touch-action: manipulation;
+  }
+  .bnav-item svg { width: 22px; height: 22px; }
+  .bnav-item.active { color: var(--blue); }
+  .bnav-item.active svg { stroke: var(--blue); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: calc(var(--bottom-nav-h) + 12px); left: 16px; right: 16px; z-index: 200;
+    background: var(--navy); color: #fff; padding: 13px 18px;
+    border-radius: 12px; font-size: 14px; font-weight: 500;
+    transform: translateY(20px); opacity: 0;
+    transition: transform 0.3s, opacity 0.3s; pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2); text-align: center;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--green); }
+  .toast.error   { background: var(--red); }
+
+  /* ── LOADING ── */
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── DESKTOP OVERRIDES ── */
+  @media (min-width: 768px) {
+    body { flex-direction: row; }
+    .sidebar-desktop {
+      width: 220px; background: var(--navy); color: #fff;
+      display: flex; flex-direction: column; flex-shrink: 0;
+      height: 100dvh; overflow-y: auto;
+    }
+    .sidebar-brand { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-brand h1 { font-size: 16px; font-weight: 700; }
+    .sidebar-brand span { font-size: 11px; color: #64748B; }
+    .sidebar-nav { padding: 16px 10px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .nav-item-desktop {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 8px;
+      font-size: 14px; font-weight: 500; color: #94A3B8;
+      cursor: pointer; transition: background 0.15s, color 0.15s;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item-desktop svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-item-desktop:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .nav-item-desktop.active { background: var(--blue); color: #fff; }
+    .sidebar-footer { padding: 16px 20px; font-size: 11px; color: #475569; border-top: 1px solid rgba(255,255,255,0.06); }
+    .main { overflow: hidden; }
+    .topbar { height: 60px; padding: 0 28px; background: var(--card); border-bottom: 1px solid var(--border); }
+    .topbar-title { color: var(--navy); font-size: 18px; }
+    .topbar-brand { display: none; }
+    .content { padding: 28px; padding-bottom: 28px; }
+    .bottom-nav { display: none; }
+    .fab { display: none !important; }
+    .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-value { font-size: 28px; }
+    .dash-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .modal { border-radius: 14px; max-width: 480px; padding: 28px; animation: none; }
+    .modal-drag { display: none; }
+    .overlay { align-items: center; }
+    .search-wrap input { width: 220px; }
+    .card-header { flex-wrap: nowrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ DESKTOP SIDEBAR (hidden on mobile) ══════════════════ -->
+<aside class="sidebar-desktop" style="display:none" id="sidebar-desktop">
+  <div class="sidebar-brand">
+    <h1>💰 LendTrack</h1>
+    <span>Lending Manager</span>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item-desktop active" data-section="dashboard">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item-desktop" data-section="borrowers">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Borrowers
+    </button>
+    <button class="nav-item-desktop" data-section="loans">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Loans
+    </button>
+    <button class="nav-item-desktop" data-section="payments">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Payments
+    </button>
+  </nav>
+  <div class="sidebar-footer">v1.0 · Vertex Consulting</div>
+</aside>
+
+<!-- ═══ MAIN ════════════════════════════════════════════════ -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <span class="topbar-brand-icon">💰</span>
+      <span class="topbar-brand-text">LendTrack</span>
+    </div>
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="refreshAll()" style="background:rgba(255,255,255,0.12);color:#fff;font-size:18px;padding:6px 10px;min-height:36px;">↻</button>
+    </div>
+  </div>
+
+  <div id="loader-bar" style="height:3px;background:var(--blue);width:0%;opacity:0;flex-shrink:0;transition:width 1.5s ease;"></div>
+  <div class="content">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="section active" id="section-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-label">Active Loans</div>
+          <div class="stat-value" id="d-active">—</div>
+          <div class="stat-sub" id="d-total-loans">— total loans</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-label">Outstanding Balance</div>
+          <div class="stat-value" id="d-outstanding">—</div>
+          <div class="stat-sub">total receivable</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Collected Today</div>
+          <div class="stat-value" id="d-today">—</div>
+          <div class="stat-sub" id="d-total-collected">— total collected</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Overdue</div>
+          <div class="stat-value" id="d-overdue">—</div>
+          <div class="stat-sub">needs attention</div>
+        </div>
+      </div>
+
+      <div class="dash-bottom">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Recent Payments</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Borrower</th><th>Amount</th><th>Date</th></tr></thead>
+              <tbody id="d-recent-payments"><tr><td colspan="3" class="empty"><p>Loading…</p></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Overdue Loans</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Borrower</th><th>Balance</th><th>Due</th></tr></thead>
+              <tbody id="d-overdue-list"><tr><td colspan="3" class="empty"><p>Loading…</p></td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BORROWERS ── -->
+    <div class="section" id="section-borrowers">
+      <div class="section-header">
+        <div class="section-header-title">Borrowers</div>
+      </div>
+      <div class="search-wrap" style="margin-bottom:14px">
+        <span class="search-icon">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+        <input type="text" placeholder="Search borrowers…" id="borrower-search" oninput="filterBorrowers()" />
+      </div>
+      <div class="card">
+        <div id="borrowers-list" class="row-cards"></div>
+      </div>
+    </div>
+
+    <!-- ── LOANS ── -->
+    <div class="section" id="section-loans">
+      <div class="section-header">
+        <div class="section-header-title">Loans</div>
+        <select class="form-select" id="loan-status-filter" onchange="renderLoans()" style="width:130px;padding:8px 10px;font-size:13px;">
+          <option value="">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Paid">Paid</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="card">
+        <div id="loans-list" class="row-cards"></div>
+      </div>
+    </div>
+
+    <!-- ── PAYMENTS ── -->
+    <div class="section" id="section-payments">
+      <div class="section-header">
+        <div class="section-header-title">Payments</div>
+      </div>
+      <div class="card">
+        <div id="payments-list" class="row-cards"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- ═══ FAB ══════════════════════════════════════════════════ -->
+<button class="fab" id="fab" onclick="handleFab()">+</button>
+
+<!-- ═══ BOTTOM NAV ════════════════════════════════════════════ -->
+<nav class="bottom-nav">
+  <button class="bnav-item active" data-section="dashboard">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Home
+  </button>
+  <button class="bnav-item" data-section="borrowers">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Borrowers
+  </button>
+  <button class="bnav-item" data-section="loans">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Loans
+  </button>
+  <button class="bnav-item" data-section="payments">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    Payments
+  </button>
+</nav>
+
+<!-- ═══ MODALS ══════════════════════════════════════════════ -->
+
+<!-- Add/Edit Borrower -->
+<div class="overlay" id="modal-borrower">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-title" id="borrower-modal-title">Add Borrower</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Full Name *</label>
+        <input class="form-input" id="b-name" placeholder="Juan Dela Cruz" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone *</label>
+        <input class="form-input" id="b-phone" placeholder="09XX-XXX-XXXX" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <input class="form-input" id="b-address" placeholder="City, Province" />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Notes</label>
+        <textarea class="form-textarea" id="b-notes" placeholder="Optional notes…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-borrower')">Cancel</button>
+      <button class="btn btn-primary" id="save-borrower-btn" onclick="saveBorrower()">Save Borrower</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Loan -->
+<div class="overlay" id="modal-loan">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-title">Create New Loan</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Borrower *</label>
+        <select class="form-select" id="l-borrower"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Principal Amount (₱) *</label>
+        <input class="form-input" id="l-principal" type="number" placeholder="10000" oninput="calcLoan()" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Monthly Interest Rate (%) *</label>
+        <input class="form-input" id="l-rate" type="number" placeholder="5" step="0.1" oninput="calcLoan()" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Term (Months) *</label>
+        <input class="form-input" id="l-term" type="number" placeholder="6" oninput="calcLoan()" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Interest Type</label>
+        <select class="form-select" id="l-itype" onchange="calcLoan()">
+          <option value="monthly">Monthly</option>
+          <option value="flat">Flat</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Start Date *</label>
+        <input class="form-input" id="l-start" type="date" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <input class="form-input" id="l-notes" placeholder="Optional" />
+      </div>
+    </div>
+    <!-- Loan Preview -->
+    <div id="loan-preview" style="display:none;margin-top:16px;background:var(--blue-50);border-radius:10px;padding:14px 16px;">
+      <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em;">Loan Summary</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div><div style="font-size:11px;color:var(--muted)">Total Interest</div><div id="prev-interest" style="font-size:15px;font-weight:700;color:var(--navy)">—</div></div>
+        <div><div style="font-size:11px;color:var(--muted)">Total Amount</div><div id="prev-total" style="font-size:15px;font-weight:700;color:var(--blue)">—</div></div>
+        <div><div style="font-size:11px;color:var(--muted)">Monthly Payment</div><div id="prev-monthly" style="font-size:15px;font-weight:700;color:var(--navy)">—</div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-loan')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLoan()">Create Loan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Record Payment -->
+<div class="overlay" id="modal-payment">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-title">Record Payment</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Select Loan *</label>
+        <select class="form-select" id="p-loan" onchange="onLoanSelect()"></select>
+      </div>
+      <div id="p-loan-info" style="display:none" class="full" style="background:var(--blue-50);border-radius:8px;padding:12px 14px;font-size:13px;margin-bottom:4px;">
+        <span id="p-loan-balance-text"></span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount (₱) *</label>
+        <input class="form-input" id="p-amount" type="number" placeholder="0" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payment Date *</label>
+        <input class="form-input" id="p-date" type="date" />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Notes</label>
+        <input class="form-input" id="p-notes" placeholder="Optional" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-payment')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePayment()">Save Payment</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  CONFIG — paste your deployed GAS web app URL here
+// ─────────────────────────────────────────────────────────────
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyc3WOeBU4V5IrWZPSeG0-0_gS2ejUGWt7ZSt4Bcec9knDzHtNu9lMSF3joKesK3_VkKQ/exec';
+
+// ─────────────────────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────────────────────
+let borrowers = [];
+let loans     = [];
+let payments  = [];
+let editBorrowerId = null;
+
+// ─────────────────────────────────────────────────────────────
+//  API
+// ─────────────────────────────────────────────────────────────
+let pendingCalls = 0;
+function showLoader(show) {
+  document.getElementById('loader-bar').style.width = show ? '70%' : '100%';
+  document.getElementById('loader-bar').style.opacity = show ? '1' : '0';
+}
+
+async function api(action, payload = {}) {
+  pendingCalls++;
+  if (pendingCalls === 1) {
+    const bar = document.getElementById('loader-bar');
+    bar.style.transition = 'none'; bar.style.width = '0%'; bar.style.opacity = '1';
+    requestAnimationFrame(() => { bar.style.transition = 'width 1.5s ease'; bar.style.width = '70%'; });
+  }
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action, ...payload }),
+    });
+    const data = await res.json();
+    pendingCalls = Math.max(0, pendingCalls - 1);
+    if (pendingCalls === 0) {
+      const bar = document.getElementById('loader-bar');
+      bar.style.transition = 'width 0.2s ease, opacity 0.4s ease 0.3s';
+      bar.style.width = '100%';
+      setTimeout(() => { bar.style.opacity = '0'; }, 300);
+    }
+    return data;
+  } catch (e) {
+    pendingCalls = 0;
+    document.getElementById('loader-bar').style.opacity = '0';
+    toast('Network error: ' + e.message, 'error');
+    return { error: e.message };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────────────────────────────
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  setTimeout(() => el.className = 'toast', 3000);
+}
+
+// ─────────────────────────────────────────────────────────────
+//  NAVIGATION
+// ─────────────────────────────────────────────────────────────
+let currentSection = 'dashboard';
+
+function navigateTo(sec) {
+  currentSection = sec;
+  document.querySelectorAll('.bnav-item, .nav-item-desktop').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll(`[data-section="${sec}"]`).forEach(b => b.classList.add('active'));
+  document.getElementById('section-' + sec).classList.add('active');
+  document.getElementById('topbar-title').textContent =
+    sec.charAt(0).toUpperCase() + sec.slice(1);
+
+  // Show FAB for sections that need add action
+  const fab = document.getElementById('fab');
+  if (sec === 'borrowers' || sec === 'loans' || sec === 'payments') {
+    fab.classList.add('visible');
+  } else {
+    fab.classList.remove('visible');
+  }
+}
+
+function handleFab() {
+  if (currentSection === 'borrowers') openAddBorrowerModal();
+  else if (currentSection === 'loans') openNewLoanModal();
+  else if (currentSection === 'payments') openNewPaymentModal();
+}
+
+document.querySelectorAll('.bnav-item, .nav-item-desktop').forEach(btn => {
+  btn.addEventListener('click', () => navigateTo(btn.dataset.section));
+});
+
+// ─────────────────────────────────────────────────────────────
+//  MODAL
+// ─────────────────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('open'); });
+});
+
+// ─────────────────────────────────────────────────────────────
+//  FORMAT
+// ─────────────────────────────────────────────────────────────
+const peso  = n => '₱' + Number(n).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fDate = d => d ? new Date(d).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+const today = () => new Date().toISOString().split('T')[0];
+
+// ─────────────────────────────────────────────────────────────
+//  DASHBOARD
+// ─────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const res = await api('getDashboard');
+  if (res.error) return;
+  document.getElementById('d-active').textContent      = res.activeLoans;
+  document.getElementById('d-total-loans').textContent = res.totalLoans + ' total loans';
+  document.getElementById('d-outstanding').textContent = peso(res.totalOutstanding);
+  document.getElementById('d-today').textContent       = peso(res.collectedToday);
+  document.getElementById('d-total-collected').textContent = peso(res.totalCollected) + ' total';
+  document.getElementById('d-overdue').textContent     = res.overdueLoans;
+
+  const rp = document.getElementById('d-recent-payments');
+  rp.innerHTML = res.recentPayments.length
+    ? res.recentPayments.map(p => `<tr>
+        <td class="td-name">${p.BorrowerName}</td>
+        <td>${peso(p.Amount)}</td>
+        <td>${fDate(p.Date)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="3"><div class="empty"><p>No payments yet</p></div></td></tr>';
+
+  const ol = document.getElementById('d-overdue-list');
+  ol.innerHTML = res.overdueList.length
+    ? res.overdueList.map(l => `<tr>
+        <td class="td-name">${l.BorrowerName}</td>
+        <td>${peso(l.Balance)}</td>
+        <td style="color:var(--red)">${fDate(l.DueDate)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="3"><div class="empty"><p>No overdue loans</p></div></td></tr>';
+}
+
+// ─────────────────────────────────────────────────────────────
+//  BORROWERS
+// ─────────────────────────────────────────────────────────────
+async function loadBorrowers() {
+  const res = await api('getBorrowers');
+  if (res.error) return;
+  borrowers = res.data || [];
+  renderBorrowers();
+}
+
+function renderBorrowers() {
+  const q = (document.getElementById('borrower-search').value || '').toLowerCase();
+  const filtered = borrowers.filter(b =>
+    b.Name.toLowerCase().includes(q) || (b.Phone || '').includes(q)
+  );
+  const list = document.getElementById('borrowers-list');
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><p>No borrowers found</p></div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(b => {
+    const activeLoans = loans.filter(l => l.BorrowerID === b.ID && l.Status === 'Active').length;
+    return `<div class="row-card">
+      <div class="row-card-top">
+        <div class="row-card-name">${b.Name}</div>
+        ${activeLoans ? `<span class="badge badge-blue">${activeLoans} active</span>` : '<span class="badge badge-green">Clear</span>'}
+      </div>
+      <div class="row-card-meta">
+        <div class="row-meta-item"><div class="row-meta-label">Phone</div><div class="row-meta-value">${b.Phone || '—'}</div></div>
+        <div class="row-meta-item"><div class="row-meta-label">Address</div><div class="row-meta-value">${b.Address || '—'}</div></div>
+      </div>
+      <div class="row-card-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editBorrower('${b.ID}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteBorrower('${b.ID}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterBorrowers() { renderBorrowers(); }
+
+function openAddBorrowerModal() {
+  editBorrowerId = null;
+  ['b-name','b-phone','b-address','b-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('borrower-modal-title').textContent = 'Add Borrower';
+  openModal('modal-borrower');
+}
+
+function editBorrower(id) {
+  const b = borrowers.find(x => x.ID === id);
+  if (!b) return;
+  editBorrowerId = id;
+  document.getElementById('b-name').value    = b.Name    || '';
+  document.getElementById('b-phone').value   = b.Phone   || '';
+  document.getElementById('b-address').value = b.Address || '';
+  document.getElementById('b-notes').value   = b.Notes   || '';
+  document.getElementById('borrower-modal-title').textContent = 'Edit Borrower';
+  openModal('modal-borrower');
+}
+
+async function saveBorrower() {
+  const name  = document.getElementById('b-name').value.trim();
+  const phone = document.getElementById('b-phone').value.trim();
+  if (!name || !phone) { toast('Name and phone are required', 'error'); return; }
+
+  const btn = document.getElementById('save-borrower-btn');
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  const payload = {
+    name, phone,
+    address: document.getElementById('b-address').value.trim(),
+    notes:   document.getElementById('b-notes').value.trim(),
+  };
+
+  let res;
+  if (editBorrowerId) {
+    res = await api('updateBorrower', { id: editBorrowerId, ...payload });
+  } else {
+    res = await api('addBorrower', payload);
+  }
+
+  btn.innerHTML = 'Save Borrower'; btn.disabled = false;
+
+  if (res.error) { toast(res.error, 'error'); return; }
+  toast(editBorrowerId ? 'Borrower updated!' : 'Borrower added!');
+  closeModal('modal-borrower');
+  await loadBorrowers();
+}
+
+async function deleteBorrower(id) {
+  const b = borrowers.find(x => x.ID === id);
+  if (!confirm(`Delete ${b?.Name}? This will not delete their loans.`)) return;
+  const res = await api('deleteBorrower', { id });
+  if (res.error) { toast(res.error, 'error'); return; }
+  toast('Borrower deleted');
+  await loadBorrowers();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  LOANS
+// ─────────────────────────────────────────────────────────────
+async function loadLoans() {
+  const res = await api('getLoans');
+  if (res.error) return;
+  loans = res.data || [];
+  renderLoans();
+}
+
+function renderLoans() {
+  const filter   = document.getElementById('loan-status-filter').value;
+  const filtered = filter ? loans.filter(l => l.Status === filter) : loans;
+  const listEl   = document.getElementById('loans-list');
+  const now = new Date(); now.setHours(0,0,0,0);
+
+  if (!filtered.length) {
+    listEl.innerHTML = '<div class="empty"><div class="empty-icon">📄</div><p>No loans found</p></div>';
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(l => {
+    const isOverdue = l.Status === 'Active' && new Date(l.DueDate) < now;
+    const status    = isOverdue ? 'Overdue' : l.Status;
+    const badge     = status === 'Paid'      ? 'badge-green'
+                    : status === 'Overdue'   ? 'badge-red'
+                    : status === 'Cancelled' ? 'badge-grey'
+                    : 'badge-blue';
+    const isActive  = l.Status === 'Active';
+    return `<div class="row-card">
+      <div class="row-card-top">
+        <div class="row-card-name">${l.BorrowerName}</div>
+        <span class="badge ${badge}">${status}</span>
+      </div>
+      <div class="row-card-meta">
+        <div class="row-meta-item"><div class="row-meta-label">Principal</div><div class="row-meta-value">${peso(l.Principal)}</div></div>
+        <div class="row-meta-item"><div class="row-meta-label">Balance</div><div class="row-meta-value" style="${parseFloat(l.Balance)>0?'color:var(--orange)':'color:var(--green)'}">${peso(l.Balance)}</div></div>
+        <div class="row-meta-item"><div class="row-meta-label">Due Date</div><div class="row-meta-value" style="${isOverdue?'color:var(--red)':''}">${fDate(l.DueDate)}</div></div>
+        <div class="row-meta-item"><div class="row-meta-label">Interest</div><div class="row-meta-value">${l.InterestRate}%/mo · ${l.TermMonths}mo</div></div>
+      </div>
+      <div class="row-card-actions">
+        ${isActive ? `<button class="btn btn-primary btn-sm" onclick="recordPaymentForLoan('${l.ID}')">💳 Pay</button>` : ''}
+        ${isActive ? `<button class="btn btn-ghost btn-sm" onclick="markLoan('${l.ID}','Paid')">Mark Paid</button>` : ''}
+        ${isActive ? `<button class="btn btn-danger btn-sm" onclick="cancelLoan('${l.ID}','${l.BorrowerName}')">Cancel</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openNewLoanModal() {
+  // Populate borrower select
+  const sel = document.getElementById('l-borrower');
+  sel.innerHTML = borrowers.length
+    ? borrowers.map(b => `<option value="${b.ID}" data-name="${b.Name}">${b.Name}</option>`).join('')
+    : '<option value="">No borrowers — add one first</option>';
+
+  document.getElementById('l-principal').value = '';
+  document.getElementById('l-rate').value = '';
+  document.getElementById('l-term').value = '';
+  document.getElementById('l-notes').value = '';
+  document.getElementById('l-start').value = today();
+  document.getElementById('loan-preview').style.display = 'none';
+  openModal('modal-loan');
+}
+
+function calcLoan() {
+  const p    = parseFloat(document.getElementById('l-principal').value);
+  const r    = parseFloat(document.getElementById('l-rate').value);
+  const t    = parseInt(document.getElementById('l-term').value);
+  const prev = document.getElementById('loan-preview');
+
+  if (!p || !r || !t) { prev.style.display = 'none'; return; }
+
+  const interest = p * (r / 100) * t;
+  const total    = p + interest;
+  const monthly  = total / t;
+
+  document.getElementById('prev-interest').textContent = peso(interest);
+  document.getElementById('prev-total').textContent    = peso(total);
+  document.getElementById('prev-monthly').textContent  = peso(monthly);
+  prev.style.display = 'block';
+}
+
+let _savingLoan = false;
+
+async function saveLoan() {
+  if (_savingLoan) return; // prevent duplicate submission
+
+  const sel       = document.getElementById('l-borrower');
+  const bId       = sel.value;
+  const bName     = sel.options[sel.selectedIndex]?.dataset.name;
+  const principal = document.getElementById('l-principal').value;
+  const rate      = document.getElementById('l-rate').value;
+  const term      = document.getElementById('l-term').value;
+  const start     = document.getElementById('l-start').value;
+
+  if (!bId || !principal || !rate || !term || !start) {
+    toast('Please fill all required fields', 'error'); return;
+  }
+
+  // Lock the button while saving
+  _savingLoan = true;
+  const btn = document.querySelector('#modal-loan .btn-primary');
+  const origText = btn.textContent;
+  btn.innerHTML = '<span class="spinner"></span> Saving…';
+  btn.disabled = true;
+
+  const res = await api('addLoan', {
+    borrowerId:   bId,
+    borrowerName: bName,
+    principal, interestRate: rate, termMonths: term,
+    interestType: document.getElementById('l-itype').value,
+    startDate:    start,
+    notes:        document.getElementById('l-notes').value,
+  });
+
+  btn.textContent = origText;
+  btn.disabled = false;
+  _savingLoan = false;
+
+  if (res.error) { toast(res.error, 'error'); return; }
+  toast('Loan created! Total: ' + peso(res.totalAmount));
+  closeModal('modal-loan');
+  await loadLoans();
+}
+
+async function cancelLoan(id, borrowerName) {
+  if (!confirm(`Cancel loan for ${borrowerName}?\n\nThis marks it as Cancelled. Existing payments will not be affected.`)) return;
+  const res = await api('updateLoan', { id, status: 'Cancelled' });
+  if (res.error) { toast(res.error, 'error'); return; }
+  toast('Loan cancelled');
+  await Promise.all([loadLoans(), loadDashboard()]);
+}
+
+async function markLoan(id, status) {
+  const res = await api('updateLoan', { id, status });
+  if (res.error) { toast(res.error, 'error'); return; }
+  toast('Loan marked as ' + status);
+  await loadLoans();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  PAYMENTS
+// ─────────────────────────────────────────────────────────────
+async function loadPayments() {
+  const res = await api('getPayments');
+  if (res.error) return;
+  payments = res.data || [];
+  renderPayments();
+}
+
+function renderPayments() {
+  const listEl = document.getElementById('payments-list');
+  if (!payments.length) {
+    listEl.innerHTML = '<div class="empty"><div class="empty-icon">💳</div><p>No payments recorded</p></div>';
+    return;
+  }
+  const sorted = [...payments].sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt));
+  listEl.innerHTML = sorted.map(p => `<div class="row-card">
+    <div class="row-card-top">
+      <div class="row-card-name">${p.BorrowerName}</div>
+      <div style="font-size:18px;font-weight:800;color:var(--green)">${peso(p.Amount)}</div>
+    </div>
+    <div class="row-card-meta">
+      <div class="row-meta-item"><div class="row-meta-label">Date</div><div class="row-meta-value">${fDate(p.Date)}</div></div>
+      ${p.Notes ? `<div class="row-meta-item"><div class="row-meta-label">Notes</div><div class="row-meta-value">${p.Notes}</div></div>` : ''}
+    </div>
+    <div class="row-card-actions">
+      <button class="btn btn-danger btn-sm" onclick="deletePayment('${p.ID}')">Delete</button>
+    </div>
+  </div>`).join('');
+}
+
+function openNewPaymentModal() {
+  const sel = document.getElementById('p-loan');
+  const activeLoans = loans.filter(l => l.Status !== 'Paid');
+  sel.innerHTML = activeLoans.length
+    ? activeLoans.map(l => `<option value="${l.ID}" data-name="${l.BorrowerName}" data-balance="${l.Balance}">${l.BorrowerName} — ${peso(l.Balance)} balance</option>`).join('')
+    : '<option value="">No active loans</option>';
+
+  document.getElementById('p-amount').value = '';
+  document.getElementById('p-date').value   = today();
+  document.getElementById('p-notes').value  = '';
+  onLoanSelect();
+  openModal('modal-payment');
+}
+
+function recordPaymentForLoan(loanId) {
+  openNewPaymentModal();
+  const sel = document.getElementById('p-loan');
+  for (let opt of sel.options) {
+    if (opt.value === loanId) { sel.value = loanId; break; }
+  }
+  onLoanSelect();
+}
+
+function onLoanSelect() {
+  const sel     = document.getElementById('p-loan');
+  const opt     = sel.options[sel.selectedIndex];
+  const balance = opt?.dataset.balance;
+  const info    = document.getElementById('p-loan-info');
+  if (balance) {
+    document.getElementById('p-loan-balance-text').innerHTML =
+      `Outstanding balance: <strong style="color:var(--blue)">${peso(balance)}</strong>`;
+    info.style.cssText = 'display:block;grid-column:1/-1;background:var(--blue-50);border-radius:8px;padding:10px 14px;font-size:13px;';
+  } else {
+    info.style.display = 'none';
+  }
+}
+
+async function savePayment() {
+  const sel    = document.getElementById('p-loan');
+  const loanId = sel.value;
+  const name   = sel.options[sel.selectedIndex]?.dataset.name;
+  const amount = document.getElementById('p-amount').value;
+  const date   = document.getElementById('p-date').value;
+
+  if (!loanId || !amount || !date) { toast('Please fill all required fields', 'error'); return; }
+
+  const res = await api('addPayment', {
+    loanId, borrowerName: name, amount, date,
+    notes: document.getElementById('p-notes').value,
+  });
+
+  if (res.error) { toast(res.error, 'error'); return; }
+  const msg = res.status === 'Paid'
+    ? '🎉 Loan fully paid!'
+    : `Payment saved! Remaining: ${peso(res.newBalance)}`;
+  toast(msg);
+  closeModal('modal-payment');
+  await Promise.all([loadLoans(), loadPayments(), loadDashboard()]);
+}
+
+async function deletePayment(id) {
+  if (!confirm('Delete this payment? The loan balance will be reversed.')) return;
+  const res = await api('deletePayment', { id });
+  if (res.error) { toast(res.error, 'error'); return; }
+  toast('Payment deleted');
+  await Promise.all([loadLoans(), loadPayments(), loadDashboard()]);
+}
+
+// ─────────────────────────────────────────────────────────────
+//  INIT — lazy load per section
+// ─────────────────────────────────────────────────────────────
+const loaded = { dashboard: false, borrowers: false, loans: false, payments: false };
+
+async function refreshAll() {
+  loaded.dashboard = false; loaded.borrowers = false;
+  loaded.loans = false;     loaded.payments = false;
+  await loadCurrentSection();
+  toast('Refreshed');
+}
+
+async function loadCurrentSection() {
+  if (currentSection === 'dashboard' && !loaded.dashboard) {
+    loaded.dashboard = true;
+    await loadDashboard();
+  } else if (currentSection === 'borrowers' && !loaded.borrowers) {
+    loaded.borrowers = true;
+    await Promise.all([loadBorrowers(), loadLoans()]); // need loans for badge count
+  } else if (currentSection === 'loans' && !loaded.loans) {
+    loaded.loans = true;
+    await loadLoans();
+  } else if (currentSection === 'payments' && !loaded.payments) {
+    loaded.payments = true;
+    await Promise.all([loadPayments(), loadLoans()]); // need loans for payment modal select
+  }
+}
+
+// Override navigateTo to lazy-load on section switch
+const _navTo = navigateTo;
+navigateTo = function(sec) {
+  _navTo(sec);
+  loadCurrentSection();
+};
+
+// Re-wire nav buttons after override
+document.querySelectorAll('.bnav-item, .nav-item-desktop').forEach(btn => {
+  btn.onclick = () => navigateTo(btn.dataset.section);
+});
+
+// Show desktop sidebar on wide screens
+if (window.innerWidth >= 768) {
+  document.getElementById('sidebar-desktop').style.display = 'flex';
+}
+
+// Check config
+if (GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
+  document.body.insertAdjacentHTML('beforeend', `
+    <div style="position:fixed;inset:0;background:rgba(15,23,42,0.85);display:flex;align-items:center;justify-content:center;z-index:999;">
+      <div style="background:#fff;border-radius:14px;padding:32px;max-width:440px;text-align:center;">
+        <div style="font-size:32px;margin-bottom:12px">⚙️</div>
+        <h2 style="font-size:18px;font-weight:700;color:#0F172A;margin-bottom:10px">Setup Required</h2>
+        <p style="font-size:14px;color:#475569;line-height:1.6">
+          Replace <strong>GAS_URL</strong> in the HTML with your deployed Google Apps Script URL.
+        </p>
+      </div>
+    </div>
+  `);
+} else {
+  loadCurrentSection(); // only load dashboard on startup
+}
+</script>
+</body>
+</html>
