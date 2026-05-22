@@ -1342,14 +1342,22 @@ async function saveEditLoan() {
   const btn = document.getElementById('save-edit-loan-btn');
   btn.innerHTML = '<span class="spinner"></span> Saving…'; btn.disabled = true;
 
-  const res = await api('editLoan', {
-    id: _editingLoanId, principal, interestRate, termMonths, interestType, startDate, notes, changes
+  const res = await api('updateLoan', {
+    id: _editingLoanId, principal, interestRate, termMonths, interestType, startDate, notes
   });
 
   btn.textContent = 'Save Changes'; btn.disabled = false;
   _savingEditLoan = false;
 
   if (res.error) { toast(res.error, 'error'); return; }
+
+  // Save audit trail to localStorage (no GAS needed)
+  const auditKey  = 'audit_' + _editingLoanId;
+  const existing  = JSON.parse(localStorage.getItem(auditKey) || '[]');
+  const timestamp = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' });
+  changes.forEach(c => existing.unshift({ ...c, timestamp }));
+  localStorage.setItem(auditKey, JSON.stringify(existing));
+
   toast('Loan updated');
   closeModal('modal-edit-loan');
   await Promise.all([loadLoans(), loadDashboard()]);
@@ -1358,28 +1366,28 @@ async function saveEditLoan() {
 // ─────────────────────────────────────────────────────────────
 //  AUDIT TRAIL
 // ─────────────────────────────────────────────────────────────
-async function openAuditModal(loanId) {
+function openAuditModal(loanId) {
   const l = loans.find(x => x.ID === loanId);
   document.getElementById('audit-borrower').textContent = l ? l.BorrowerName : '';
-  document.getElementById('audit-body').innerHTML = '<div class="empty"><p>Loading…</p></div>';
   openModal('modal-audit');
 
-  const res = await api('getAuditLog', { loanId });
-  const body = document.getElementById('audit-body');
-  if (!res.data || !res.data.length) {
+  const entries = JSON.parse(localStorage.getItem('audit_' + loanId) || '[]');
+  const body    = document.getElementById('audit-body');
+
+  if (!entries.length) {
     body.innerHTML = '<div class="empty"><div class="empty-icon">📝</div><p>No edit history yet</p></div>';
     return;
   }
-  body.innerHTML = res.data.map(e => `
+  body.innerHTML = entries.map(e => `
     <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <span style="font-size:12px;font-weight:700;color:var(--navy)">${e.Field}</span>
-        <span style="font-size:11px;color:var(--muted)">${e.Timestamp}</span>
+        <span style="font-size:12px;font-weight:700;color:var(--navy)">${e.field}</span>
+        <span style="font-size:11px;color:var(--muted)">${e.timestamp}</span>
       </div>
       <div style="display:flex;gap:8px;align-items:center;font-size:13px;">
-        <span style="background:#FEE2E2;color:#991B1B;padding:3px 10px;border-radius:6px;text-decoration:line-through;">${e.OldValue || '—'}</span>
+        <span style="background:#FEE2E2;color:#991B1B;padding:3px 10px;border-radius:6px;text-decoration:line-through;">${e.old || '—'}</span>
         <span style="color:var(--muted)">→</span>
-        <span style="background:#D1FAE5;color:#065F46;padding:3px 10px;border-radius:6px;font-weight:600;">${e.NewValue}</span>
+        <span style="background:#D1FAE5;color:#065F46;padding:3px 10px;border-radius:6px;font-weight:600;">${e.new}</span>
       </div>
     </div>
   `).join('');

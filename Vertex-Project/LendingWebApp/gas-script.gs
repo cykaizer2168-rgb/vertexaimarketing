@@ -170,13 +170,37 @@ function addLoan(p) {
 
 function updateLoan(p) {
   const sheet = getOrCreateSheet('Loans', LOAN_HEADERS);
-  const data = sheet.getDataRange().getValues();
+  const data  = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === p.id) {
-      if (p.status !== undefined) sheet.getRange(i + 1, 13).setValue(p.status);
-      if (p.notes  !== undefined) sheet.getRange(i + 1, 14).setValue(p.notes);
-      return { success: true };
+    if (data[i][0] !== p.id) continue;
+
+    // Status / notes update (existing)
+    if (p.status !== undefined) sheet.getRange(i + 1, 13).setValue(p.status);
+    if (p.notes  !== undefined) sheet.getRange(i + 1, 14).setValue(p.notes);
+
+    // Full edit (principal, rate, term, dates)
+    if (p.principal !== undefined) {
+      const principal     = parseFloat(p.principal);
+      const rate          = parseFloat(p.interestRate);
+      const term          = parseInt(p.termMonths);
+      const totalInterest = principal * (rate / 100) * term;
+      const totalAmount   = principal + totalInterest;
+      const paidAmount    = parseFloat(data[i][10]) || 0;
+      const balance       = Math.max(0, totalAmount - paidAmount);
+      const dueDate       = new Date(p.startDate);
+      dueDate.setMonth(dueDate.getMonth() + term);
+
+      sheet.getRange(i + 1, 4).setValue(principal);
+      sheet.getRange(i + 1, 5).setValue(rate);
+      sheet.getRange(i + 1, 6).setValue(p.interestType || 'flat');
+      sheet.getRange(i + 1, 7).setValue(term);
+      sheet.getRange(i + 1, 8).setValue(p.startDate);
+      sheet.getRange(i + 1, 9).setValue(formatDate(dueDate));
+      sheet.getRange(i + 1, 10).setValue(totalAmount);
+      sheet.getRange(i + 1, 12).setValue(balance);
     }
+
+    return { success: true };
   }
   return { error: 'Loan not found' };
 }
