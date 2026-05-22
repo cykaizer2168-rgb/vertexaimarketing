@@ -823,7 +823,7 @@ async function deleteBorrower(id) {
 async function loadLoans() {
   const res = await api('getLoans');
   if (res.error) return;
-  loans = res.data || [];
+  loans = (res.data || []).filter(l => l.Status !== 'Deleted');
   renderLoans();
 }
 
@@ -953,11 +953,11 @@ async function cancelLoan(id, borrowerName) {
 }
 
 async function deleteLoan(id, borrowerName) {
-  if (!confirm(`Delete loan for ${borrowerName}?\n\nThis permanently removes the loan and all its payment records. This cannot be undone.`)) return;
-  const res = await api('deleteLoan', { id });
+  if (!confirm(`Delete loan for ${borrowerName}?\n\nThis cannot be undone.`)) return;
+  const res = await api('updateLoan', { id, status: 'Deleted' });
   if (res.error) { toast(res.error, 'error'); return; }
   toast('Loan deleted');
-  await Promise.all([loadLoans(), loadPayments(), loadDashboard()]);
+  await Promise.all([loadLoans(), loadDashboard()]);
 }
 
 async function markLoan(id, status) {
