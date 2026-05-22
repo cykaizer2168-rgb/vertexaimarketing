@@ -360,6 +360,10 @@
     gap: 8px;
     transition: gap 0.3s;
     cursor: none;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
   }
 
   .btn-ghost:hover { gap: 16px; }
@@ -2334,7 +2338,7 @@
     </p>
     <div class="hero-actions" id="heroActions">
       <button onclick="openBookingModal()" class="btn-primary"><span>Create Your Memory Film →</span></button>
-      <a href="https://youtu.be/eQ_9nEigsY0?si=NdftjrVSMh8_btLA" target="_blank" rel="noopener" class="btn-ghost">Watch Samples <span>→</span></a>
+      <button onclick="openVideoModal('eQ_9nEigsY0')" class="btn-ghost">Watch Samples <span>→</span></button>
     </div>
     <div class="hero-stats" id="heroStats">
       <div class="stat-item">
@@ -2933,7 +2937,7 @@
     <p class="cta-sub reveal-sub">Every family has a story worth telling. Let us help you preserve it beautifully — before the moment passes.</p>
     <div class="cta-actions reveal-sub" style="opacity:0; transform:translateY(16px)">
       <button onclick="openBookingModal()" class="btn-primary"><span>Start Your Memory Film →</span></button>
-      <a href="https://youtu.be/eQ_9nEigsY0?si=NdftjrVSMh8_btLA" target="_blank" rel="noopener" class="btn-ghost">Watch Samples First →</a>
+      <button onclick="openVideoModal('eQ_9nEigsY0')" class="btn-ghost">Watch Samples First →</button>
     </div>
   </div>
 </section>
