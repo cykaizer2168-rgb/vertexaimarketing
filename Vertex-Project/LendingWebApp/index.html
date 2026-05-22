@@ -602,6 +602,73 @@
   </div>
 </div>
 
+<!-- Edit Loan -->
+<div class="overlay" id="modal-edit-loan">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-title">Edit Loan</div>
+    <div id="edit-loan-borrower" style="font-size:13px;color:var(--muted);margin:-10px 0 16px;"></div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Principal Amount (₱) *</label>
+        <input class="form-input" id="el-principal" type="number" oninput="calcEditLoan()" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Monthly Interest Rate (%) *</label>
+        <input class="form-input" id="el-rate" type="number" step="0.1" oninput="calcEditLoan()" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Term (Months) *</label>
+        <input class="form-input" id="el-term" type="number" oninput="calcEditLoan()" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Interest Type</label>
+        <select class="form-select" id="el-itype" onchange="calcEditLoan()">
+          <option value="flat">Flat</option>
+          <option value="monthly">Monthly</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Repayment Start Date *</label>
+        <input class="form-input" id="el-start" type="date" oninput="calcEditLoan()" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Repayment End Date</label>
+        <input class="form-input" id="el-end" type="text" readonly style="background:var(--bg);color:var(--navy);font-weight:600;cursor:default;" />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Notes</label>
+        <input class="form-input" id="el-notes" placeholder="Optional" />
+      </div>
+    </div>
+    <div id="edit-loan-preview" style="display:none;margin-top:14px;background:var(--blue-50);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em;">Updated Summary</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+        <div><div style="font-size:11px;color:var(--muted)">Total Interest</div><div id="el-prev-interest" style="font-size:14px;font-weight:700;color:var(--navy)">—</div></div>
+        <div><div style="font-size:11px;color:var(--muted)">Total Amount</div><div id="el-prev-total" style="font-size:14px;font-weight:700;color:var(--blue)">—</div></div>
+        <div><div style="font-size:11px;color:var(--muted)">Monthly Payment</div><div id="el-prev-monthly" style="font-size:14px;font-weight:700;color:var(--navy)">—</div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-loan')">Cancel</button>
+      <button class="btn btn-primary" id="save-edit-loan-btn" onclick="saveEditLoan()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Audit Trail -->
+<div class="overlay" id="modal-audit">
+  <div class="modal" style="max-height:90dvh;">
+    <div class="modal-drag"></div>
+    <div class="modal-title">Edit History</div>
+    <div id="audit-borrower" style="font-size:13px;color:var(--muted);margin:-10px 0 16px;"></div>
+    <div id="audit-body" style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;"></div>
+    <div class="modal-footer" style="margin-top:16px;">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('modal-audit')">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- Amortization Schedule -->
 <div class="overlay" id="modal-amort">
   <div class="modal" style="max-height:96dvh;">
@@ -929,6 +996,8 @@ function renderLoans() {
       <div class="row-card-actions">
         ${isActive ? `<button class="btn btn-primary btn-sm" onclick="recordPaymentForLoan('${l.ID}')">💳 Pay</button>` : ''}
         ${isActive ? `<button class="btn btn-ghost btn-sm" onclick="markLoan('${l.ID}','Paid')">Mark Paid</button>` : ''}
+        <button class="btn btn-ghost btn-sm" onclick="openEditLoanModal('${l.ID}')">✏️ Edit</button>
+        <button class="btn btn-ghost btn-sm" onclick="openAuditModal('${l.ID}')">🕓 History</button>
         <button class="btn btn-ghost btn-sm" onclick="openAmortModal('${l.ID}')">📋 Schedule</button>
         ${isActive ? `<button class="btn btn-danger btn-sm" onclick="cancelLoan('${l.ID}','${l.BorrowerName}')">Cancel</button>` : ''}
         <button class="btn btn-danger btn-sm" onclick="deleteLoan('${l.ID}','${l.BorrowerName}')">Delete</button>
@@ -1188,6 +1257,133 @@ navigateTo = function(sec) {
 document.querySelectorAll('.bnav-item, .nav-item-desktop').forEach(btn => {
   btn.onclick = () => navigateTo(btn.dataset.section);
 });
+
+// ─────────────────────────────────────────────────────────────
+//  EDIT LOAN
+// ─────────────────────────────────────────────────────────────
+let _editingLoanId   = null;
+let _editingLoanSnap = {}; // snapshot of original values for diff
+let _savingEditLoan  = false;
+
+function openEditLoanModal(loanId) {
+  const l = loans.find(x => x.ID === loanId);
+  if (!l) return;
+  _editingLoanId   = loanId;
+  _editingLoanSnap = {
+    principal:    l.Principal,
+    interestRate: l.InterestRate,
+    termMonths:   l.TermMonths,
+    interestType: l.InterestType,
+    startDate:    l.StartDate,
+    notes:        l.Notes || '',
+  };
+
+  document.getElementById('edit-loan-borrower').textContent = l.BorrowerName;
+  document.getElementById('el-principal').value = l.Principal;
+  document.getElementById('el-rate').value      = l.InterestRate;
+  document.getElementById('el-term').value      = l.TermMonths;
+  document.getElementById('el-itype').value     = l.InterestType || 'flat';
+  document.getElementById('el-start').value     = l.StartDate ? l.StartDate.toString().split('T')[0] : '';
+  document.getElementById('el-notes').value     = l.Notes || '';
+  document.getElementById('edit-loan-preview').style.display = 'none';
+  calcEditLoan();
+  openModal('modal-edit-loan');
+}
+
+function calcEditLoan() {
+  const p  = parseFloat(document.getElementById('el-principal').value);
+  const r  = parseFloat(document.getElementById('el-rate').value);
+  const t  = parseInt(document.getElementById('el-term').value);
+  const s  = document.getElementById('el-start').value;
+  const prev = document.getElementById('edit-loan-preview');
+
+  if (s && t) {
+    const end = new Date(s); end.setMonth(end.getMonth() + t);
+    document.getElementById('el-end').value = fDate(end);
+  } else {
+    document.getElementById('el-end').value = '';
+  }
+
+  if (!p || !r || !t) { prev.style.display = 'none'; return; }
+  const interest = p * (r / 100) * t;
+  document.getElementById('el-prev-interest').textContent = peso(interest);
+  document.getElementById('el-prev-total').textContent    = peso(p + interest);
+  document.getElementById('el-prev-monthly').textContent  = peso((p + interest) / t);
+  prev.style.display = 'block';
+}
+
+async function saveEditLoan() {
+  if (_savingEditLoan) return;
+  const principal    = document.getElementById('el-principal').value;
+  const interestRate = document.getElementById('el-rate').value;
+  const termMonths   = document.getElementById('el-term').value;
+  const interestType = document.getElementById('el-itype').value;
+  const startDate    = document.getElementById('el-start').value;
+  const notes        = document.getElementById('el-notes').value.trim();
+
+  if (!principal || !interestRate || !termMonths || !startDate) {
+    toast('Please fill all required fields', 'error'); return;
+  }
+
+  // Build diff for audit trail
+  const snap = _editingLoanSnap;
+  const changes = [];
+  if (String(principal)    !== String(snap.principal))    changes.push({ field: 'Principal',     old: snap.principal,    new: principal });
+  if (String(interestRate) !== String(snap.interestRate)) changes.push({ field: 'Interest Rate', old: snap.interestRate, new: interestRate });
+  if (String(termMonths)   !== String(snap.termMonths))   changes.push({ field: 'Term Months',   old: snap.termMonths,   new: termMonths });
+  if (interestType         !== snap.interestType)         changes.push({ field: 'Interest Type', old: snap.interestType, new: interestType });
+  if (startDate            !== (snap.startDate || '').toString().split('T')[0])
+                                                          changes.push({ field: 'Start Date',    old: snap.startDate,    new: startDate });
+  if (notes                !== snap.notes)                changes.push({ field: 'Notes',         old: snap.notes,        new: notes });
+
+  if (!changes.length) { toast('No changes made'); closeModal('modal-edit-loan'); return; }
+
+  _savingEditLoan = true;
+  const btn = document.getElementById('save-edit-loan-btn');
+  btn.innerHTML = '<span class="spinner"></span> Saving…'; btn.disabled = true;
+
+  const res = await api('editLoan', {
+    id: _editingLoanId, principal, interestRate, termMonths, interestType, startDate, notes, changes
+  });
+
+  btn.textContent = 'Save Changes'; btn.disabled = false;
+  _savingEditLoan = false;
+
+  if (res.error) { toast(res.error, 'error'); return; }
+  toast('Loan updated');
+  closeModal('modal-edit-loan');
+  await Promise.all([loadLoans(), loadDashboard()]);
+}
+
+// ─────────────────────────────────────────────────────────────
+//  AUDIT TRAIL
+// ─────────────────────────────────────────────────────────────
+async function openAuditModal(loanId) {
+  const l = loans.find(x => x.ID === loanId);
+  document.getElementById('audit-borrower').textContent = l ? l.BorrowerName : '';
+  document.getElementById('audit-body').innerHTML = '<div class="empty"><p>Loading…</p></div>';
+  openModal('modal-audit');
+
+  const res = await api('getAuditLog', { loanId });
+  const body = document.getElementById('audit-body');
+  if (!res.data || !res.data.length) {
+    body.innerHTML = '<div class="empty"><div class="empty-icon">📝</div><p>No edit history yet</p></div>';
+    return;
+  }
+  body.innerHTML = res.data.map(e => `
+    <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:12px;font-weight:700;color:var(--navy)">${e.Field}</span>
+        <span style="font-size:11px;color:var(--muted)">${e.Timestamp}</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;font-size:13px;">
+        <span style="background:#FEE2E2;color:#991B1B;padding:3px 10px;border-radius:6px;text-decoration:line-through;">${e.OldValue || '—'}</span>
+        <span style="color:var(--muted)">→</span>
+        <span style="background:#D1FAE5;color:#065F46;padding:3px 10px;border-radius:6px;font-weight:600;">${e.NewValue}</span>
+      </div>
+    </div>
+  `).join('');
+}
 
 // ─────────────────────────────────────────────────────────────
 //  AMORTIZATION SCHEDULE

@@ -29,6 +29,8 @@ function handleRequest(e) {
       case 'addLoan':                  result = addLoan(payload);                  break;
       case 'updateLoan':               result = updateLoan(payload);              break;
       case 'deleteLoan':               result = deleteLoan(payload);              break;
+      case 'editLoan':                 result = editLoan(payload);                break;
+      case 'getAuditLog':              result = getAuditLog(payload);             break;
       case 'getPayments':              result = getPayments(payload);              break;
       case 'addPayment':               result = addPayment(payload);              break;
       case 'deletePayment':            result = deletePayment(payload);            break;
@@ -344,6 +346,65 @@ function getLoanSummaryByBorrower(p) {
   }));
 
   return { totalBorrowed, totalPaid, outstanding, activeCount, loans: loansWithPayment };
+}
+
+// ── EDIT LOAN + AUDIT TRAIL ───────────────────────────────────
+
+const AUDIT_HEADERS = ['ID', 'LoanID', 'BorrowerName', 'Field', 'OldValue', 'NewValue', 'Timestamp'];
+
+function editLoan(p) {
+  const loanSheet  = getOrCreateSheet('Loans', LOAN_HEADERS);
+  const auditSheet = getOrCreateSheet('AuditLog', AUDIT_HEADERS);
+  const loanData   = loanSheet.getDataRange().getValues();
+
+  for (let i = 1; i < loanData.length; i++) {
+    if (loanData[i][0] !== p.id) continue;
+
+    const borrowerName = loanData[i][2];
+    const principal    = parseFloat(p.principal);
+    const rate         = parseFloat(p.interestRate);
+    const term         = parseInt(p.termMonths);
+    const totalInterest = principal * (rate / 100) * term;
+    const totalAmount   = principal + totalInterest;
+    const start         = new Date(p.startDate);
+    const dueDate       = new Date(start);
+    dueDate.setMonth(dueDate.getMonth() + term);
+
+    // Recalculate balance: totalAmount - paidAmount
+    const paidAmount = parseFloat(loanData[i][10]) || 0;
+    const newBalance = Math.max(0, totalAmount - paidAmount);
+
+    // Update loan row
+    loanSheet.getRange(i + 1, 4).setValue(principal);
+    loanSheet.getRange(i + 1, 5).setValue(rate);
+    loanSheet.getRange(i + 1, 6).setValue(p.interestType || 'flat');
+    loanSheet.getRange(i + 1, 7).setValue(term);
+    loanSheet.getRange(i + 1, 8).setValue(p.startDate);
+    loanSheet.getRange(i + 1, 9).setValue(formatDate(dueDate));
+    loanSheet.getRange(i + 1, 10).setValue(totalAmount);
+    loanSheet.getRange(i + 1, 12).setValue(newBalance);
+    loanSheet.getRange(i + 1, 14).setValue(p.notes || '');
+
+    // Write each changed field to audit log
+    const timestamp = Utilities.formatDate(new Date(), 'Asia/Manila', 'MMM dd, yyyy hh:mm a');
+    const changes = typeof p.changes === 'string' ? JSON.parse(p.changes) : (p.changes || []);
+    changes.forEach(c => {
+      auditSheet.appendRow([
+        generateId('AUD'), p.id, borrowerName,
+        c.field, c.old, c.new, timestamp
+      ]);
+    });
+
+    return { success: true };
+  }
+  return { error: 'Loan not found' };
+}
+
+function getAuditLog(p) {
+  const sheet = getOrCreateSheet('AuditLog', AUDIT_HEADERS);
+  const all   = sheetToObjects(sheet);
+  const data  = all.filter(r => r.LoanID === p.loanId).reverse(); // newest first
+  return { data };
 }
 
 // ── SETUP ─────────────────────────────────────────────────────
