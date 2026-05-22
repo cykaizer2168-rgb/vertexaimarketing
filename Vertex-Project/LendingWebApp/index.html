@@ -916,8 +916,10 @@ function renderLoans() {
       <div class="row-card-meta">
         <div class="row-meta-item"><div class="row-meta-label">Principal</div><div class="row-meta-value">${peso(l.Principal)}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Balance</div><div class="row-meta-value" style="${parseFloat(l.Balance)>0?'color:var(--orange)':'color:var(--green)'}">${peso(l.Balance)}</div></div>
-        <div class="row-meta-item"><div class="row-meta-label">Due Date</div><div class="row-meta-value" style="${isOverdue?'color:var(--red)':''}">${fDate(l.DueDate)}</div></div>
+        <div class="row-meta-item"><div class="row-meta-label">Date Borrowed</div><div class="row-meta-value">${fDate(l.StartDate)}</div></div>
+        <div class="row-meta-item"><div class="row-meta-label">Full Repayment</div><div class="row-meta-value" style="${isOverdue?'color:var(--red)':'color:var(--navy);font-weight:700'}">${fDate(l.DueDate)}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Interest</div><div class="row-meta-value">${l.InterestRate}%/mo · ${l.TermMonths}mo</div></div>
+        <div class="row-meta-item"><div class="row-meta-label">Monthly Payment</div><div class="row-meta-value" style="color:var(--blue);font-weight:700">${peso(parseFloat(l.TotalAmount)/parseInt(l.TermMonths))}</div></div>
       </div>
       <div class="row-card-actions">
         ${isActive ? `<button class="btn btn-primary btn-sm" onclick="recordPaymentForLoan('${l.ID}')">💳 Pay</button>` : ''}
@@ -1222,12 +1224,15 @@ function openAmortModal(loanId) {
 
   const monthlyPmt = parseFloat(loan.TotalAmount) / parseInt(loan.TermMonths);
   document.getElementById('amort-summary').innerHTML = `
+    <div class="amort-sum-item"><div class="amort-sum-label">Date Borrowed</div><div class="amort-sum-value">${fDate(loan.StartDate)}</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">Full Repayment</div><div class="amort-sum-value">${fDate(loan.DueDate)}</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">Status</div><div class="amort-sum-value">${loan.Status}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Principal</div><div class="amort-sum-value">${peso(loan.Principal)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Monthly Payment</div><div class="amort-sum-value">${peso(monthlyPmt)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Total Amount</div><div class="amort-sum-value">${peso(loan.TotalAmount)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Amount Paid</div><div class="amort-sum-value" style="color:var(--green)">${peso(loan.PaidAmount || 0)}</div></div>
-    <div class="amort-sum-item"><div class="amort-sum-label">Balance</div><div class="amort-sum-value" style="color:var(--orange)">${peso(loan.Balance)}</div></div>
-    <div class="amort-sum-item"><div class="amort-sum-label">Status</div><div class="amort-sum-value">${loan.Status}</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">Remaining Balance</div><div class="amort-sum-value" style="color:var(--orange)">${peso(loan.Balance)}</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">Term</div><div class="amort-sum-value">${loan.TermMonths} months</div></div>
   `;
 
   document.getElementById('amort-body').innerHTML = _amortSchedule.map(r => `
