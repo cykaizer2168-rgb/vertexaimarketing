@@ -861,6 +861,7 @@ function renderLoans() {
         ${isActive ? `<button class="btn btn-primary btn-sm" onclick="recordPaymentForLoan('${l.ID}')">💳 Pay</button>` : ''}
         ${isActive ? `<button class="btn btn-ghost btn-sm" onclick="markLoan('${l.ID}','Paid')">Mark Paid</button>` : ''}
         ${isActive ? `<button class="btn btn-danger btn-sm" onclick="cancelLoan('${l.ID}','${l.BorrowerName}')">Cancel</button>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="deleteLoan('${l.ID}','${l.BorrowerName}')">Delete</button>
       </div>
     </div>`;
   }).join('');
@@ -949,6 +950,14 @@ async function cancelLoan(id, borrowerName) {
   if (res.error) { toast(res.error, 'error'); return; }
   toast('Loan cancelled');
   await Promise.all([loadLoans(), loadDashboard()]);
+}
+
+async function deleteLoan(id, borrowerName) {
+  if (!confirm(`Delete loan for ${borrowerName}?\n\nThis permanently removes the loan and all its payment records. This cannot be undone.`)) return;
+  const res = await api('deleteLoan', { id });
+  if (res.error) { toast(res.error, 'error'); return; }
+  toast('Loan deleted');
+  await Promise.all([loadLoans(), loadPayments(), loadDashboard()]);
 }
 
 async function markLoan(id, status) {

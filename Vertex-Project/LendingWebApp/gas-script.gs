@@ -28,6 +28,7 @@ function handleRequest(e) {
       case 'getLoans':                 result = getLoans(payload);                 break;
       case 'addLoan':                  result = addLoan(payload);                  break;
       case 'updateLoan':               result = updateLoan(payload);              break;
+      case 'deleteLoan':               result = deleteLoan(payload);              break;
       case 'getPayments':              result = getPayments(payload);              break;
       case 'addPayment':               result = addPayment(payload);              break;
       case 'deletePayment':            result = deletePayment(payload);            break;
@@ -176,6 +177,33 @@ function updateLoan(p) {
     }
   }
   return { error: 'Loan not found' };
+}
+
+function deleteLoan(p) {
+  const loanSheet = getOrCreateSheet('Loans', LOAN_HEADERS);
+  const paySheet  = getOrCreateSheet('Payments', PAYMENT_HEADERS);
+
+  // Delete the loan row
+  const loanData = loanSheet.getDataRange().getValues();
+  let deleted = false;
+  for (let i = 1; i < loanData.length; i++) {
+    if (loanData[i][0] === p.id) {
+      loanSheet.deleteRow(i + 1);
+      deleted = true;
+      break;
+    }
+  }
+  if (!deleted) return { error: 'Loan not found' };
+
+  // Also delete all payment records for this loan
+  let payData = paySheet.getDataRange().getValues();
+  for (let i = payData.length - 1; i >= 1; i--) {
+    if (payData[i][1] === p.id) {
+      paySheet.deleteRow(i + 1);
+    }
+  }
+
+  return { success: true };
 }
 
 // ── PAYMENTS ──────────────────────────────────────────────────
