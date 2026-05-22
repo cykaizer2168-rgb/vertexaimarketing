@@ -139,6 +139,36 @@
   .badge-orange { background: #FEF3C7; color: #92400E; }
   .badge-grey   { background: #F1F5F9; color: #64748B; }
 
+  /* ── AMORTIZATION TABLE ── */
+  .amort-summary {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-bottom: 16px;
+    background: var(--blue-50); border-radius: 10px; padding: 14px 16px;
+  }
+  .amort-sum-item { display: flex; flex-direction: column; gap: 2px; }
+  .amort-sum-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+  .amort-sum-value { font-size: 14px; font-weight: 700; color: var(--navy); }
+  .amort-table-wrap { overflow-x: auto; max-height: 52vh; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; }
+  .amort-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 540px; }
+  .amort-table thead th {
+    background: var(--navy); color: #fff;
+    padding: 9px 12px; text-align: right; white-space: nowrap;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    position: sticky; top: 0; z-index: 1;
+  }
+  .amort-table thead th:first-child { text-align: center; }
+  .amort-table tbody td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: right; color: var(--body); }
+  .amort-table tbody td:first-child { text-align: center; font-weight: 700; color: var(--navy); }
+  .amort-table tbody tr:last-child td { border-bottom: none; }
+  .amort-table tbody tr.row-paid   { background: #F0FDF4; }
+  .amort-table tbody tr.row-overdue { background: #FFF1F2; }
+  .amort-table tbody tr.row-current { background: #EFF6FF; font-weight: 600; }
+  .amort-status { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; }
+  .amort-status.paid     { background: #D1FAE5; color: #065F46; }
+  .amort-status.overdue  { background: #FEE2E2; color: #991B1B; }
+  .amort-status.current  { background: #DBEAFE; color: #1D4ED8; }
+  .amort-status.upcoming { background: #F1F5F9; color: #64748B; }
+
   /* ── MODAL ── */
   .overlay {
     position: fixed; inset: 0; background: rgba(15,23,42,0.6);
@@ -567,6 +597,38 @@
   </div>
 </div>
 
+<!-- Amortization Schedule -->
+<div class="overlay" id="modal-amort">
+  <div class="modal" style="max-height:96dvh;">
+    <div class="modal-drag"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div class="modal-title" id="amort-title" style="margin-bottom:0">Schedule</div>
+      <button class="btn btn-ghost btn-sm" onclick="downloadAmortCSV()">⬇ CSV</button>
+    </div>
+    <div id="amort-borrower" style="font-size:13px;color:var(--muted);margin-bottom:14px;"></div>
+    <div class="amort-summary" id="amort-summary"></div>
+    <div class="amort-table-wrap">
+      <table class="amort-table">
+        <thead>
+          <tr>
+            <th style="text-align:center">#</th>
+            <th>Due Date</th>
+            <th>Payment</th>
+            <th>Principal</th>
+            <th>Interest</th>
+            <th>Balance</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="amort-body"></tbody>
+      </table>
+    </div>
+    <div class="modal-footer" style="margin-top:16px;">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;" onclick="closeModal('modal-amort')">Close</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -860,6 +922,7 @@ function renderLoans() {
       <div class="row-card-actions">
         ${isActive ? `<button class="btn btn-primary btn-sm" onclick="recordPaymentForLoan('${l.ID}')">💳 Pay</button>` : ''}
         ${isActive ? `<button class="btn btn-ghost btn-sm" onclick="markLoan('${l.ID}','Paid')">Mark Paid</button>` : ''}
+        <button class="btn btn-ghost btn-sm" onclick="openAmortModal('${l.ID}')">📋 Schedule</button>
         ${isActive ? `<button class="btn btn-danger btn-sm" onclick="cancelLoan('${l.ID}','${l.BorrowerName}')">Cancel</button>` : ''}
         <button class="btn btn-danger btn-sm" onclick="deleteLoan('${l.ID}','${l.BorrowerName}')">Delete</button>
       </div>
@@ -1106,6 +1169,100 @@ navigateTo = function(sec) {
 document.querySelectorAll('.bnav-item, .nav-item-desktop').forEach(btn => {
   btn.onclick = () => navigateTo(btn.dataset.section);
 });
+
+// ─────────────────────────────────────────────────────────────
+//  AMORTIZATION SCHEDULE
+// ─────────────────────────────────────────────────────────────
+let _amortSchedule = [];
+
+function calcAmortSchedule(loan) {
+  const principal    = parseFloat(loan.Principal);
+  const rate         = parseFloat(loan.InterestRate) / 100; // monthly rate
+  const term         = parseInt(loan.TermMonths);
+  const totalAmount  = parseFloat(loan.TotalAmount);
+  const monthlyPmt   = totalAmount / term;
+  const monthlyInt   = principal * rate;       // flat: same each month
+  const monthlyPrin  = principal / term;       // flat: same each month
+  const start        = new Date(loan.StartDate);
+  const paidAmount   = parseFloat(loan.PaidAmount || 0);
+  // Estimate how many payments have been fully settled
+  const paymentsMade = Math.min(term, Math.round(paidAmount / monthlyPmt));
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  let balance = principal;
+  const rows  = [];
+
+  for (let i = 1; i <= term; i++) {
+    const dueDate = new Date(start);
+    dueDate.setMonth(dueDate.getMonth() + i);
+    dueDate.setHours(0, 0, 0, 0);
+
+    const ending = Math.max(0, balance - monthlyPrin);
+
+    let status;
+    if (i <= paymentsMade)           status = 'paid';
+    else if (dueDate < today)        status = 'overdue';
+    else if (i === paymentsMade + 1) status = 'current';
+    else                             status = 'upcoming';
+
+    rows.push({ month: i, dueDate, payment: monthlyPmt, principal: monthlyPrin, interest: monthlyInt, balance: ending, status });
+    balance = ending;
+  }
+  return rows;
+}
+
+function openAmortModal(loanId) {
+  const loan = loans.find(l => l.ID === loanId);
+  if (!loan) return;
+
+  _amortSchedule = calcAmortSchedule(loan);
+
+  document.getElementById('amort-title').textContent   = 'Amortization Schedule';
+  document.getElementById('amort-borrower').textContent = loan.BorrowerName + ' · ' + loan.TermMonths + ' months @ ' + loan.InterestRate + '%/mo';
+
+  const monthlyPmt = parseFloat(loan.TotalAmount) / parseInt(loan.TermMonths);
+  document.getElementById('amort-summary').innerHTML = `
+    <div class="amort-sum-item"><div class="amort-sum-label">Principal</div><div class="amort-sum-value">${peso(loan.Principal)}</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">Monthly Payment</div><div class="amort-sum-value">${peso(monthlyPmt)}</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">Total Amount</div><div class="amort-sum-value">${peso(loan.TotalAmount)}</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">Amount Paid</div><div class="amort-sum-value" style="color:var(--green)">${peso(loan.PaidAmount || 0)}</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">Balance</div><div class="amort-sum-value" style="color:var(--orange)">${peso(loan.Balance)}</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">Status</div><div class="amort-sum-value">${loan.Status}</div></div>
+  `;
+
+  document.getElementById('amort-body').innerHTML = _amortSchedule.map(r => `
+    <tr class="row-${r.status}">
+      <td>${r.month}</td>
+      <td style="text-align:left">${fDate(r.dueDate)}</td>
+      <td>${peso(r.payment)}</td>
+      <td>${peso(r.principal)}</td>
+      <td>${peso(r.interest)}</td>
+      <td>${peso(r.balance)}</td>
+      <td style="text-align:left"><span class="amort-status ${r.status}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span></td>
+    </tr>
+  `).join('');
+
+  openModal('modal-amort');
+}
+
+function downloadAmortCSV() {
+  if (!_amortSchedule.length) return;
+  const headers = ['Month', 'Due Date', 'Payment', 'Principal', 'Interest', 'Ending Balance', 'Status'];
+  const rows = _amortSchedule.map(r => [
+    r.month,
+    fDate(r.dueDate),
+    r.payment.toFixed(2),
+    r.principal.toFixed(2),
+    r.interest.toFixed(2),
+    r.balance.toFixed(2),
+    r.status
+  ]);
+  const csv  = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a'); a.href = url; a.download = 'amortization.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
 
 // Show desktop sidebar on wide screens
 if (window.innerWidth >= 768) {
