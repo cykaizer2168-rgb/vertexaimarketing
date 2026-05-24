@@ -148,7 +148,7 @@
   .amort-sum-item { display: flex; flex-direction: column; gap: 2px; }
   .amort-sum-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
   .amort-sum-value { font-size: 14px; font-weight: 700; color: var(--navy); }
-  .amort-table-wrap { overflow-x: auto; max-height: 52vh; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; }
+  .amort-table-wrap { overflow-x: auto; max-height: 56vh; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; }
   .amort-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 540px; }
   .amort-table thead th {
     background: var(--navy); color: #fff;
@@ -168,6 +168,29 @@
   .amort-status.overdue  { background: #FEE2E2; color: #991B1B; }
   .amort-status.current  { background: #DBEAFE; color: #1D4ED8; }
   .amort-status.upcoming { background: #F1F5F9; color: #64748B; }
+
+  /* ── PAYMENT METHOD CARDS ── */
+  .pay-method-group { display: flex; gap: 10px; margin-top: 4px; }
+  .pay-method-card { flex: 1; position: relative; }
+  .pay-method-card input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+  .pay-method-label {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 12px 8px; border: 1.5px solid var(--border); border-radius: 10px;
+    cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    font-size: 12px; font-weight: 600; color: var(--navy); text-align: center;
+    background: #fff;
+  }
+  .pay-method-label .pm-icon { font-size: 22px; }
+  .pay-method-card input:checked + .pay-method-label {
+    border-color: var(--blue); background: var(--blue-50); color: var(--blue);
+  }
+  .attach-drop {
+    border: 2px dashed var(--border); border-radius: 10px; padding: 20px;
+    text-align: center; cursor: pointer; transition: border-color 0.15s;
+    font-size: 13px; color: var(--muted);
+  }
+  .attach-drop:hover { border-color: var(--blue); color: var(--blue); }
+  .attach-drop.has-file { border-color: var(--green); background: #F0FDF4; color: #065F46; }
 
   /* ── MODAL ── */
   .overlay {
@@ -311,6 +334,7 @@
     .stat-value { font-size: 28px; }
     .dash-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .modal { border-radius: 14px; max-width: 480px; padding: 28px; animation: none; }
+    #modal-amort .modal { max-width: 860px; }
     .modal-drag { display: none; }
     .overlay { align-items: center; }
     .search-wrap input { width: 220px; }
@@ -408,6 +432,29 @@
           </div>
         </div>
       </div>
+
+      <div class="card" style="margin-top:20px;">
+        <div class="card-header">
+          <div class="card-title">Repayment Overdue</div>
+          <span id="d-repayment-overdue-count" class="badge badge-red" style="display:none;"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Borrower</th>
+                <th style="text-align:center">Period</th>
+                <th>Due Date</th>
+                <th>Amount</th>
+                <th>Days Late</th>
+              </tr>
+            </thead>
+            <tbody id="d-repayment-overdue">
+              <tr><td colspan="5"><div class="empty"><p>Loading…</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- ── BORROWERS ── -->
@@ -499,6 +546,11 @@
         <input class="form-input" id="b-address" placeholder="City, Province" />
       </div>
       <div class="form-group full">
+        <label class="form-label">Facebook Messenger Link</label>
+        <input class="form-input" id="b-messenger" placeholder="https://m.me/username or facebook.com/name" />
+        <div style="font-size:11px;color:var(--muted);margin-top:3px;">Used for sending payment reminders</div>
+      </div>
+      <div class="form-group full">
         <label class="form-label">Notes</label>
         <textarea class="form-textarea" id="b-notes" placeholder="Optional notes…"></textarea>
       </div>
@@ -533,10 +585,11 @@
         <input class="form-input" id="l-term" type="number" placeholder="6" oninput="calcLoan()" />
       </div>
       <div class="form-group">
-        <label class="form-label">Interest Type</label>
-        <select class="form-select" id="l-itype" onchange="calcLoan()">
+        <label class="form-label">Repayment Frequency</label>
+        <select class="form-select" id="l-freq" onchange="calcLoan()">
           <option value="monthly">Monthly</option>
-          <option value="flat">Flat</option>
+          <option value="semi-monthly">Semi-Monthly</option>
+          <option value="weekly">Weekly</option>
         </select>
       </div>
       <div class="form-group">
@@ -559,7 +612,7 @@
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
         <div><div style="font-size:11px;color:var(--muted)">Total Interest</div><div id="prev-interest" style="font-size:15px;font-weight:700;color:var(--navy)">—</div></div>
         <div><div style="font-size:11px;color:var(--muted)">Total Amount</div><div id="prev-total" style="font-size:15px;font-weight:700;color:var(--blue)">—</div></div>
-        <div><div style="font-size:11px;color:var(--muted)">Monthly Payment</div><div id="prev-monthly" style="font-size:15px;font-weight:700;color:var(--navy)">—</div></div>
+        <div><div style="font-size:11px;color:var(--muted)" id="prev-monthly-label">Payment / mo</div><div id="prev-monthly" style="font-size:15px;font-weight:700;color:var(--navy)">—</div></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -622,10 +675,11 @@
         <input class="form-input" id="el-term" type="number" oninput="calcEditLoan()" />
       </div>
       <div class="form-group">
-        <label class="form-label">Interest Type</label>
-        <select class="form-select" id="el-itype" onchange="calcEditLoan()">
-          <option value="flat">Flat</option>
+        <label class="form-label">Repayment Frequency</label>
+        <select class="form-select" id="el-freq" onchange="calcEditLoan()">
           <option value="monthly">Monthly</option>
+          <option value="semi-monthly">Semi-Monthly</option>
+          <option value="weekly">Weekly</option>
         </select>
       </div>
       <div class="form-group">
@@ -646,7 +700,7 @@
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
         <div><div style="font-size:11px;color:var(--muted)">Total Interest</div><div id="el-prev-interest" style="font-size:14px;font-weight:700;color:var(--navy)">—</div></div>
         <div><div style="font-size:11px;color:var(--muted)">Total Amount</div><div id="el-prev-total" style="font-size:14px;font-weight:700;color:var(--blue)">—</div></div>
-        <div><div style="font-size:11px;color:var(--muted)">Monthly Payment</div><div id="el-prev-monthly" style="font-size:14px;font-weight:700;color:var(--navy)">—</div></div>
+        <div><div style="font-size:11px;color:var(--muted)" id="el-prev-monthly-label">Payment / mo</div><div id="el-prev-monthly" style="font-size:14px;font-weight:700;color:var(--navy)">—</div></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -690,6 +744,7 @@
             <th>Interest</th>
             <th>Balance</th>
             <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody id="amort-body"></tbody>
@@ -701,13 +756,67 @@
   </div>
 </div>
 
+<!-- Amort Pay Modal -->
+<div class="overlay" id="modal-amort-pay">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <div class="modal-title">Record Payment</div>
+    <div id="amort-pay-meta" style="font-size:13px;color:var(--muted);margin:-10px 0 16px;"></div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Amount (₱)</label>
+        <input class="form-input" id="ap-amount" type="number" readonly
+          style="background:var(--bg);font-weight:700;color:var(--blue);cursor:default;" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payment Date *</label>
+        <input class="form-input" id="ap-date" type="date" />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Payment Method *</label>
+        <div class="pay-method-group">
+          <label class="pay-method-card">
+            <input type="radio" name="ap-method" value="Cash" onchange="onPayMethodChange()" />
+            <span class="pay-method-label"><span class="pm-icon">💵</span>Cash</span>
+          </label>
+          <label class="pay-method-card">
+            <input type="radio" name="ap-method" value="GCash" onchange="onPayMethodChange()" />
+            <span class="pay-method-label"><span class="pm-icon">📱</span>GCash</span>
+          </label>
+          <label class="pay-method-card">
+            <input type="radio" name="ap-method" value="Bank Transfer" onchange="onPayMethodChange()" />
+            <span class="pay-method-label"><span class="pm-icon">🏦</span>Bank Transfer</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-group full" id="ap-attach-wrap" style="display:none;">
+        <label class="form-label">Receipt / Proof of Payment *</label>
+        <div class="attach-drop" id="ap-drop-zone" onclick="document.getElementById('ap-attachment').click()">
+          <div>📎 Click to attach receipt</div>
+          <div style="font-size:11px;margin-top:4px;">JPG, PNG, PDF — max 10MB</div>
+        </div>
+        <input type="file" id="ap-attachment" accept="image/*,application/pdf" style="display:none;"
+          onchange="onAttachmentChange()" />
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Notes</label>
+        <input class="form-input" id="ap-notes" placeholder="Optional" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-amort-pay')">Cancel</button>
+      <button class="btn btn-primary" id="ap-submit-btn" onclick="confirmAmortPayment()">Confirm Payment</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 // ─────────────────────────────────────────────────────────────
 //  CONFIG — paste your deployed GAS web app URL here
 // ─────────────────────────────────────────────────────────────
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyc3WOeBU4V5IrWZPSeG0-0_gS2ejUGWt7ZSt4Bcec9knDzHtNu9lMSF3joKesK3_VkKQ/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyAj4DyhuJWCsXrs2_C_gQkn1yDKWJAwWS5KjChURq1hk0DMLbtq8Lr_3Jj2U_QzPY2lw/exec';
 
 // ─────────────────────────────────────────────────────────────
 //  STATE
@@ -821,6 +930,50 @@ const today = () => new Date().toISOString().split('T')[0];
 // ─────────────────────────────────────────────────────────────
 //  DASHBOARD
 // ─────────────────────────────────────────────────────────────
+function renderOverdueRepayments() {
+  const el = document.getElementById('d-repayment-overdue');
+  if (!el) return;
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const overdueRows = [];
+
+  loans
+    .filter(l => l.Status === 'Active')
+    .forEach(loan => {
+      calcAmortSchedule(loan)
+        .filter(r => r.status === 'overdue')
+        .forEach(r => {
+          const daysLate = Math.floor((today - r.dueDate) / 864e5);
+          overdueRows.push({
+            loanId: loan.ID, borrowerName: loan.BorrowerName,
+            period: r.month, dueDate: r.dueDate,
+            amount: r.payment, daysLate,
+          });
+        });
+    });
+
+  overdueRows.sort((a, b) => b.daysLate - a.daysLate);
+
+  const countEl = document.getElementById('d-repayment-overdue-count');
+  if (overdueRows.length) {
+    countEl.textContent = overdueRows.length + ' overdue';
+    countEl.style.display = 'inline-block';
+  } else {
+    countEl.style.display = 'none';
+  }
+
+  el.innerHTML = overdueRows.length
+    ? overdueRows.map(r => `
+      <tr>
+        <td class="td-name">${r.borrowerName}</td>
+        <td style="text-align:center;font-weight:700;color:var(--navy)">#${r.period}</td>
+        <td style="color:var(--red)">${fDate(r.dueDate)}</td>
+        <td style="font-weight:700;color:var(--navy)">${peso(r.amount)}</td>
+        <td><span style="background:#FEE2E2;color:#991B1B;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;">${r.daysLate}d late</span></td>
+      </tr>`).join('')
+    : '<tr><td colspan="5"><div class="empty"><p>All repayments are up to date</p></div></td></tr>';
+}
+
 async function loadDashboard() {
   const res = await api('getDashboard');
   if (res.error) return;
@@ -863,7 +1016,7 @@ async function loadBorrowers() {
 function renderBorrowers() {
   const q = (document.getElementById('borrower-search').value || '').toLowerCase();
   const filtered = borrowers.filter(b =>
-    b.Name.toLowerCase().includes(q) || (b.Phone || '').includes(q)
+    b.Name.toLowerCase().includes(q) || String(b.Phone || '').includes(q)
   );
   const list = document.getElementById('borrowers-list');
 
@@ -882,6 +1035,7 @@ function renderBorrowers() {
       <div class="row-card-meta">
         <div class="row-meta-item"><div class="row-meta-label">Phone</div><div class="row-meta-value">${b.Phone || '—'}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Address</div><div class="row-meta-value">${b.Address || '—'}</div></div>
+        ${b.MessengerUrl ? `<div class="row-meta-item"><div class="row-meta-label">Messenger</div><div class="row-meta-value"><a href="${b.MessengerUrl}" target="_blank" style="color:var(--blue);font-weight:600;font-size:13px;text-decoration:none;">💬 Open Chat</a></div></div>` : ''}
       </div>
       <div class="row-card-actions">
         <button class="btn btn-ghost btn-sm" onclick="editBorrower('${b.ID}')">Edit</button>
@@ -895,7 +1049,7 @@ function filterBorrowers() { renderBorrowers(); }
 
 function openAddBorrowerModal() {
   editBorrowerId = null;
-  ['b-name','b-phone','b-address','b-notes'].forEach(id => document.getElementById(id).value = '');
+  ['b-name','b-phone','b-address','b-messenger','b-notes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('borrower-modal-title').textContent = 'Add Borrower';
   openModal('modal-borrower');
 }
@@ -904,10 +1058,11 @@ function editBorrower(id) {
   const b = borrowers.find(x => x.ID === id);
   if (!b) return;
   editBorrowerId = id;
-  document.getElementById('b-name').value    = b.Name    || '';
-  document.getElementById('b-phone').value   = b.Phone   || '';
-  document.getElementById('b-address').value = b.Address || '';
-  document.getElementById('b-notes').value   = b.Notes   || '';
+  document.getElementById('b-name').value      = b.Name         != null ? String(b.Name)         : '';
+  document.getElementById('b-phone').value     = b.Phone        != null ? String(b.Phone)        : '';
+  document.getElementById('b-address').value   = b.Address      != null ? String(b.Address)      : '';
+  document.getElementById('b-messenger').value = b.MessengerUrl != null ? String(b.MessengerUrl) : '';
+  document.getElementById('b-notes').value     = b.Notes        != null ? String(b.Notes)        : '';
   document.getElementById('borrower-modal-title').textContent = 'Edit Borrower';
   openModal('modal-borrower');
 }
@@ -923,8 +1078,9 @@ async function saveBorrower() {
 
   const payload = {
     name, phone,
-    address: document.getElementById('b-address').value.trim(),
-    notes:   document.getElementById('b-notes').value.trim(),
+    address:      document.getElementById('b-address').value.trim(),
+    messengerUrl: document.getElementById('b-messenger').value.trim(),
+    notes:        document.getElementById('b-notes').value.trim(),
   };
 
   let res;
@@ -972,6 +1128,8 @@ function renderLoans() {
     return;
   }
 
+  renderOverdueRepayments();
+
   listEl.innerHTML = filtered.map(l => {
     const isOverdue = l.Status === 'Active' && new Date(l.DueDate) < now;
     const status    = isOverdue ? 'Overdue' : l.Status;
@@ -980,6 +1138,13 @@ function renderLoans() {
                     : status === 'Cancelled' ? 'badge-grey'
                     : 'badge-blue';
     const isActive  = l.Status === 'Active';
+    const lBorrower = borrowers.find(b => b.ID === l.BorrowerID);
+    const lMessenger = lBorrower?.MessengerUrl || '';
+    const lFreq     = ['monthly','semi-monthly','weekly'].includes(l.InterestType) ? l.InterestType : 'monthly';
+    const lPpm      = lFreq === 'weekly' ? 4 : lFreq === 'semi-monthly' ? 2 : 1;
+    const lPeriods  = parseInt(l.TermMonths) * lPpm;
+    const lPmt      = parseFloat(l.TotalAmount) / Math.max(1, lPeriods);
+    const lPmtLabel = lFreq === 'weekly' ? 'Payment/Week' : lFreq === 'semi-monthly' ? 'Payment/2Wks' : 'Monthly Pay';
     return `<div class="row-card">
       <div class="row-card-top">
         <div class="row-card-name">${l.BorrowerName}</div>
@@ -991,11 +1156,11 @@ function renderLoans() {
         <div class="row-meta-item"><div class="row-meta-label">Date Borrowed</div><div class="row-meta-value">${fDate(l.StartDate)}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Full Repayment</div><div class="row-meta-value" style="${isOverdue?'color:var(--red)':'color:var(--navy);font-weight:700'}">${fDate(l.DueDate)}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Interest</div><div class="row-meta-value">${l.InterestRate}%/mo · ${l.TermMonths}mo</div></div>
-        <div class="row-meta-item"><div class="row-meta-label">Monthly Payment</div><div class="row-meta-value" style="color:var(--blue);font-weight:700">${peso(parseFloat(l.TotalAmount)/parseInt(l.TermMonths))}</div></div>
+        <div class="row-meta-item"><div class="row-meta-label">${lPmtLabel}</div><div class="row-meta-value" style="color:var(--blue);font-weight:700">${peso(lPmt)}</div></div>
       </div>
       <div class="row-card-actions">
         ${isActive ? `<button class="btn btn-primary btn-sm" onclick="recordPaymentForLoan('${l.ID}')">💳 Pay</button>` : ''}
-        ${isActive ? `<button class="btn btn-ghost btn-sm" onclick="markLoan('${l.ID}','Paid')">Mark Paid</button>` : ''}
+        ${isActive && lMessenger ? `<button class="btn btn-ghost btn-sm" onclick="sendMessengerReminder('${l.ID}')" style="color:#1877F2;border-color:#1877F2;">📨 Remind</button>` : ''}
         <button class="btn btn-ghost btn-sm" onclick="openEditLoanModal('${l.ID}')">✏️ Edit</button>
         <button class="btn btn-ghost btn-sm" onclick="openAuditModal('${l.ID}')">🕓 History</button>
         <button class="btn btn-ghost btn-sm" onclick="openAmortModal('${l.ID}')">📋 Schedule</button>
@@ -1019,19 +1184,20 @@ function openNewLoanModal() {
   document.getElementById('l-notes').value = '';
   document.getElementById('l-start').value = today();
   document.getElementById('l-end').value = '';
+  document.getElementById('l-freq').value = 'monthly';
   document.getElementById('loan-preview').style.display = 'none';
   openModal('modal-loan');
 }
 
 function calcLoan() {
-  const p       = parseFloat(document.getElementById('l-principal').value);
-  const r       = parseFloat(document.getElementById('l-rate').value);
-  const t       = parseInt(document.getElementById('l-term').value);
+  const p        = parseFloat(document.getElementById('l-principal').value);
+  const r        = parseFloat(document.getElementById('l-rate').value);
+  const t        = parseInt(document.getElementById('l-term').value);
+  const freq     = document.getElementById('l-freq').value;
   const startVal = document.getElementById('l-start').value;
-  const prev    = document.getElementById('loan-preview');
-  const endEl   = document.getElementById('l-end');
+  const prev     = document.getElementById('loan-preview');
+  const endEl    = document.getElementById('l-end');
 
-  // Auto-calculate repayment end date from start + term
   if (startVal && t) {
     const endDate = new Date(startVal);
     endDate.setMonth(endDate.getMonth() + t);
@@ -1042,13 +1208,17 @@ function calcLoan() {
 
   if (!p || !r || !t) { prev.style.display = 'none'; return; }
 
-  const interest = p * (r / 100) * t;
-  const total    = p + interest;
-  const monthly  = total / t;
+  const interest        = p * (r / 100) * t;
+  const total           = p + interest;
+  const periodsPerMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
+  const totalPeriods    = t * periodsPerMonth;
+  const periodPayment   = total / totalPeriods;
+  const freqLabel       = freq === 'weekly' ? 'Payment / week' : freq === 'semi-monthly' ? 'Payment / 2 wks' : 'Payment / mo';
 
-  document.getElementById('prev-interest').textContent = peso(interest);
-  document.getElementById('prev-total').textContent    = peso(total);
-  document.getElementById('prev-monthly').textContent  = peso(monthly);
+  document.getElementById('prev-interest').textContent      = peso(interest);
+  document.getElementById('prev-total').textContent         = peso(total);
+  document.getElementById('prev-monthly').textContent       = peso(periodPayment);
+  document.getElementById('prev-monthly-label').textContent = freqLabel;
   prev.style.display = 'block';
 }
 
@@ -1080,7 +1250,7 @@ async function saveLoan() {
     borrowerId:   bId,
     borrowerName: bName,
     principal, interestRate: rate, termMonths: term,
-    interestType: document.getElementById('l-itype').value,
+    interestType: document.getElementById('l-freq').value,
     startDate:    start,
     notes:        document.getElementById('l-notes').value,
   });
@@ -1093,6 +1263,48 @@ async function saveLoan() {
   toast('Loan created! Total: ' + peso(res.totalAmount));
   closeModal('modal-loan');
   await loadLoans();
+}
+
+function sendMessengerReminder(loanId) {
+  const loan     = loans.find(l => l.ID === loanId);
+  const borrower = borrowers.find(b => b.ID === loan?.BorrowerID);
+  if (!loan || !borrower?.MessengerUrl) return;
+
+  const freq    = ['monthly','semi-monthly','weekly'].includes(loan.InterestType) ? loan.InterestType : 'monthly';
+  const ppm     = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
+  const pmt     = parseFloat(loan.TotalAmount) / Math.max(1, parseInt(loan.TermMonths) * ppm);
+  const schedule = calcAmortSchedule(loan);
+  const overdue  = schedule.filter(r => r.status === 'overdue');
+  const nextDue  = schedule.find(r => r.status === 'current' || r.status === 'upcoming');
+
+  let message;
+  if (overdue.length > 0) {
+    const totalOverdue = overdue.reduce((s, r) => s + r.payment, 0);
+    message =
+      `Hi ${loan.BorrowerName}! 👋\n\n` +
+      `Ito ay paalala na mayroon kang ${overdue.length} nahuling bayad.\n\n` +
+      `💰 Kabuuang nahuling bayad: ₱${totalOverdue.toLocaleString('en-PH', {minimumFractionDigits:2})}\n\n` +
+      `Pakibayaran na po agad para maiwasan ang karagdagang singil. Salamat po! 🙏`;
+  } else if (nextDue) {
+    message =
+      `Hi ${loan.BorrowerName}! 👋\n\n` +
+      `Paalala lang po na ang iyong susunod na bayad ay:\n\n` +
+      `💰 Halaga: ₱${pmt.toLocaleString('en-PH', {minimumFractionDigits:2})}\n` +
+      `📅 Petsa: ${fDate(nextDue.dueDate)}\n\n` +
+      `Salamat po at ingat lagi! 🙏`;
+  } else {
+    message =
+      `Hi ${loan.BorrowerName}! 👋\n\n` +
+      `Paalala lang po tungkol sa iyong utang.\n` +
+      `💰 Natitirang balanse: ₱${parseFloat(loan.Balance).toLocaleString('en-PH', {minimumFractionDigits:2})}\n\n` +
+      `Salamat po! 🙏`;
+  }
+
+  navigator.clipboard.writeText(message)
+    .then(() => toast('Message copied! Opening Messenger…'))
+    .catch(() => toast('Opening Messenger…'));
+
+  window.open(borrower.MessengerUrl, '_blank');
 }
 
 async function cancelLoan(id, borrowerName) {
@@ -1128,26 +1340,52 @@ async function loadPayments() {
   renderPayments();
 }
 
+function parsePaymentNotes(raw) {
+  if (!raw) return { method: null, receiptUrl: null, notes: '' };
+  const parts = raw.split(' | ');
+  let method = null, receiptUrl = null, notesParts = [];
+  for (const part of parts) {
+    const mMethod  = part.match(/^\[(.+?)\]$/);
+    const mReceipt = part.match(/^Receipt:\s*(https?:\/\/.+)$/);
+    if (mMethod)        method     = mMethod[1];
+    else if (mReceipt)  receiptUrl = mReceipt[1];
+    else if (part.trim()) notesParts.push(part.trim());
+  }
+  return { method, receiptUrl, notes: notesParts.join(' | ') };
+}
+
 function renderPayments() {
   const listEl = document.getElementById('payments-list');
   if (!payments.length) {
     listEl.innerHTML = '<div class="empty"><div class="empty-icon">💳</div><p>No payments recorded</p></div>';
     return;
   }
+  const methodIcon  = { 'Cash': '💵', 'GCash': '📱', 'Bank Transfer': '🏦' };
+  const methodColor = { 'Cash': '#065F46', 'GCash': '#1D4ED8', 'Bank Transfer': '#7C3AED' };
+  const methodBg    = { 'Cash': '#D1FAE5', 'GCash': '#DBEAFE', 'Bank Transfer': '#EDE9FE' };
+
   const sorted = [...payments].sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt));
-  listEl.innerHTML = sorted.map(p => `<div class="row-card">
+  listEl.innerHTML = sorted.map(p => {
+    const { method, receiptUrl, notes } = parsePaymentNotes(p.Notes);
+    const icon  = method ? (methodIcon[method]  || '💳') : null;
+    const color = method ? (methodColor[method] || 'var(--navy)') : null;
+    const bg    = method ? (methodBg[method]    || '#F1F5F9') : null;
+    return `<div class="row-card">
     <div class="row-card-top">
       <div class="row-card-name">${p.BorrowerName}</div>
       <div style="font-size:18px;font-weight:800;color:var(--green)">${peso(p.Amount)}</div>
     </div>
     <div class="row-card-meta">
       <div class="row-meta-item"><div class="row-meta-label">Date</div><div class="row-meta-value">${fDate(p.Date)}</div></div>
-      ${p.Notes ? `<div class="row-meta-item"><div class="row-meta-label">Notes</div><div class="row-meta-value">${p.Notes}</div></div>` : ''}
+      ${method ? `<div class="row-meta-item"><div class="row-meta-label">Method</div><div class="row-meta-value"><span style="background:${bg};color:${color};padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;">${icon} ${method}</span></div></div>` : ''}
+      ${receiptUrl ? `<div class="row-meta-item"><div class="row-meta-label">Receipt</div><div class="row-meta-value"><a href="${receiptUrl}" target="_blank" style="color:var(--blue);font-weight:600;font-size:13px;text-decoration:none;">📎 View Receipt</a></div></div>` : ''}
+      ${notes ? `<div class="row-meta-item"><div class="row-meta-label">Notes</div><div class="row-meta-value">${notes}</div></div>` : ''}
     </div>
     <div class="row-card-actions">
       <button class="btn btn-danger btn-sm" onclick="deletePayment('${p.ID}')">Delete</button>
     </div>
-  </div>`).join('');
+  </div>`;
+  }).join('');
 }
 
 function openNewPaymentModal() {
@@ -1165,12 +1403,13 @@ function openNewPaymentModal() {
 }
 
 function recordPaymentForLoan(loanId) {
-  openNewPaymentModal();
-  const sel = document.getElementById('p-loan');
-  for (let opt of sel.options) {
-    if (opt.value === loanId) { sel.value = loanId; break; }
-  }
-  onLoanSelect();
+  const loan = loans.find(l => l.ID === loanId);
+  if (!loan) return;
+  _payFromAmort = false;
+  const freq    = ['monthly','semi-monthly','weekly'].includes(loan.InterestType) ? loan.InterestType : 'monthly';
+  const ppm     = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
+  const pmt     = parseFloat(loan.TotalAmount) / Math.max(1, parseInt(loan.TermMonths) * ppm);
+  _openPayModal(loanId, loan.BorrowerName + ' · Balance: ' + peso(loan.Balance), pmt, true);
 }
 
 function onLoanSelect() {
@@ -1282,7 +1521,7 @@ function openEditLoanModal(loanId) {
   document.getElementById('el-principal').value = l.Principal;
   document.getElementById('el-rate').value      = l.InterestRate;
   document.getElementById('el-term').value      = l.TermMonths;
-  document.getElementById('el-itype').value     = l.InterestType || 'flat';
+  document.getElementById('el-freq').value      = ['monthly','semi-monthly','weekly'].includes(l.InterestType) ? l.InterestType : 'monthly';
   document.getElementById('el-start').value     = l.StartDate ? l.StartDate.toString().split('T')[0] : '';
   document.getElementById('el-notes').value     = l.Notes || '';
   document.getElementById('edit-loan-preview').style.display = 'none';
@@ -1291,10 +1530,11 @@ function openEditLoanModal(loanId) {
 }
 
 function calcEditLoan() {
-  const p  = parseFloat(document.getElementById('el-principal').value);
-  const r  = parseFloat(document.getElementById('el-rate').value);
-  const t  = parseInt(document.getElementById('el-term').value);
-  const s  = document.getElementById('el-start').value;
+  const p    = parseFloat(document.getElementById('el-principal').value);
+  const r    = parseFloat(document.getElementById('el-rate').value);
+  const t    = parseInt(document.getElementById('el-term').value);
+  const freq = document.getElementById('el-freq').value;
+  const s    = document.getElementById('el-start').value;
   const prev = document.getElementById('edit-loan-preview');
 
   if (s && t) {
@@ -1305,10 +1545,16 @@ function calcEditLoan() {
   }
 
   if (!p || !r || !t) { prev.style.display = 'none'; return; }
-  const interest = p * (r / 100) * t;
-  document.getElementById('el-prev-interest').textContent = peso(interest);
-  document.getElementById('el-prev-total').textContent    = peso(p + interest);
-  document.getElementById('el-prev-monthly').textContent  = peso((p + interest) / t);
+  const interest        = p * (r / 100) * t;
+  const total           = p + interest;
+  const periodsPerMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
+  const totalPeriods    = t * periodsPerMonth;
+  const freqLabel       = freq === 'weekly' ? 'Payment / week' : freq === 'semi-monthly' ? 'Payment / 2 wks' : 'Payment / mo';
+
+  document.getElementById('el-prev-interest').textContent      = peso(interest);
+  document.getElementById('el-prev-total').textContent         = peso(total);
+  document.getElementById('el-prev-monthly').textContent       = peso(total / totalPeriods);
+  document.getElementById('el-prev-monthly-label').textContent = freqLabel;
   prev.style.display = 'block';
 }
 
@@ -1317,7 +1563,7 @@ async function saveEditLoan() {
   const principal    = document.getElementById('el-principal').value;
   const interestRate = document.getElementById('el-rate').value;
   const termMonths   = document.getElementById('el-term').value;
-  const interestType = document.getElementById('el-itype').value;
+  const interestType = document.getElementById('el-freq').value;
   const startDate    = document.getElementById('el-start').value;
   const notes        = document.getElementById('el-notes').value.trim();
 
@@ -1331,7 +1577,7 @@ async function saveEditLoan() {
   if (String(principal)    !== String(snap.principal))    changes.push({ field: 'Principal',     old: snap.principal,    new: principal });
   if (String(interestRate) !== String(snap.interestRate)) changes.push({ field: 'Interest Rate', old: snap.interestRate, new: interestRate });
   if (String(termMonths)   !== String(snap.termMonths))   changes.push({ field: 'Term Months',   old: snap.termMonths,   new: termMonths });
-  if (interestType         !== snap.interestType)         changes.push({ field: 'Interest Type', old: snap.interestType, new: interestType });
+  if (interestType         !== snap.interestType)         changes.push({ field: 'Repayment Frequency', old: snap.interestType, new: interestType });
   if (startDate            !== (snap.startDate || '').toString().split('T')[0])
                                                           changes.push({ field: 'Start Date',    old: snap.startDate,    new: startDate });
   if (notes                !== snap.notes)                changes.push({ field: 'Notes',         old: snap.notes,        new: notes });
@@ -1397,30 +1643,35 @@ function openAuditModal(loanId) {
 //  AMORTIZATION SCHEDULE
 // ─────────────────────────────────────────────────────────────
 let _amortSchedule = [];
+let _amortLoanId   = null;
 
 function calcAmortSchedule(loan) {
-  const principal    = parseFloat(loan.Principal);
-  const rate         = parseFloat(loan.InterestRate) / 100; // monthly rate
-  const term         = parseInt(loan.TermMonths);
-  const totalAmount  = parseFloat(loan.TotalAmount);
-  const monthlyPmt   = totalAmount / term;
-  const monthlyInt   = principal * rate;       // flat: same each month
-  const monthlyPrin  = principal / term;       // flat: same each month
-  const start        = new Date(loan.StartDate);
-  const paidAmount   = parseFloat(loan.PaidAmount || 0);
-  // Estimate how many payments have been fully settled
-  const paymentsMade = Math.min(term, Math.round(paidAmount / monthlyPmt));
+  const principal       = parseFloat(loan.Principal);
+  const rate            = parseFloat(loan.InterestRate) / 100;
+  const term            = parseInt(loan.TermMonths);
+  const totalAmount     = parseFloat(loan.TotalAmount);
+  const freq            = ['monthly','semi-monthly','weekly'].includes(loan.InterestType) ? loan.InterestType : 'monthly';
+  const periodsPerMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
+  const totalPeriods    = term * periodsPerMonth;
+  const periodPmt       = totalAmount / totalPeriods;
+  const periodInt       = (principal * rate) / periodsPerMonth; // flat: spread evenly
+  const periodPrin      = principal / totalPeriods;
+  const start           = new Date(loan.StartDate);
+  const paidAmount      = parseFloat(loan.PaidAmount || 0);
+  const paymentsMade    = Math.min(totalPeriods, Math.round(paidAmount / periodPmt));
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
   let balance = principal;
   const rows  = [];
 
-  for (let i = 1; i <= term; i++) {
+  for (let i = 1; i <= totalPeriods; i++) {
     const dueDate = new Date(start);
-    dueDate.setMonth(dueDate.getMonth() + i);
+    if (freq === 'weekly')       dueDate.setDate(dueDate.getDate() + i * 7);
+    else if (freq === 'semi-monthly') dueDate.setDate(dueDate.getDate() + i * 14);
+    else                         dueDate.setMonth(dueDate.getMonth() + i);
     dueDate.setHours(0, 0, 0, 0);
 
-    const ending = Math.max(0, balance - monthlyPrin);
+    const ending = Math.max(0, balance - periodPrin);
 
     let status;
     if (i <= paymentsMade)           status = 'paid';
@@ -1428,7 +1679,7 @@ function calcAmortSchedule(loan) {
     else if (i === paymentsMade + 1) status = 'current';
     else                             status = 'upcoming';
 
-    rows.push({ month: i, dueDate, payment: monthlyPmt, principal: monthlyPrin, interest: monthlyInt, balance: ending, status });
+    rows.push({ month: i, dueDate, payment: periodPmt, principal: periodPrin, interest: periodInt, balance: ending, status });
     balance = ending;
   }
   return rows;
@@ -1438,25 +1689,38 @@ function openAmortModal(loanId) {
   const loan = loans.find(l => l.ID === loanId);
   if (!loan) return;
 
+  _amortLoanId   = loanId;
   _amortSchedule = calcAmortSchedule(loan);
 
-  document.getElementById('amort-title').textContent   = 'Amortization Schedule';
-  document.getElementById('amort-borrower').textContent = loan.BorrowerName + ' · ' + loan.TermMonths + ' months @ ' + loan.InterestRate + '%/mo';
+  const aFreq     = ['monthly','semi-monthly','weekly'].includes(loan.InterestType) ? loan.InterestType : 'monthly';
+  const aPpm      = aFreq === 'weekly' ? 4 : aFreq === 'semi-monthly' ? 2 : 1;
+  const aPeriods  = parseInt(loan.TermMonths) * aPpm;
+  const aPmt      = parseFloat(loan.TotalAmount) / Math.max(1, aPeriods);
+  const aFreqName = aFreq === 'weekly' ? 'Weekly' : aFreq === 'semi-monthly' ? 'Semi-Monthly' : 'Monthly';
+  const aPmtLabel = aFreq === 'weekly' ? 'Payment/Week' : aFreq === 'semi-monthly' ? 'Payment/2 Wks' : 'Monthly Pay';
 
-  const monthlyPmt = parseFloat(loan.TotalAmount) / parseInt(loan.TermMonths);
+  document.getElementById('amort-title').textContent   = 'Amortization Schedule';
+  document.getElementById('amort-borrower').textContent = loan.BorrowerName + ' · ' + loan.TermMonths + ' months @ ' + loan.InterestRate + '%/mo · ' + aFreqName;
+
   document.getElementById('amort-summary').innerHTML = `
     <div class="amort-sum-item"><div class="amort-sum-label">Date Borrowed</div><div class="amort-sum-value">${fDate(loan.StartDate)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Full Repayment</div><div class="amort-sum-value">${fDate(loan.DueDate)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Status</div><div class="amort-sum-value">${loan.Status}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Principal</div><div class="amort-sum-value">${peso(loan.Principal)}</div></div>
-    <div class="amort-sum-item"><div class="amort-sum-label">Monthly Payment</div><div class="amort-sum-value">${peso(monthlyPmt)}</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">${aPmtLabel}</div><div class="amort-sum-value">${peso(aPmt)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Total Amount</div><div class="amort-sum-value">${peso(loan.TotalAmount)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Amount Paid</div><div class="amort-sum-value" style="color:var(--green)">${peso(loan.PaidAmount || 0)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Remaining Balance</div><div class="amort-sum-value" style="color:var(--orange)">${peso(loan.Balance)}</div></div>
-    <div class="amort-sum-item"><div class="amort-sum-label">Term</div><div class="amort-sum-value">${loan.TermMonths} months</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">Term</div><div class="amort-sum-value">${loan.TermMonths} months (${aPeriods} payments)</div></div>
   `;
 
-  document.getElementById('amort-body').innerHTML = _amortSchedule.map(r => `
+  const isLoanActive = loan.Status === 'Active';
+  document.getElementById('amort-body').innerHTML = _amortSchedule.map(r => {
+    const canPay  = isLoanActive && r.status !== 'paid';
+    const btnStyle = r.status === 'current' || r.status === 'overdue'
+      ? 'background:var(--blue);color:#fff;border:none;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;'
+      : 'background:var(--bg);color:var(--navy);border:1px solid var(--border);padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;';
+    return `
     <tr class="row-${r.status}">
       <td>${r.month}</td>
       <td style="text-align:left">${fDate(r.dueDate)}</td>
@@ -1465,10 +1729,122 @@ function openAmortModal(loanId) {
       <td>${peso(r.interest)}</td>
       <td>${peso(r.balance)}</td>
       <td style="text-align:left"><span class="amort-status ${r.status}">${r.status.charAt(0).toUpperCase() + r.status.slice(1)}</span></td>
-    </tr>
-  `).join('');
+      <td style="text-align:center">${canPay ? `<button style="${btnStyle}" onclick="payAmortRow(${r.payment.toFixed(2)})">💳 Pay</button>` : '—'}</td>
+    </tr>`;
+  }).join('');
 
   openModal('modal-amort');
+}
+
+let _amortPayAmount = 0;
+let _payLoanId      = null;
+let _payFromAmort   = false;
+
+function _openPayModal(loanId, subtitle, amount, editable) {
+  _payLoanId = loanId;
+  const amountEl = document.getElementById('ap-amount');
+  document.getElementById('amort-pay-meta').textContent = subtitle;
+  amountEl.value    = amount !== null ? amount.toFixed(2) : '';
+  amountEl.readOnly = !editable;
+  amountEl.style.background = editable ? '#fff' : 'var(--bg)';
+  amountEl.style.cursor     = editable ? 'auto' : 'default';
+  document.getElementById('ap-date').value   = today();
+  document.getElementById('ap-notes').value  = '';
+  document.getElementById('ap-attachment').value = '';
+  document.getElementById('ap-attach-wrap').style.display = 'none';
+  document.getElementById('ap-drop-zone').innerHTML =
+    '<div>📎 Click to attach receipt</div><div style="font-size:11px;margin-top:4px;">JPG, PNG, PDF — max 10MB</div>';
+  document.getElementById('ap-drop-zone').classList.remove('has-file');
+  document.querySelectorAll('input[name="ap-method"]').forEach(r => r.checked = false);
+  openModal('modal-amort-pay');
+}
+
+function payAmortRow(amount) {
+  const loan = loans.find(l => l.ID === _amortLoanId);
+  if (!loan) return;
+  _amortPayAmount = amount;
+  _payFromAmort   = true;
+  _openPayModal(_amortLoanId, loan.BorrowerName + ' · ' + peso(amount), amount, false);
+}
+
+function onPayMethodChange() {
+  const method = document.querySelector('input[name="ap-method"]:checked')?.value;
+  const needsAttachment = method === 'GCash' || method === 'Bank Transfer';
+  document.getElementById('ap-attach-wrap').style.display = needsAttachment ? 'block' : 'none';
+}
+
+function onAttachmentChange() {
+  const file = document.getElementById('ap-attachment').files[0];
+  const zone = document.getElementById('ap-drop-zone');
+  if (file) {
+    zone.classList.add('has-file');
+    zone.innerHTML = `<div>✅ ${file.name}</div><div style="font-size:11px;margin-top:4px;">${(file.size/1024/1024).toFixed(2)} MB</div>`;
+  } else {
+    zone.classList.remove('has-file');
+    zone.innerHTML = '<div>📎 Click to attach receipt</div><div style="font-size:11px;margin-top:4px;">JPG, PNG, PDF — max 10MB</div>';
+  }
+}
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function confirmAmortPayment() {
+  const method = document.querySelector('input[name="ap-method"]:checked')?.value;
+  const amount = parseFloat(document.getElementById('ap-amount').value);
+  const date   = document.getElementById('ap-date').value;
+  const notes  = document.getElementById('ap-notes').value.trim();
+  const file   = document.getElementById('ap-attachment').files[0];
+  const loan   = loans.find(l => l.ID === _payLoanId);
+
+  if (!method)  { toast('Please select a payment method', 'error'); return; }
+  if (!date)    { toast('Please select a date', 'error'); return; }
+  if ((method === 'GCash' || method === 'Bank Transfer') && !file) {
+    toast('Please attach a receipt for ' + method, 'error'); return;
+  }
+  if (file && file.size > 10 * 1024 * 1024) {
+    toast('File too large — max 10MB', 'error'); return;
+  }
+
+  const btn = document.getElementById('ap-submit-btn');
+  btn.innerHTML = '<span class="spinner"></span> Processing…'; btn.disabled = true;
+
+  let attachmentUrl = '';
+  if (file) {
+    const base64 = await toBase64(file);
+    const uploadRes = await api('saveAttachment', {
+      fileName: file.name, mimeType: file.type,
+      base64Data: base64, loanId: _payLoanId,
+    });
+    if (uploadRes.error) {
+      toast('Receipt upload failed: ' + uploadRes.error, 'error');
+      btn.textContent = 'Confirm Payment'; btn.disabled = false;
+      return;
+    }
+    attachmentUrl = uploadRes.url;
+  }
+
+  const fullNotes = [`[${method}]`, attachmentUrl ? 'Receipt: ' + attachmentUrl : '', notes]
+    .filter(Boolean).join(' | ');
+
+  const res = await api('addPayment', {
+    loanId: _payLoanId, borrowerName: loan.BorrowerName,
+    amount, date, notes: fullNotes,
+  });
+
+  btn.textContent = 'Confirm Payment'; btn.disabled = false;
+  if (res.error) { toast(res.error, 'error'); return; }
+
+  const msg = res.status === 'Paid' ? '🎉 Loan fully paid!' : `Payment saved! Remaining: ${peso(res.newBalance)}`;
+  toast(msg);
+  closeModal('modal-amort-pay');
+  await Promise.all([loadLoans(), loadPayments(), loadDashboard()]);
+  if (_payFromAmort) openAmortModal(_payLoanId);
 }
 
 function downloadAmortCSV() {

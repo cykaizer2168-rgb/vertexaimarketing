@@ -35,6 +35,7 @@ function handleRequest(e) {
       case 'addPayment':               result = addPayment(payload);              break;
       case 'deletePayment':            result = deletePayment(payload);            break;
       case 'getLoanSummaryByBorrower': result = getLoanSummaryByBorrower(payload); break;
+      case 'saveAttachment':           result = saveAttachment(payload);           break;
       default: result = { error: 'Unknown action: ' + action };
     }
     return jsonResponse(result);
@@ -87,26 +88,48 @@ function formatDate(date) {
 
 // ── BORROWERS ─────────────────────────────────────────────────
 
-const BORROWER_HEADERS = ['ID', 'Name', 'Phone', 'Address', 'Notes', 'CreatedAt'];
+const BORROWER_HEADERS = ['ID', 'Name', 'Phone', 'Address', 'Notes', 'CreatedAt', 'MessengerUrl'];
+
+function ensureColumns(sheet, headers) {
+  const existing = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  headers.forEach((h, i) => {
+    if (!existing.includes(h)) {
+      const col = sheet.getLastColumn() + 1;
+      sheet.getRange(1, col).setValue(h).setFontWeight('bold').setBackground('#0B1F3A').setFontColor('#ffffff');
+    }
+  });
+}
 
 function getBorrowers() {
   const sheet = getOrCreateSheet('Borrowers', BORROWER_HEADERS);
+  ensureColumns(sheet, BORROWER_HEADERS);
   return { data: sheetToObjects(sheet) };
 }
 
 function addBorrower(p) {
   const sheet = getOrCreateSheet('Borrowers', BORROWER_HEADERS);
+  ensureColumns(sheet, BORROWER_HEADERS);
   const id = generateId('BRW');
-  sheet.appendRow([id, p.name, p.phone, p.address || '', p.notes || '', new Date().toISOString()]);
+  sheet.appendRow([id, p.name, p.phone, p.address || '', p.notes || '', new Date().toISOString(), p.messengerUrl || '']);
   return { success: true, id };
 }
 
 function updateBorrower(p) {
   const sheet = getOrCreateSheet('Borrowers', BORROWER_HEADERS);
+  ensureColumns(sheet, BORROWER_HEADERS);
+  SpreadsheetApp.flush(); // ensure ensureColumns changes are committed before reading headers
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const colOf = name => headers.indexOf(name); // 0-indexed
   const data = sheet.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === p.id) {
-      sheet.getRange(i + 1, 2, 1, 4).setValues([[p.name, p.phone, p.address || '', p.notes || '']]);
+    if (String(data[i][0]) === String(p.id)) {
+      const row = i + 1;
+      const setCol = (name, val) => { const c = colOf(name); if (c >= 0) sheet.getRange(row, c + 1).setValue(val); };
+      setCol('Name',        p.name         || '');
+      setCol('Phone',       p.phone        || '');
+      setCol('Address',     p.address      || '');
+      setCol('Notes',       p.notes        || '');
+      setCol('MessengerUrl',p.messengerUrl || '');
       return { success: true };
     }
   }
@@ -129,6 +152,7 @@ const LOAN_HEADERS = [
   'InterestType', 'TermMonths', 'StartDate', 'DueDate',
   'TotalAmount', 'PaidAmount', 'Balance', 'Status', 'Notes', 'CreatedAt'
 ];
+// InterestType column (col 6) stores repayment frequency: monthly | semi-monthly | weekly
 
 function getLoans(p) {
   const sheet = getOrCreateSheet('Loans', LOAN_HEADERS);
@@ -136,11 +160,14 @@ function getLoans(p) {
   if (p && p.borrowerId) loans = loans.filter(l => l.BorrowerID === p.borrowerId);
   if (p && p.status)     loans = loans.filter(l => l.Status === p.status);
 
-  // Compute MonthlyPayment for each loan so frontend doesn't have to
-  loans = loans.map(l => ({
-    ...l,
-    MonthlyPayment: parseFloat(l.TotalAmount) / Math.max(1, parseInt(l.TermMonths))
-  }));
+  // Compute PeriodPayment based on repayment frequency
+  loans = loans.map(l => {
+    const freq  = ['monthly','semi-monthly','weekly'].includes(l.InterestType) ? l.InterestType : 'monthly';
+    const ppm   = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
+    const total = parseFloat(l.TotalAmount);
+    const term  = Math.max(1, parseInt(l.TermMonths));
+    return { ...l, MonthlyPayment: total / (term * ppm) };
+  });
   return { data: loans };
 }
 
@@ -159,13 +186,17 @@ function addLoan(p) {
   const dueDate       = new Date(start);
   dueDate.setMonth(dueDate.getMonth() + term);
 
+  const freq            = p.interestType || 'monthly'; // monthly | semi-monthly | weekly
+  const periodsPerMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
+  const totalPeriods    = term * periodsPerMonth;
+
   sheet.appendRow([
     id, p.borrowerId, p.borrowerName, principal, rate,
-    p.interestType || 'flat', term,
+    freq, term,
     startDate, formatDate(dueDate), totalAmount, 0, totalAmount,
     'Active', p.notes || '', new Date().toISOString()
   ]);
-  return { success: true, id, totalAmount, monthlyPayment: totalAmount / term, dueDate: formatDate(dueDate) };
+  return { success: true, id, totalAmount, periodPayment: totalAmount / totalPeriods, dueDate: formatDate(dueDate) };
 }
 
 function updateLoan(p) {
@@ -183,6 +214,7 @@ function updateLoan(p) {
       const principal     = parseFloat(p.principal);
       const rate          = parseFloat(p.interestRate);
       const term          = parseInt(p.termMonths);
+      const freq          = p.interestType || 'monthly'; // monthly | semi-monthly | weekly
       const totalInterest = principal * (rate / 100) * term;
       const totalAmount   = principal + totalInterest;
       const paidAmount    = parseFloat(data[i][10]) || 0;
@@ -192,7 +224,7 @@ function updateLoan(p) {
 
       sheet.getRange(i + 1, 4).setValue(principal);
       sheet.getRange(i + 1, 5).setValue(rate);
-      sheet.getRange(i + 1, 6).setValue(p.interestType || 'flat');
+      sheet.getRange(i + 1, 6).setValue(freq);
       sheet.getRange(i + 1, 7).setValue(term);
       sheet.getRange(i + 1, 8).setValue(p.startDate);
       sheet.getRange(i + 1, 9).setValue(formatDate(dueDate));
@@ -429,6 +461,25 @@ function getAuditLog(p) {
   const all   = sheetToObjects(sheet);
   const data  = all.filter(r => r.LoanID === p.loanId).reverse(); // newest first
   return { data };
+}
+
+// ── RECEIPT ATTACHMENTS ───────────────────────────────────────
+
+function saveAttachment(p) {
+  const folderName = 'LendingReceipts';
+  let folder;
+  const folders = DriveApp.getFoldersByName(folderName);
+  folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
+
+  const decoded = Utilities.newBlob(
+    Utilities.base64Decode(p.base64Data),
+    p.mimeType,
+    p.fileName
+  );
+  const file = folder.createFile(decoded);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+  return { success: true, url: file.getUrl() };
 }
 
 // ── SETUP ─────────────────────────────────────────────────────
