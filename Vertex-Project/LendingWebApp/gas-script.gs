@@ -127,10 +127,10 @@ function addBorrower(p) {
   set('CreatedAt',   new Date().toISOString());
   set('MessengerUrl',p.messengerUrl || '');
   sheet.appendRow(row);
-  // Format phone cell as plain text to preserve leading zeros (e.g. 09171234567)
+  // Re-set phone as text to preserve leading zeros — appendRow can coerce to number
   const lastRow = sheet.getLastRow();
   const phoneCol = headers.indexOf('Phone') + 1;
-  if (phoneCol > 0) sheet.getRange(lastRow, phoneCol).setNumberFormat('@STRING@');
+  if (phoneCol > 0) sheet.getRange(lastRow, phoneCol).setNumberFormat('@').setValue(String(p.phone || ''));
   return { success: true, id };
 }
 
@@ -151,7 +151,7 @@ function updateBorrower(p) {
       // Write phone last, formatted as text to preserve leading zeros
       const phoneCol = colOf('Phone');
       if (phoneCol >= 0) {
-        sheet.getRange(row, phoneCol + 1).setNumberFormat('@STRING@').setValue(p.phone || '');
+        sheet.getRange(row, phoneCol + 1).setNumberFormat('@').setValue(String(p.phone || ''));
       }
       return { success: true };
     }
