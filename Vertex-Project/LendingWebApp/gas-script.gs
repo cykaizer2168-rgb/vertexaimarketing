@@ -92,12 +92,17 @@ const BORROWER_HEADERS = ['ID', 'Name', 'Phone', 'Address', 'Notes', 'CreatedAt'
 
 function ensureColumns(sheet, headers) {
   const existing = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  headers.forEach((h, i) => {
+  let nextCol = existing.length + 1; // track position locally so multiple adds don't collide
+  let added = false;
+  headers.forEach(h => {
     if (!existing.includes(h)) {
-      const col = sheet.getLastColumn() + 1;
-      sheet.getRange(1, col).setValue(h).setFontWeight('bold').setBackground('#0B1F3A').setFontColor('#ffffff');
+      sheet.getRange(1, nextCol).setValue(h).setFontWeight('bold').setBackground('#0B1F3A').setFontColor('#ffffff');
+      existing.push(h);
+      nextCol++;
+      added = true;
     }
   });
+  if (added) SpreadsheetApp.flush(); // commit new headers before any caller reads getLastColumn()
 }
 
 function getBorrowers() {
@@ -108,16 +113,30 @@ function getBorrowers() {
 
 function addBorrower(p) {
   const sheet = getOrCreateSheet('Borrowers', BORROWER_HEADERS);
-  ensureColumns(sheet, BORROWER_HEADERS);
+  ensureColumns(sheet, BORROWER_HEADERS); // flush is inside ensureColumns when needed
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const id = generateId('BRW');
-  sheet.appendRow([id, p.name, p.phone, p.address || '', p.notes || '', new Date().toISOString(), p.messengerUrl || '']);
+  // Build row by header position so column order never matters
+  const row = new Array(headers.length).fill('');
+  const set = (name, val) => { const i = headers.indexOf(name); if (i >= 0) row[i] = val; };
+  set('ID',          id);
+  set('Name',        p.name         || '');
+  set('Phone',       p.phone        || '');
+  set('Address',     p.address      || '');
+  set('Notes',       p.notes        || '');
+  set('CreatedAt',   new Date().toISOString());
+  set('MessengerUrl',p.messengerUrl || '');
+  sheet.appendRow(row);
+  // Format phone cell as plain text to preserve leading zeros (e.g. 09171234567)
+  const lastRow = sheet.getLastRow();
+  const phoneCol = headers.indexOf('Phone') + 1;
+  if (phoneCol > 0) sheet.getRange(lastRow, phoneCol).setNumberFormat('@STRING@');
   return { success: true, id };
 }
 
 function updateBorrower(p) {
   const sheet = getOrCreateSheet('Borrowers', BORROWER_HEADERS);
-  ensureColumns(sheet, BORROWER_HEADERS);
-  SpreadsheetApp.flush(); // ensure ensureColumns changes are committed before reading headers
+  ensureColumns(sheet, BORROWER_HEADERS); // flush is inside ensureColumns when needed
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const colOf = name => headers.indexOf(name); // 0-indexed
   const data = sheet.getDataRange().getValues();
@@ -126,10 +145,14 @@ function updateBorrower(p) {
       const row = i + 1;
       const setCol = (name, val) => { const c = colOf(name); if (c >= 0) sheet.getRange(row, c + 1).setValue(val); };
       setCol('Name',        p.name         || '');
-      setCol('Phone',       p.phone        || '');
       setCol('Address',     p.address      || '');
       setCol('Notes',       p.notes        || '');
       setCol('MessengerUrl',p.messengerUrl || '');
+      // Write phone last, formatted as text to preserve leading zeros
+      const phoneCol = colOf('Phone');
+      if (phoneCol >= 0) {
+        sheet.getRange(row, phoneCol + 1).setNumberFormat('@STRING@').setValue(p.phone || '');
+      }
       return { success: true };
     }
   }
