@@ -173,7 +173,7 @@ function deleteBorrower(p) {
 const LOAN_HEADERS = [
   'ID', 'BorrowerID', 'BorrowerName', 'Principal', 'InterestRate',
   'InterestType', 'TermMonths', 'StartDate', 'DueDate',
-  'TotalAmount', 'PaidAmount', 'Balance', 'Status', 'Notes', 'CreatedAt', 'RefNo'
+  'TotalAmount', 'PaidAmount', 'Balance', 'Status', 'Notes', 'CreatedAt', 'RefNo', 'BorrowedDate'
 ];
 // InterestType column (col 6) stores repayment frequency: monthly | semi-monthly | weekly
 
@@ -194,16 +194,18 @@ function getLoans(p) {
   return { data: loans };
 }
 
-function nextRefNo(sheet, prefix) {
-  const count = Math.max(0, sheet.getLastRow() - 1); // rows minus header
-  return prefix + '-' + String(count + 1).padStart(4, '0');
+function nextTxnNo() {
+  const props = PropertiesService.getScriptProperties();
+  const next  = parseInt(props.getProperty('TXN_COUNTER') || '0') + 1;
+  props.setProperty('TXN_COUNTER', String(next));
+  return 'TXN-' + String(next).padStart(4, '0');
 }
 
 function addLoan(p) {
   const sheet = getOrCreateSheet('Loans', LOAN_HEADERS);
   ensureColumns(sheet, LOAN_HEADERS);
   const id        = generateId('LN');
-  const refNo     = nextRefNo(sheet, 'LN');
+  const refNo     = nextTxnNo();
   const principal = parseFloat(p.principal);
   const rate      = parseFloat(p.interestRate);
   const term      = parseInt(p.termMonths);
@@ -220,11 +222,12 @@ function addLoan(p) {
   const periodsPerMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
   const totalPeriods    = term * periodsPerMonth;
 
+  const borrowedDate = p.borrowedDate || startDate;
   sheet.appendRow([
     id, p.borrowerId, p.borrowerName, principal, rate,
     freq, term,
     startDate, formatDate(dueDate), totalAmount, 0, totalAmount,
-    'Active', p.notes || '', new Date().toISOString(), refNo
+    'Active', p.notes || '', new Date().toISOString(), refNo, borrowedDate
   ]);
   return { success: true, id, refNo, totalAmount, periodPayment: totalAmount / totalPeriods, dueDate: formatDate(dueDate) };
 }
@@ -260,6 +263,7 @@ function updateLoan(p) {
       sheet.getRange(i + 1, 9).setValue(formatDate(dueDate));
       sheet.getRange(i + 1, 10).setValue(totalAmount);
       sheet.getRange(i + 1, 12).setValue(balance);
+      if (p.borrowedDate) sheet.getRange(i + 1, 17).setValue(p.borrowedDate);
     }
 
     return { success: true };
@@ -311,7 +315,7 @@ function addPayment(p) {
   const loanSheet = getOrCreateSheet('Loans', LOAN_HEADERS);
   const amount    = parseFloat(p.amount);
   const payId     = generateId('PAY');
-  const refNo     = nextRefNo(paySheet, 'PAY');
+  const refNo     = nextTxnNo();
   const payDate   = p.date || formatDate(new Date());
 
   paySheet.appendRow([payId, p.loanId, p.borrowerName, amount, payDate, p.notes || '', new Date().toISOString(), refNo]);

@@ -582,7 +582,7 @@
     <div class="modal-title">Create New Loan</div>
     <div class="form-grid">
       <div class="form-group full">
-        <label class="form-label">Loan Reference No.</label>
+        <label class="form-label">Document No.</label>
         <input class="form-input" id="l-refno" readonly
           style="background:var(--blue-50);color:var(--blue);font-weight:700;cursor:default;letter-spacing:.06em;" />
       </div>
@@ -609,6 +609,10 @@
           <option value="semi-monthly">Semi-Monthly</option>
           <option value="weekly">Weekly</option>
         </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date Borrowed *</label>
+        <input class="form-input" id="l-borrowed" type="date" />
       </div>
       <div class="form-group">
         <label class="form-label">Repayment Start Date *</label>
@@ -647,7 +651,7 @@
     <div class="modal-title">Record Payment</div>
     <div class="form-grid">
       <div class="form-group full">
-        <label class="form-label">Payment Reference No.</label>
+        <label class="form-label">Document No.</label>
         <input class="form-input" id="p-refno" readonly
           style="background:var(--blue-50);color:var(--blue);font-weight:700;cursor:default;letter-spacing:.06em;" />
       </div>
@@ -717,6 +721,10 @@
           <option value="semi-monthly">Semi-Monthly</option>
           <option value="weekly">Weekly</option>
         </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date Borrowed *</label>
+        <input class="form-input" id="el-borrowed" type="date" />
       </div>
       <div class="form-group">
         <label class="form-label">Repayment Start Date *</label>
@@ -800,7 +808,7 @@
     <div id="amort-pay-meta" style="font-size:13px;color:var(--muted);margin:-10px 0 16px;"></div>
     <div class="form-grid">
       <div class="form-group full">
-        <label class="form-label">Payment Reference No.</label>
+        <label class="form-label">Document No.</label>
         <input class="form-input" id="ap-refno" readonly
           style="background:var(--blue-50);color:var(--blue);font-weight:700;cursor:default;letter-spacing:.06em;" />
       </div>
@@ -1135,7 +1143,7 @@ function showBorrowerHistory(borrowerId) {
         <div style="font-size:18px;font-weight:800;color:var(--green)">${peso(p.Amount)}</div>
       </div>
       <div class="row-card-meta">
-        ${loan ? `<div class="row-meta-item"><div class="row-meta-label">Loan Ref</div><div class="row-meta-value" style="font-weight:700;color:var(--blue);">${loan.RefNo || '—'} · ${peso(loan.Principal)} · ${loan.Status}</div></div>` : ''}
+        ${loan ? `<div class="row-meta-item"><div class="row-meta-label">Doc No.</div><div class="row-meta-value" style="font-weight:700;color:var(--blue);">${loan.RefNo || '—'} · ${peso(loan.Principal)} · ${loan.Status}</div></div>` : ''}
         ${method ? `<div class="row-meta-item"><div class="row-meta-label">Method</div><div class="row-meta-value"><span style="background:${bg};color:${color};padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;">${icon} ${method}</span></div></div>` : ''}
         ${receiptUrl ? `<div class="row-meta-item"><div class="row-meta-label">Receipt</div><div class="row-meta-value"><a href="${receiptUrl}" target="_blank" style="color:var(--blue);font-weight:600;font-size:13px;text-decoration:none;">📎 View</a></div></div>` : ''}
         ${notes ? `<div class="row-meta-item"><div class="row-meta-label">Notes</div><div class="row-meta-value">${notes}</div></div>` : ''}
@@ -1255,7 +1263,8 @@ function renderLoans() {
       <div class="row-card-meta">
         <div class="row-meta-item"><div class="row-meta-label">Principal</div><div class="row-meta-value">${peso(l.Principal)}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Balance</div><div class="row-meta-value" style="${parseFloat(l.Balance)>0?'color:var(--orange)':'color:var(--green)'}">${peso(l.Balance)}</div></div>
-        <div class="row-meta-item"><div class="row-meta-label">Date Borrowed</div><div class="row-meta-value">${fDate(l.StartDate)}</div></div>
+        <div class="row-meta-item"><div class="row-meta-label">Date Borrowed</div><div class="row-meta-value">${fDate(l.BorrowedDate || l.StartDate)}</div></div>
+        <div class="row-meta-item"><div class="row-meta-label">Repayment Starts</div><div class="row-meta-value">${fDate(l.StartDate)}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Full Repayment</div><div class="row-meta-value" style="${isOverdue?'color:var(--red)':'color:var(--navy);font-weight:700'}">${fDate(l.DueDate)}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Interest</div><div class="row-meta-value">${l.InterestRate}%/mo · ${l.TermMonths}mo</div></div>
         <div class="row-meta-item"><div class="row-meta-label">${lPmtLabel}</div><div class="row-meta-value" style="color:var(--blue);font-weight:700">${peso(lPmt)}</div></div>
@@ -1280,7 +1289,8 @@ function openNewLoanModal() {
     ? borrowers.map(b => `<option value="${b.ID}" data-name="${b.Name}">${b.Name}</option>`).join('')
     : '<option value="">No borrowers — add one first</option>';
 
-  document.getElementById('l-refno').value = 'LN-' + String(loans.length + 1).padStart(4, '0');
+  document.getElementById('l-refno').value   = 'TXN-' + String(loans.length + payments.length + 1).padStart(4, '0');
+  document.getElementById('l-borrowed').value = today();
   document.getElementById('l-principal').value = '';
   document.getElementById('l-rate').value = '';
   document.getElementById('l-term').value = '';
@@ -1336,9 +1346,10 @@ async function saveLoan() {
   const principal = document.getElementById('l-principal').value;
   const rate      = document.getElementById('l-rate').value;
   const term      = document.getElementById('l-term').value;
+  const borrowed  = document.getElementById('l-borrowed').value;
   const start     = document.getElementById('l-start').value;
 
-  if (!bId || !principal || !rate || !term || !start) {
+  if (!bId || !principal || !rate || !term || !borrowed || !start) {
     toast('Please fill all required fields', 'error'); return;
   }
 
@@ -1353,9 +1364,10 @@ async function saveLoan() {
     borrowerId:   bId,
     borrowerName: bName,
     principal, interestRate: rate, termMonths: term,
-    interestType: document.getElementById('l-freq').value,
-    startDate:    start,
-    notes:        document.getElementById('l-notes').value,
+    interestType:  document.getElementById('l-freq').value,
+    borrowedDate:  borrowed,
+    startDate:     start,
+    notes:         document.getElementById('l-notes').value,
   });
 
   btn.textContent = origText;
@@ -1501,7 +1513,7 @@ function openNewPaymentModal() {
     ? activeLoans.map(l => `<option value="${l.ID}" data-name="${l.BorrowerName}" data-balance="${l.Balance}">${l.BorrowerName} — ${peso(l.Balance)} balance</option>`).join('')
     : '<option value="">No active loans</option>';
 
-  document.getElementById('p-refno').value  = 'PAY-' + String(payments.length + 1).padStart(4, '0');
+  document.getElementById('p-refno').value  = 'TXN-' + String(loans.length + payments.length + 1).padStart(4, '0');
   document.getElementById('p-amount').value = '';
   document.getElementById('p-date').value   = today();
   document.getElementById('p-notes').value  = '';
@@ -1629,6 +1641,7 @@ function openEditLoanModal(loanId) {
   document.getElementById('el-rate').value      = l.InterestRate;
   document.getElementById('el-term').value      = l.TermMonths;
   document.getElementById('el-freq').value      = ['monthly','semi-monthly','weekly'].includes(l.InterestType) ? l.InterestType : 'monthly';
+  document.getElementById('el-borrowed').value  = l.BorrowedDate ? l.BorrowedDate.toString().split('T')[0] : (l.StartDate ? l.StartDate.toString().split('T')[0] : '');
   document.getElementById('el-start').value     = l.StartDate ? l.StartDate.toString().split('T')[0] : '';
   document.getElementById('el-notes').value     = l.Notes || '';
   document.getElementById('edit-loan-preview').style.display = 'none';
@@ -1671,10 +1684,11 @@ async function saveEditLoan() {
   const interestRate = document.getElementById('el-rate').value;
   const termMonths   = document.getElementById('el-term').value;
   const interestType = document.getElementById('el-freq').value;
+  const borrowedDate = document.getElementById('el-borrowed').value;
   const startDate    = document.getElementById('el-start').value;
   const notes        = document.getElementById('el-notes').value.trim();
 
-  if (!principal || !interestRate || !termMonths || !startDate) {
+  if (!principal || !interestRate || !termMonths || !borrowedDate || !startDate) {
     toast('Please fill all required fields', 'error'); return;
   }
 
@@ -1696,7 +1710,7 @@ async function saveEditLoan() {
   btn.innerHTML = '<span class="spinner"></span> Saving…'; btn.disabled = true;
 
   const res = await api('updateLoan', {
-    id: _editingLoanId, principal, interestRate, termMonths, interestType, startDate, notes
+    id: _editingLoanId, principal, interestRate, termMonths, interestType, borrowedDate, startDate, notes
   });
 
   btn.textContent = 'Save Changes'; btn.disabled = false;
@@ -1810,8 +1824,9 @@ function openAmortModal(loanId) {
   document.getElementById('amort-borrower').textContent = loan.BorrowerName + ' · ' + loan.TermMonths + ' months @ ' + loan.InterestRate + '%/mo · ' + aFreqName;
 
   document.getElementById('amort-summary').innerHTML = `
-    ${loan.RefNo ? `<div class="amort-sum-item"><div class="amort-sum-label">Loan Ref</div><div class="amort-sum-value" style="color:var(--blue)">${loan.RefNo}</div></div>` : ''}
-    <div class="amort-sum-item"><div class="amort-sum-label">Date Borrowed</div><div class="amort-sum-value">${fDate(loan.StartDate)}</div></div>
+    ${loan.RefNo ? `<div class="amort-sum-item"><div class="amort-sum-label">Doc No.</div><div class="amort-sum-value" style="color:var(--blue)">${loan.RefNo}</div></div>` : ''}
+    <div class="amort-sum-item"><div class="amort-sum-label">Date Borrowed</div><div class="amort-sum-value">${fDate(loan.BorrowedDate || loan.StartDate)}</div></div>
+    <div class="amort-sum-item"><div class="amort-sum-label">Repayment Starts</div><div class="amort-sum-value">${fDate(loan.StartDate)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Full Repayment</div><div class="amort-sum-value">${fDate(loan.DueDate)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Status</div><div class="amort-sum-value">${loan.Status}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Principal</div><div class="amort-sum-value">${peso(loan.Principal)}</div></div>
@@ -1851,7 +1866,7 @@ let _payFromAmort   = false;
 function _openPayModal(loanId, subtitle, amount, editable) {
   _payLoanId = loanId;
   const amountEl = document.getElementById('ap-amount');
-  document.getElementById('ap-refno').value = 'PAY-' + String(payments.length + 1).padStart(4, '0');
+  document.getElementById('ap-refno').value = 'TXN-' + String(loans.length + payments.length + 1).padStart(4, '0');
   document.getElementById('amort-pay-meta').textContent = subtitle;
   amountEl.value    = amount !== null ? amount.toFixed(2) : '';
   amountEl.readOnly = !editable;
