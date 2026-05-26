@@ -604,7 +604,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">Repayment Frequency</label>
-        <select class="form-select" id="l-freq" onchange="calcLoan()">
+        <select class="form-select" id="l-freq" onchange="autoFillRepaymentStart('l');calcLoan()">
           <option value="monthly">Monthly</option>
           <option value="semi-monthly">Semi-Monthly</option>
           <option value="weekly">Weekly</option>
@@ -612,7 +612,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">Date Borrowed *</label>
-        <input class="form-input" id="l-borrowed" type="date" />
+        <input class="form-input" id="l-borrowed" type="date" oninput="autoFillRepaymentStart('l')" />
       </div>
       <div class="form-group">
         <label class="form-label">Repayment Start Date *</label>
@@ -716,7 +716,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">Repayment Frequency</label>
-        <select class="form-select" id="el-freq" onchange="calcEditLoan()">
+        <select class="form-select" id="el-freq" onchange="autoFillRepaymentStart('el');calcEditLoan()">
           <option value="monthly">Monthly</option>
           <option value="semi-monthly">Semi-Monthly</option>
           <option value="weekly">Weekly</option>
@@ -724,7 +724,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">Date Borrowed *</label>
-        <input class="form-input" id="el-borrowed" type="date" />
+        <input class="form-input" id="el-borrowed" type="date" oninput="autoFillRepaymentStart('el')" />
       </div>
       <div class="form-group">
         <label class="form-label">Repayment Start Date *</label>
@@ -1300,6 +1300,21 @@ function openNewLoanModal() {
   document.getElementById('l-freq').value = 'monthly';
   document.getElementById('loan-preview').style.display = 'none';
   openModal('modal-loan');
+}
+
+function autoFillRepaymentStart(prefix) {
+  const borrowed = document.getElementById(prefix + '-borrowed').value;
+  const freq     = document.getElementById(prefix === 'l' ? 'l-freq' : 'el-freq').value;
+  const startEl  = document.getElementById(prefix + '-start');
+  if (!borrowed) return;
+  const days = freq === 'weekly' ? 7 : freq === 'semi-monthly' ? 15 : 30;
+  const d = new Date(borrowed);
+  d.setDate(d.getDate() + days);
+  const yyyy = d.getFullYear();
+  const mm   = String(d.getMonth() + 1).padStart(2, '0');
+  const dd   = String(d.getDate()).padStart(2, '0');
+  startEl.value = `${yyyy}-${mm}-${dd}`;
+  if (prefix === 'l') calcLoan(); else calcEditLoan();
 }
 
 function calcLoan() {
