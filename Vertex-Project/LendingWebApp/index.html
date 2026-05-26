@@ -242,6 +242,8 @@
     margin-bottom: 14px; gap: 10px;
   }
   .section-header-title { font-size: 16px; font-weight: 700; color: var(--navy); }
+  .desktop-add-btn { display: none; }
+  @media (min-width: 768px) { .desktop-add-btn { display: inline-flex; } }
 
   /* ── EMPTY ── */
   .empty { padding: 40px 20px; text-align: center; color: var(--muted); }
@@ -368,6 +370,12 @@
       Payments
     </button>
   </nav>
+  <div style="padding: 12px 10px 8px;">
+    <button class="btn btn-primary" style="width:100%;justify-content:center;gap:6px;" onclick="openNewPaymentModal()">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Record Payment
+    </button>
+  </div>
   <div class="sidebar-footer">v1.0 · Vertex Consulting</div>
 </aside>
 
@@ -461,6 +469,7 @@
     <div class="section" id="section-borrowers">
       <div class="section-header">
         <div class="section-header-title">Borrowers</div>
+        <button class="btn btn-primary btn-sm desktop-add-btn" onclick="openAddBorrowerModal()">+ Add Borrower</button>
       </div>
       <div class="search-wrap" style="margin-bottom:14px">
         <span class="search-icon">
@@ -477,12 +486,15 @@
     <div class="section" id="section-loans">
       <div class="section-header">
         <div class="section-header-title">Loans</div>
-        <select class="form-select" id="loan-status-filter" onchange="renderLoans()" style="width:130px;padding:8px 10px;font-size:13px;">
-          <option value="">All Status</option>
-          <option value="Active">Active</option>
-          <option value="Paid">Paid</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-primary btn-sm desktop-add-btn" onclick="openNewLoanModal()">+ New Loan</button>
+          <select class="form-select" id="loan-status-filter" onchange="renderLoans()" style="width:130px;padding:8px 10px;font-size:13px;">
+            <option value="">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Paid">Paid</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
       </div>
       <div class="card">
         <div id="loans-list" class="row-cards"></div>
@@ -493,6 +505,7 @@
     <div class="section" id="section-payments">
       <div class="section-header">
         <div class="section-header-title">Payments</div>
+        <button class="btn btn-primary btn-sm desktop-add-btn" onclick="openNewPaymentModal()">+ Record Payment</button>
       </div>
       <div class="card">
         <div id="payments-list" class="row-cards"></div>
@@ -569,6 +582,11 @@
     <div class="modal-title">Create New Loan</div>
     <div class="form-grid">
       <div class="form-group full">
+        <label class="form-label">Loan Reference No.</label>
+        <input class="form-input" id="l-refno" readonly
+          style="background:var(--blue-50);color:var(--blue);font-weight:700;cursor:default;letter-spacing:.06em;" />
+      </div>
+      <div class="form-group full">
         <label class="form-label">Borrower *</label>
         <select class="form-select" id="l-borrower"></select>
       </div>
@@ -629,6 +647,11 @@
     <div class="modal-title">Record Payment</div>
     <div class="form-grid">
       <div class="form-group full">
+        <label class="form-label">Payment Reference No.</label>
+        <input class="form-input" id="p-refno" readonly
+          style="background:var(--blue-50);color:var(--blue);font-weight:700;cursor:default;letter-spacing:.06em;" />
+      </div>
+      <div class="form-group full">
         <label class="form-label">Select Loan *</label>
         <select class="form-select" id="p-loan" onchange="onLoanSelect()"></select>
       </div>
@@ -651,6 +674,19 @@
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-payment')">Cancel</button>
       <button class="btn btn-primary" onclick="savePayment()">Save Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- Borrower Payment History -->
+<div class="overlay" id="modal-borrower-history">
+  <div class="modal" style="max-height:85dvh;display:flex;flex-direction:column;">
+    <div class="modal-drag"></div>
+    <div class="modal-title" id="bh-title">Payment History</div>
+    <div id="bh-summary" style="display:flex;gap:10px;margin:-6px 0 16px;flex-wrap:wrap;"></div>
+    <div id="bh-list" style="flex:1;overflow-y:auto;margin:0 -4px;padding:0 4px;"></div>
+    <div class="modal-footer" style="margin-top:16px;">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="closeModal('modal-borrower-history')">Close</button>
     </div>
   </div>
 </div>
@@ -763,6 +799,11 @@
     <div class="modal-title">Record Payment</div>
     <div id="amort-pay-meta" style="font-size:13px;color:var(--muted);margin:-10px 0 16px;"></div>
     <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Payment Reference No.</label>
+        <input class="form-input" id="ap-refno" readonly
+          style="background:var(--blue-50);color:var(--blue);font-weight:700;cursor:default;letter-spacing:.06em;" />
+      </div>
       <div class="form-group">
         <label class="form-label">Amount (₱)</label>
         <input class="form-input" id="ap-amount" type="number" readonly
@@ -1038,6 +1079,7 @@ function renderBorrowers() {
         ${b.MessengerUrl ? `<div class="row-meta-item"><div class="row-meta-label">Messenger</div><div class="row-meta-value"><a href="${b.MessengerUrl}" target="_blank" style="color:var(--blue);font-weight:600;font-size:13px;text-decoration:none;">💬 Open Chat</a></div></div>` : ''}
       </div>
       <div class="row-card-actions">
+        <button class="btn btn-ghost btn-sm" onclick="showBorrowerHistory('${b.ID}')">📋 History</button>
         <button class="btn btn-ghost btn-sm" onclick="editBorrower('${b.ID}')">Edit</button>
         <button class="btn btn-danger btn-sm" onclick="deleteBorrower('${b.ID}')">Delete</button>
       </div>
@@ -1046,6 +1088,63 @@ function renderBorrowers() {
 }
 
 function filterBorrowers() { renderBorrowers(); }
+
+function showBorrowerHistory(borrowerId) {
+  const b = borrowers.find(x => x.ID === borrowerId);
+  if (!b) return;
+
+  const bPayments = [...payments]
+    .filter(p => p.BorrowerName === b.Name)
+    .sort((a, c) => new Date(c.Date) - new Date(a.Date));
+
+  const totalPaid  = bPayments.reduce((s, p) => s + parseFloat(p.Amount || 0), 0);
+  const bLoans     = loans.filter(l => l.BorrowerID === borrowerId);
+  const activeLoans = bLoans.filter(l => l.Status === 'Active').length;
+
+  document.getElementById('bh-title').textContent = b.Name + ' — Payments';
+  document.getElementById('bh-summary').innerHTML = `
+    <div style="background:var(--blue-50);border-radius:8px;padding:8px 14px;font-size:13px;flex:1;min-width:120px;">
+      <div style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Total Paid</div>
+      <div style="font-size:18px;font-weight:800;color:var(--green)">${peso(totalPaid)}</div>
+    </div>
+    <div style="background:var(--blue-50);border-radius:8px;padding:8px 14px;font-size:13px;flex:1;min-width:120px;">
+      <div style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Payments</div>
+      <div style="font-size:18px;font-weight:800;color:var(--navy)">${bPayments.length}</div>
+    </div>
+    <div style="background:var(--blue-50);border-radius:8px;padding:8px 14px;font-size:13px;flex:1;min-width:120px;">
+      <div style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Active Loans</div>
+      <div style="font-size:18px;font-weight:800;color:${activeLoans ? 'var(--orange)' : 'var(--green)'}">${activeLoans}</div>
+    </div>`;
+
+  const methodIcon  = { 'Cash': '💵', 'GCash': '📱', 'Bank Transfer': '🏦' };
+  const methodColor = { 'Cash': '#065F46', 'GCash': '#1D4ED8', 'Bank Transfer': '#7C3AED' };
+  const methodBg    = { 'Cash': '#D1FAE5', 'GCash': '#DBEAFE', 'Bank Transfer': '#EDE9FE' };
+
+  document.getElementById('bh-list').innerHTML = bPayments.length ? bPayments.map(p => {
+    const { method, receiptUrl, notes } = parsePaymentNotes(p.Notes);
+    const loan    = loans.find(l => l.ID === p.LoanID);
+    const icon    = method ? (methodIcon[method]  || '💳') : null;
+    const color   = method ? (methodColor[method] || 'var(--navy)') : null;
+    const bg      = method ? (methodBg[method]    || '#F1F5F9') : null;
+    return `<div class="row-card">
+      <div class="row-card-top">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;color:var(--muted)">${fDate(p.Date)}</div>
+          ${p.RefNo ? `<span style="background:var(--blue-100);color:var(--blue);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;letter-spacing:.05em;align-self:flex-start;">${p.RefNo}</span>` : ''}
+        </div>
+        <div style="font-size:18px;font-weight:800;color:var(--green)">${peso(p.Amount)}</div>
+      </div>
+      <div class="row-card-meta">
+        ${loan ? `<div class="row-meta-item"><div class="row-meta-label">Loan Ref</div><div class="row-meta-value" style="font-weight:700;color:var(--blue);">${loan.RefNo || '—'} · ${peso(loan.Principal)} · ${loan.Status}</div></div>` : ''}
+        ${method ? `<div class="row-meta-item"><div class="row-meta-label">Method</div><div class="row-meta-value"><span style="background:${bg};color:${color};padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;">${icon} ${method}</span></div></div>` : ''}
+        ${receiptUrl ? `<div class="row-meta-item"><div class="row-meta-label">Receipt</div><div class="row-meta-value"><a href="${receiptUrl}" target="_blank" style="color:var(--blue);font-weight:600;font-size:13px;text-decoration:none;">📎 View</a></div></div>` : ''}
+        ${notes ? `<div class="row-meta-item"><div class="row-meta-label">Notes</div><div class="row-meta-value">${notes}</div></div>` : ''}
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty"><div class="empty-icon">💳</div><p>No payments yet</p></div>';
+
+  openModal('modal-borrower-history');
+}
 
 function openAddBorrowerModal() {
   editBorrowerId = null;
@@ -1148,7 +1247,10 @@ function renderLoans() {
     return `<div class="row-card">
       <div class="row-card-top">
         <div class="row-card-name">${l.BorrowerName}</div>
-        <span class="badge ${badge}">${status}</span>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          ${l.RefNo ? `<span style="background:var(--blue-100);color:var(--blue);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;letter-spacing:.05em;">${l.RefNo}</span>` : ''}
+          <span class="badge ${badge}">${status}</span>
+        </div>
       </div>
       <div class="row-card-meta">
         <div class="row-meta-item"><div class="row-meta-label">Principal</div><div class="row-meta-value">${peso(l.Principal)}</div></div>
@@ -1178,6 +1280,7 @@ function openNewLoanModal() {
     ? borrowers.map(b => `<option value="${b.ID}" data-name="${b.Name}">${b.Name}</option>`).join('')
     : '<option value="">No borrowers — add one first</option>';
 
+  document.getElementById('l-refno').value = 'LN-' + String(loans.length + 1).padStart(4, '0');
   document.getElementById('l-principal').value = '';
   document.getElementById('l-rate').value = '';
   document.getElementById('l-term').value = '';
@@ -1372,7 +1475,10 @@ function renderPayments() {
     const bg    = method ? (methodBg[method]    || '#F1F5F9') : null;
     return `<div class="row-card">
     <div class="row-card-top">
-      <div class="row-card-name">${p.BorrowerName}</div>
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div class="row-card-name">${p.BorrowerName}</div>
+        ${p.RefNo ? `<span style="background:var(--blue-100);color:var(--blue);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;letter-spacing:.05em;align-self:flex-start;">${p.RefNo}</span>` : ''}
+      </div>
       <div style="font-size:18px;font-weight:800;color:var(--green)">${peso(p.Amount)}</div>
     </div>
     <div class="row-card-meta">
@@ -1395,6 +1501,7 @@ function openNewPaymentModal() {
     ? activeLoans.map(l => `<option value="${l.ID}" data-name="${l.BorrowerName}" data-balance="${l.Balance}">${l.BorrowerName} — ${peso(l.Balance)} balance</option>`).join('')
     : '<option value="">No active loans</option>';
 
+  document.getElementById('p-refno').value  = 'PAY-' + String(payments.length + 1).padStart(4, '0');
   document.getElementById('p-amount').value = '';
   document.getElementById('p-date').value   = today();
   document.getElementById('p-notes').value  = '';
@@ -1703,6 +1810,7 @@ function openAmortModal(loanId) {
   document.getElementById('amort-borrower').textContent = loan.BorrowerName + ' · ' + loan.TermMonths + ' months @ ' + loan.InterestRate + '%/mo · ' + aFreqName;
 
   document.getElementById('amort-summary').innerHTML = `
+    ${loan.RefNo ? `<div class="amort-sum-item"><div class="amort-sum-label">Loan Ref</div><div class="amort-sum-value" style="color:var(--blue)">${loan.RefNo}</div></div>` : ''}
     <div class="amort-sum-item"><div class="amort-sum-label">Date Borrowed</div><div class="amort-sum-value">${fDate(loan.StartDate)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Full Repayment</div><div class="amort-sum-value">${fDate(loan.DueDate)}</div></div>
     <div class="amort-sum-item"><div class="amort-sum-label">Status</div><div class="amort-sum-value">${loan.Status}</div></div>
@@ -1743,6 +1851,7 @@ let _payFromAmort   = false;
 function _openPayModal(loanId, subtitle, amount, editable) {
   _payLoanId = loanId;
   const amountEl = document.getElementById('ap-amount');
+  document.getElementById('ap-refno').value = 'PAY-' + String(payments.length + 1).padStart(4, '0');
   document.getElementById('amort-pay-meta').textContent = subtitle;
   amountEl.value    = amount !== null ? amount.toFixed(2) : '';
   amountEl.readOnly = !editable;
@@ -1764,7 +1873,7 @@ function payAmortRow(amount) {
   if (!loan) return;
   _amortPayAmount = amount;
   _payFromAmort   = true;
-  _openPayModal(_amortLoanId, loan.BorrowerName + ' · ' + peso(amount), amount, false);
+  _openPayModal(_amortLoanId, loan.BorrowerName + ' · ' + peso(amount), amount, true);
 }
 
 function onPayMethodChange() {

@@ -173,7 +173,7 @@ function deleteBorrower(p) {
 const LOAN_HEADERS = [
   'ID', 'BorrowerID', 'BorrowerName', 'Principal', 'InterestRate',
   'InterestType', 'TermMonths', 'StartDate', 'DueDate',
-  'TotalAmount', 'PaidAmount', 'Balance', 'Status', 'Notes', 'CreatedAt'
+  'TotalAmount', 'PaidAmount', 'Balance', 'Status', 'Notes', 'CreatedAt', 'RefNo'
 ];
 // InterestType column (col 6) stores repayment frequency: monthly | semi-monthly | weekly
 
@@ -194,9 +194,16 @@ function getLoans(p) {
   return { data: loans };
 }
 
+function nextRefNo(sheet, prefix) {
+  const count = Math.max(0, sheet.getLastRow() - 1); // rows minus header
+  return prefix + '-' + String(count + 1).padStart(4, '0');
+}
+
 function addLoan(p) {
   const sheet = getOrCreateSheet('Loans', LOAN_HEADERS);
+  ensureColumns(sheet, LOAN_HEADERS);
   const id        = generateId('LN');
+  const refNo     = nextRefNo(sheet, 'LN');
   const principal = parseFloat(p.principal);
   const rate      = parseFloat(p.interestRate);
   const term      = parseInt(p.termMonths);
@@ -217,9 +224,9 @@ function addLoan(p) {
     id, p.borrowerId, p.borrowerName, principal, rate,
     freq, term,
     startDate, formatDate(dueDate), totalAmount, 0, totalAmount,
-    'Active', p.notes || '', new Date().toISOString()
+    'Active', p.notes || '', new Date().toISOString(), refNo
   ]);
-  return { success: true, id, totalAmount, periodPayment: totalAmount / totalPeriods, dueDate: formatDate(dueDate) };
+  return { success: true, id, refNo, totalAmount, periodPayment: totalAmount / totalPeriods, dueDate: formatDate(dueDate) };
 }
 
 function updateLoan(p) {
@@ -289,7 +296,7 @@ function deleteLoan(p) {
 
 // ── PAYMENTS ──────────────────────────────────────────────────
 
-const PAYMENT_HEADERS = ['ID', 'LoanID', 'BorrowerName', 'Amount', 'Date', 'Notes', 'CreatedAt'];
+const PAYMENT_HEADERS = ['ID', 'LoanID', 'BorrowerName', 'Amount', 'Date', 'Notes', 'CreatedAt', 'RefNo'];
 
 function getPayments(p) {
   const sheet = getOrCreateSheet('Payments', PAYMENT_HEADERS);
@@ -300,12 +307,14 @@ function getPayments(p) {
 
 function addPayment(p) {
   const paySheet  = getOrCreateSheet('Payments', PAYMENT_HEADERS);
+  ensureColumns(paySheet, PAYMENT_HEADERS);
   const loanSheet = getOrCreateSheet('Loans', LOAN_HEADERS);
   const amount    = parseFloat(p.amount);
   const payId     = generateId('PAY');
+  const refNo     = nextRefNo(paySheet, 'PAY');
   const payDate   = p.date || formatDate(new Date());
 
-  paySheet.appendRow([payId, p.loanId, p.borrowerName, amount, payDate, p.notes || '', new Date().toISOString()]);
+  paySheet.appendRow([payId, p.loanId, p.borrowerName, amount, payDate, p.notes || '', new Date().toISOString(), refNo]);
 
   const loanData = loanSheet.getDataRange().getValues();
   for (let i = 1; i < loanData.length; i++) {
