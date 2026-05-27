@@ -612,11 +612,11 @@
       </div>
       <div class="form-group">
         <label class="form-label">Date Borrowed *</label>
-        <input class="form-input" id="l-borrowed" type="date" oninput="autoFillRepaymentStart('l')" />
+        <input class="form-input" id="l-borrowed" type="date" oninput="autoFillRepaymentStart('l')" onchange="autoFillRepaymentStart('l')" />
       </div>
       <div class="form-group">
-        <label class="form-label">Repayment Start Date *</label>
-        <input class="form-input" id="l-start" type="date" oninput="calcLoan()" />
+        <label class="form-label">Repayment Start Date</label>
+        <input class="form-input" id="l-start" type="date" readonly style="background:var(--bg);color:var(--navy);cursor:default;" />
       </div>
       <div class="form-group">
         <label class="form-label">Repayment End Date</label>
@@ -724,11 +724,11 @@
       </div>
       <div class="form-group">
         <label class="form-label">Date Borrowed *</label>
-        <input class="form-input" id="el-borrowed" type="date" oninput="autoFillRepaymentStart('el')" />
+        <input class="form-input" id="el-borrowed" type="date" oninput="autoFillRepaymentStart('el')" onchange="autoFillRepaymentStart('el')" />
       </div>
       <div class="form-group">
-        <label class="form-label">Repayment Start Date *</label>
-        <input class="form-input" id="el-start" type="date" oninput="calcEditLoan()" />
+        <label class="form-label">Repayment Start Date</label>
+        <input class="form-input" id="el-start" type="date" readonly style="background:var(--bg);color:var(--navy);cursor:default;" />
       </div>
       <div class="form-group">
         <label class="form-label">Repayment End Date</label>
@@ -1283,7 +1283,7 @@ function renderLoans() {
 }
 
 function openNewLoanModal() {
-  // Populate borrower select
+  // Populate borrower dropdown
   const sel = document.getElementById('l-borrower');
   sel.innerHTML = borrowers.length
     ? borrowers.map(b => `<option value="${b.ID}" data-name="${b.Name}">${b.Name}</option>`).join('')
@@ -1647,7 +1647,8 @@ function openEditLoanModal(loanId) {
     interestRate: l.InterestRate,
     termMonths:   l.TermMonths,
     interestType: l.InterestType,
-    startDate:    l.StartDate,
+    borrowedDate: (l.BorrowedDate || l.StartDate || '').toString().split('T')[0],
+    startDate:    (l.StartDate || '').toString().split('T')[0],
     notes:        l.Notes || '',
   };
 
@@ -1710,15 +1711,13 @@ async function saveEditLoan() {
   // Build diff for audit trail
   const snap = _editingLoanSnap;
   const changes = [];
-  if (String(principal)    !== String(snap.principal))    changes.push({ field: 'Principal',     old: snap.principal,    new: principal });
-  if (String(interestRate) !== String(snap.interestRate)) changes.push({ field: 'Interest Rate', old: snap.interestRate, new: interestRate });
-  if (String(termMonths)   !== String(snap.termMonths))   changes.push({ field: 'Term Months',   old: snap.termMonths,   new: termMonths });
-  if (interestType         !== snap.interestType)         changes.push({ field: 'Repayment Frequency', old: snap.interestType, new: interestType });
-  if (startDate            !== (snap.startDate || '').toString().split('T')[0])
-                                                          changes.push({ field: 'Start Date',    old: snap.startDate,    new: startDate });
-  if (notes                !== snap.notes)                changes.push({ field: 'Notes',         old: snap.notes,        new: notes });
-
-  if (!changes.length) { toast('No changes made'); closeModal('modal-edit-loan'); return; }
+  if (String(principal)    !== String(snap.principal))    changes.push({ field: 'Principal',          old: snap.principal,    new: principal });
+  if (String(interestRate) !== String(snap.interestRate)) changes.push({ field: 'Interest Rate',      old: snap.interestRate, new: interestRate });
+  if (String(termMonths)   !== String(snap.termMonths))   changes.push({ field: 'Term Months',        old: snap.termMonths,   new: termMonths });
+  if (interestType         !== snap.interestType)         changes.push({ field: 'Repayment Frequency',old: snap.interestType, new: interestType });
+  if (borrowedDate         !== snap.borrowedDate)         changes.push({ field: 'Borrowed Date',      old: snap.borrowedDate, new: borrowedDate });
+  if (startDate            !== snap.startDate)            changes.push({ field: 'Repayment Start',    old: snap.startDate,    new: startDate });
+  if (notes                !== snap.notes)                changes.push({ field: 'Notes',              old: snap.notes,        new: notes });
 
   _savingEditLoan = true;
   const btn = document.getElementById('save-edit-loan-btn');
@@ -1733,12 +1732,13 @@ async function saveEditLoan() {
 
   if (res.error) { toast(res.error, 'error'); return; }
 
-  // Save audit trail to localStorage (no GAS needed)
-  const auditKey  = 'audit_' + _editingLoanId;
-  const existing  = JSON.parse(localStorage.getItem(auditKey) || '[]');
-  const timestamp = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' });
-  changes.forEach(c => existing.unshift({ ...c, timestamp }));
-  localStorage.setItem(auditKey, JSON.stringify(existing));
+  if (changes.length) {
+    const auditKey  = 'audit_' + _editingLoanId;
+    const existing  = JSON.parse(localStorage.getItem(auditKey) || '[]');
+    const timestamp = new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' });
+    changes.forEach(c => existing.unshift({ ...c, timestamp }));
+    localStorage.setItem(auditKey, JSON.stringify(existing));
+  }
 
   toast('Loan updated');
   closeModal('modal-edit-loan');
