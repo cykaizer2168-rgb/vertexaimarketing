@@ -213,14 +213,15 @@ function addLoan(p) {
   // Flat-rate interest: total_interest = P × r × n
   const totalInterest = principal * (rate / 100) * term;
   const totalAmount   = principal + totalInterest;
-  const startDate     = p.startDate || formatDate(new Date());
-  const start         = new Date(startDate);
-  const dueDate       = new Date(start);
-  dueDate.setMonth(dueDate.getMonth() + term);
-
+  const startDate       = p.startDate || formatDate(new Date());
+  const start           = new Date(startDate);
   const freq            = p.interestType || 'monthly'; // monthly | semi-monthly | weekly
   const periodsPerMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
   const totalPeriods    = term * periodsPerMonth;
+  const dueDate         = new Date(start);
+  if (freq === 'weekly')            dueDate.setDate(dueDate.getDate() + (totalPeriods - 1) * 7);
+  else if (freq === 'semi-monthly') dueDate.setDate(dueDate.getDate() + (totalPeriods - 1) * 14);
+  else                              dueDate.setMonth(dueDate.getMonth() + (term - 1));
 
   const borrowedDate = p.borrowedDate || startDate;
   sheet.appendRow([
@@ -248,16 +249,20 @@ function updateLoan(p) {
     if (p.notes  !== undefined) setCol('Notes',  p.notes);
 
     if (p.principal !== undefined) {
-      const principal     = parseFloat(p.principal);
-      const rate          = parseFloat(p.interestRate);
-      const term          = parseInt(p.termMonths);
-      const freq          = p.interestType || 'monthly';
-      const totalInterest = principal * (rate / 100) * term;
-      const totalAmount   = principal + totalInterest;
-      const paidAmount    = parseFloat(data[i][colOf('PaidAmount')]) || 0;
-      const balance       = Math.max(0, totalAmount - paidAmount);
-      const dueDate       = new Date(p.startDate);
-      dueDate.setMonth(dueDate.getMonth() + term);
+      const principal       = parseFloat(p.principal);
+      const rate            = parseFloat(p.interestRate);
+      const term            = parseInt(p.termMonths);
+      const freq            = p.interestType || 'monthly';
+      const periodsPerMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
+      const totalPeriods    = term * periodsPerMonth;
+      const totalInterest   = principal * (rate / 100) * term;
+      const totalAmount     = principal + totalInterest;
+      const paidAmount      = parseFloat(data[i][colOf('PaidAmount')]) || 0;
+      const balance         = Math.max(0, totalAmount - paidAmount);
+      const dueDate         = new Date(p.startDate);
+      if (freq === 'weekly')            dueDate.setDate(dueDate.getDate() + (totalPeriods - 1) * 7);
+      else if (freq === 'semi-monthly') dueDate.setDate(dueDate.getDate() + (totalPeriods - 1) * 14);
+      else                              dueDate.setMonth(dueDate.getMonth() + (term - 1));
 
       setCol('Principal',   principal);
       setCol('InterestRate', rate);

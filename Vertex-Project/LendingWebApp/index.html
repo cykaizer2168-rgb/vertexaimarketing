@@ -1282,7 +1282,8 @@ function renderLoans() {
   }).join('');
 }
 
-function openNewLoanModal() {
+async function openNewLoanModal() {
+  if (!borrowers.length) await loadBorrowers();
   // Populate borrower dropdown
   const sel = document.getElementById('l-borrower');
   sel.innerHTML = borrowers.length
@@ -1326,9 +1327,14 @@ function calcLoan() {
   const prev     = document.getElementById('loan-preview');
   const endEl    = document.getElementById('l-end');
 
+  const periodsPerMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
+  const totalPeriods    = t * periodsPerMonth;
+
   if (startVal && t) {
     const endDate = new Date(startVal);
-    endDate.setMonth(endDate.getMonth() + t);
+    if (freq === 'weekly')            endDate.setDate(endDate.getDate() + (totalPeriods - 1) * 7);
+    else if (freq === 'semi-monthly') endDate.setDate(endDate.getDate() + (totalPeriods - 1) * 14);
+    else                              endDate.setMonth(endDate.getMonth() + (t - 1));
     endEl.value = fDate(endDate);
   } else {
     endEl.value = '';
@@ -1337,9 +1343,6 @@ function calcLoan() {
   if (!p || !r || !t) { prev.style.display = 'none'; return; }
 
   const interest        = p * (r / 100) * t;
-  const total           = p + interest;
-  const periodsPerMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
-  const totalPeriods    = t * periodsPerMonth;
   const periodPayment   = total / totalPeriods;
   const freqLabel       = freq === 'weekly' ? 'Payment / week' : freq === 'semi-monthly' ? 'Payment / 2 wks' : 'Payment / mo';
 
@@ -1612,7 +1615,7 @@ async function loadCurrentSection() {
     await Promise.all([loadBorrowers(), loadLoans()]); // need loans for badge count
   } else if (currentSection === 'loans' && !loaded.loans) {
     loaded.loans = true;
-    await loadLoans();
+    await Promise.all([loadLoans(), loadBorrowers()]);
   } else if (currentSection === 'payments' && !loaded.payments) {
     loaded.payments = true;
     await Promise.all([loadPayments(), loadLoans()]); // need loans for payment modal select
@@ -1673,8 +1676,14 @@ function calcEditLoan() {
   const s    = document.getElementById('el-start').value;
   const prev = document.getElementById('edit-loan-preview');
 
+  const periodsPerMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
+  const totalPeriods    = t * periodsPerMonth;
+
   if (s && t) {
-    const end = new Date(s); end.setMonth(end.getMonth() + t);
+    const end = new Date(s);
+    if (freq === 'weekly')            end.setDate(end.getDate() + (totalPeriods - 1) * 7);
+    else if (freq === 'semi-monthly') end.setDate(end.getDate() + (totalPeriods - 1) * 14);
+    else                              end.setMonth(end.getMonth() + (t - 1));
     document.getElementById('el-end').value = fDate(end);
   } else {
     document.getElementById('el-end').value = '';
@@ -1683,8 +1692,6 @@ function calcEditLoan() {
   if (!p || !r || !t) { prev.style.display = 'none'; return; }
   const interest        = p * (r / 100) * t;
   const total           = p + interest;
-  const periodsPerMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
-  const totalPeriods    = t * periodsPerMonth;
   const freqLabel       = freq === 'weekly' ? 'Payment / week' : freq === 'semi-monthly' ? 'Payment / 2 wks' : 'Payment / mo';
 
   document.getElementById('el-prev-interest').textContent      = peso(interest);
@@ -1802,9 +1809,9 @@ function calcAmortSchedule(loan) {
 
   for (let i = 1; i <= totalPeriods; i++) {
     const dueDate = new Date(start);
-    if (freq === 'weekly')       dueDate.setDate(dueDate.getDate() + i * 7);
-    else if (freq === 'semi-monthly') dueDate.setDate(dueDate.getDate() + i * 14);
-    else                         dueDate.setMonth(dueDate.getMonth() + i);
+    if (freq === 'weekly')            dueDate.setDate(dueDate.getDate() + (i - 1) * 7);
+    else if (freq === 'semi-monthly') dueDate.setDate(dueDate.getDate() + (i - 1) * 14);
+    else                              dueDate.setMonth(dueDate.getMonth() + (i - 1));
     dueDate.setHours(0, 0, 0, 0);
 
     const ending = Math.max(0, balance - periodPrin);
