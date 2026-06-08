@@ -9,6 +9,8 @@ export type IncomingProspect = {
   address?: string;
   sourceUrl?: string;
   externalId?: string;
+  rating?: number;
+  reviewCount?: number;
 };
 
 function normPhone(p?: string | null) {
@@ -63,6 +65,8 @@ export async function importProspects(opts: {
       source: 'oxylabs_gmaps',
       source_url: p.sourceUrl ?? null,
       external_id: externalId,
+      rating: typeof p.rating === 'number' && Number.isFinite(p.rating) ? p.rating : null,
+      reviews_count: typeof p.reviewCount === 'number' && Number.isFinite(p.reviewCount) ? p.reviewCount : null,
       status: 'new',
     });
     if (error) {

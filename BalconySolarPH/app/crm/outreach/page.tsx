@@ -19,6 +19,7 @@ export default function OutreachPage() {
   // Filters over the staged list.
   const [fType, setFType] = useState('all');
   const [fArea, setFArea] = useState('all');
+  const [fRating, setFRating] = useState(0);
 
   const typeOptions = useMemo(
     () => Array.from(new Set(prospects.map((p) => p.business_type).filter(Boolean))) as string[],
@@ -30,10 +31,16 @@ export default function OutreachPage() {
   );
   const filtered = useMemo(
     () =>
-      prospects.filter(
-        (p) => (fType === 'all' || p.business_type === fType) && (fArea === 'all' || p.area === fArea)
-      ),
-    [prospects, fType, fArea]
+      prospects
+        .filter(
+          (p) =>
+            (fType === 'all' || p.business_type === fType) &&
+            (fArea === 'all' || p.area === fArea) &&
+            (fRating === 0 || (typeof p.rating === 'number' && p.rating >= fRating))
+        )
+        // Highest-rated first (un-rated last) so qualified prospects float up.
+        .sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1)),
+    [prospects, fType, fArea, fRating]
   );
 
   const toggle = (id: string) =>
@@ -136,6 +143,16 @@ export default function OutreachPage() {
             {/* Filters */}
             <Select value={fType} onChange={setFType} options={['all', ...typeOptions]} small />
             <Select value={fArea} onChange={setFArea} options={['all', ...areaOptions]} small />
+            <select
+              value={fRating}
+              onChange={(e) => setFRating(+e.target.value)}
+              className="border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 bg-white cursor-pointer text-[11px]"
+            >
+              <option value={0}>All ratings</option>
+              <option value={4}>4.0★+</option>
+              <option value={4.5}>4.5★+</option>
+              <option value={5}>5.0★</option>
+            </select>
             <button
               onClick={approveSelected}
               disabled={sel.size === 0}
@@ -177,6 +194,12 @@ export default function OutreachPage() {
                       )}
                       {p.email && <Mail className="w-3 h-3 text-green-600" />}
                       {p.website && <Globe className="w-3 h-3 text-blue-500" />}
+                      {typeof p.rating === 'number' && (
+                        <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-amber-700 bg-amber-50 border border-amber-100 rounded-full px-1.5">
+                          ⭐ {p.rating}
+                          {p.reviews_count ? ` (${p.reviews_count})` : ''}
+                        </span>
+                      )}
                       {p.runs_ads && (
                         <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-700 bg-green-50 border border-green-100 rounded-full px-1.5">
                           <Megaphone className="w-2.5 h-2.5" />

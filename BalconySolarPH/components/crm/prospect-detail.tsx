@@ -101,6 +101,12 @@ export default function ProspectDetail({
               {p.address}
             </Row>
           )}
+          {typeof p.rating === 'number' && (
+            <Row icon={<span className="text-[14px]">⭐</span>} label="Rating">
+              <span className="font-medium text-amber-700">{p.rating}</span>
+              {p.reviews_count ? <span className="text-gray-500"> ({p.reviews_count} reviews)</span> : null}
+            </Row>
+          )}
           <Row icon={<Phone className="w-4 h-4 text-gray-400" />} label="Phone">
             {p.phone || <span className="text-gray-400">—</span>}
           </Row>

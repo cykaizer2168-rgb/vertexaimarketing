@@ -75,4 +75,7 @@ export interface Prospect {
   facebook?: string | null;
   runs_ads?: boolean | null;
   ad_platforms?: string | null;
+  // Best-effort qualification (from scrape, when the source page exposes it)
+  rating?: number | null;
+  reviews_count?: number | null;
 }

@@ -18,6 +18,8 @@ const BIZ_SCHEMA = {
           phone: { type: 'string' },
           website: { type: 'string' },
           address: { type: 'string' },
+          rating: { type: 'number' },
+          review_count: { type: 'number' },
         },
       },
     },
@@ -28,6 +30,15 @@ const BIZ_SCHEMA = {
 // offices) — they're not commercial solar prospects.
 const GOV_RE =
   /\b(barangay|brgy\.?|health center|city hall|municipal|municipality|national government|government center|department of|dept\.? of|bureau of|lupon|sangguniang|public market|dswd|doh|city health office|provincial|congress|senate|commission on|office of the)\b/i;
+
+function toNum(v: unknown): number | undefined {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : undefined;
+  if (typeof v === 'string') {
+    const n = parseFloat(v.replace(/[^\d.]/g, ''));
+    return Number.isFinite(n) ? n : undefined;
+  }
+  return undefined;
+}
 
 // Finds B2B prospects with Oxylabs AI Studio: AI Search locates live listing pages
 // for the query, then AI Scraper extracts structured businesses from each. Results
@@ -77,16 +88,24 @@ export async function POST(req: NextRequest) {
           render_javascript: true,
           schema: BIZ_SCHEMA,
         });
-        const businesses: Array<Record<string, string | null>> = res?.data?.businesses ?? [];
+        const businesses = (res?.data?.businesses ?? []) as Array<Record<string, unknown>>;
         for (const b of businesses) {
-          if (!b?.name) continue;
+          const name = b?.name ? String(b.name) : '';
+          if (!name) continue;
+          const address = b?.address ? String(b.address) : '';
           // Skip government / public-sector entries.
-          if (GOV_RE.test(`${b.name} ${b.address ?? ''}`)) continue;
+          if (GOV_RE.test(`${name} ${address}`)) continue;
+
+          const rating = toNum(b?.rating);
+          const rc = toNum(b?.review_count ?? b?.reviews ?? b?.reviews_count);
+
           collected.push({
-            name: b.name,
-            phone: b.phone ?? undefined,
-            website: b.website ?? undefined,
-            address: b.address ?? undefined,
+            name,
+            phone: b?.phone ? String(b.phone) : undefined,
+            website: b?.website ? String(b.website) : undefined,
+            address: address || undefined,
+            rating: rating !== undefined && rating <= 5 ? rating : undefined,
+            reviewCount: rc,
             sourceUrl: url,
           });
         }
