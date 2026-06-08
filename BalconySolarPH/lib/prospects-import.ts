@@ -1,4 +1,43 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { createAdminSupabase } from './supabase-admin';
+
+type ConvertibleProspect = {
+  id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  area: string | null;
+  business_type: string | null;
+  address: string | null;
+  website: string | null;
+};
+
+// Creates a lead from a staged prospect and marks the prospect approved.
+// Shared by the bulk approve route and the outreach "Interested" action.
+export async function convertProspectToLead(
+  sb: SupabaseClient,
+  p: ConvertibleProspect,
+  stage = 'new'
+): Promise<string | null> {
+  const { data: lead, error } = await sb
+    .from('leads')
+    .insert({
+      name: p.name,
+      mobile: p.phone ?? '',
+      email: p.email ?? '',
+      location: p.area ?? '',
+      message: p.business_type ? `${p.business_type} — ${p.address ?? ''}`.trim() : (p.address ?? ''),
+      stage,
+      lead_source: 'oxylabs_gmaps',
+      sequence_status: 'queued',
+      notes: p.website ? `Website: ${p.website}` : null,
+    })
+    .select('id')
+    .single();
+  if (error || !lead) return null;
+  await sb.from('prospects').update({ status: 'approved', lead_id: lead.id }).eq('id', p.id);
+  return lead.id as string;
+}
 
 // Shape of an incoming scraped prospect (from the Oxylabs scrape route or n8n).
 export type IncomingProspect = {

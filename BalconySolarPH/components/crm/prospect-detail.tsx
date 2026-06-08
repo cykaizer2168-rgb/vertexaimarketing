@@ -8,6 +8,14 @@ import type { Prospect } from '@/lib/supabase';
 
 type Draft = { subject: string; body: string };
 
+const CH_LABEL: Record<string, string> = { call: '📞 Call', fb: '💬 FB', email: '✉️ Email', sms: '📱 SMS' };
+const STATUS_META: Record<string, { label: string; cls: string }> = {
+  to_contact: { label: 'To contact', cls: 'text-gray-600 bg-gray-50 border-gray-200' },
+  contacted: { label: 'Contacted', cls: 'text-blue-700 bg-blue-50 border-blue-100' },
+  follow_up: { label: 'Follow-up', cls: 'text-amber-700 bg-amber-50 border-amber-100' },
+  not_interested: { label: 'Not interested', cls: 'text-red-600 bg-red-50 border-red-100' },
+};
+
 // Profile modal for a single scraped prospect: full details, clickable website/FB
 // links, an ad-signal badge, and the per-prospect actions (enrich, AI compose,
 // approve to lead).
@@ -27,6 +35,29 @@ export default function ProspectDetail({
     p.ai_subject && p.ai_body ? { subject: p.ai_subject, body: p.ai_body } : null
   );
   const [approved, setApproved] = useState(p.status === 'approved');
+  const [channel, setChannel] = useState<'call' | 'fb' | 'email' | 'sms'>('call');
+  const [notes, setNotes] = useState('');
+  const [logging, setLogging] = useState(false);
+  const [status, setStatus] = useState<string>(p.outreach_status ?? 'to_contact');
+
+  async function logOutreach(outcome: 'contacted' | 'follow_up' | 'not_interested' | 'interested') {
+    setLogging(true);
+    const res = await fetch('/api/outreach/log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prospectId: p.id, channel, outcome, notes: notes.trim() || undefined }),
+    })
+      .then((r) => r.json())
+      .catch(() => null);
+    setLogging(false);
+    if (!res?.ok) return;
+    onChanged();
+    if (outcome === 'interested') {
+      onClose(); // graduated to the pipeline as a lead
+      return;
+    }
+    setStatus(outcome);
+  }
 
   async function enrich() {
     setEnriching(true);
@@ -162,6 +193,70 @@ export default function ProspectDetail({
             </button>
           </div>
         )}
+
+        {/* Log Outreach */}
+        <div className="px-5 py-4 border-t border-gray-100">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-[12px] font-semibold text-gray-700">Log Outreach</span>
+            <span
+              className={`text-[10px] font-medium rounded-full px-2 py-0.5 border ${(STATUS_META[status] ?? STATUS_META.to_contact).cls}`}
+            >
+              {(STATUS_META[status] ?? STATUS_META.to_contact).label}
+            </span>
+          </div>
+          <div className="flex gap-1.5 mb-2">
+            {(['call', 'fb', 'email', 'sms'] as const).map((c) => (
+              <button
+                key={c}
+                onClick={() => setChannel(c)}
+                className={`text-[11px] rounded-lg px-2.5 py-1 border cursor-pointer ${
+                  channel === c
+                    ? 'bg-amber-50 border-amber-300 text-amber-700'
+                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {CH_LABEL[c]}
+              </button>
+            ))}
+          </div>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Notes (optional)…"
+            rows={2}
+            className="w-full text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 mb-2"
+          />
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              onClick={() => logOutreach('contacted')}
+              disabled={logging}
+              className="text-[11px] border border-gray-200 rounded-lg px-2.5 py-1.5 hover:bg-gray-50 disabled:opacity-50 cursor-pointer text-gray-700"
+            >
+              No answer / Contacted
+            </button>
+            <button
+              onClick={() => logOutreach('follow_up')}
+              disabled={logging}
+              className="text-[11px] border border-amber-200 rounded-lg px-2.5 py-1.5 hover:bg-amber-50 disabled:opacity-50 cursor-pointer text-amber-700"
+            >
+              Follow-up
+            </button>
+            <button
+              onClick={() => logOutreach('not_interested')}
+              disabled={logging}
+              className="text-[11px] border border-gray-200 rounded-lg px-2.5 py-1.5 hover:bg-gray-50 disabled:opacity-50 cursor-pointer text-gray-500"
+            >
+              Not interested
+            </button>
+            <button
+              onClick={() => logOutreach('interested')}
+              disabled={logging}
+              className="text-[11px] bg-green-600 text-white rounded-lg px-2.5 py-1.5 hover:bg-green-700 disabled:opacity-50 cursor-pointer"
+            >
+              ✓ Interested → Lead
+            </button>
+          </div>
+        </div>
 
         {/* Actions */}
         <div className="flex flex-wrap gap-2 px-5 py-4 border-t border-gray-100">

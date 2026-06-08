@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminSupabase } from '@/lib/supabase-admin';
+import { convertProspectToLead } from '@/lib/prospects-import';
 
 // Converts staged prospects into real leads. Idempotent per prospect:
 // already-approved prospects are skipped.
@@ -18,24 +19,8 @@ export async function POST(req: NextRequest) {
 
   for (const p of rows ?? []) {
     if (p.status === 'approved' && p.lead_id) continue;
-    const { data: lead, error } = await sb
-      .from('leads')
-      .insert({
-        name: p.name,
-        mobile: p.phone ?? '',
-        email: p.email ?? '',
-        location: p.area ?? '',
-        message: p.business_type ? `${p.business_type} — ${p.address ?? ''}`.trim() : (p.address ?? ''),
-        stage: 'new',
-        lead_source: 'oxylabs_gmaps',
-        sequence_status: 'queued',
-        notes: p.website ? `Website: ${p.website}` : null,
-      })
-      .select('id')
-      .single();
-    if (error || !lead) continue;
-    await sb.from('prospects').update({ status: 'approved', lead_id: lead.id }).eq('id', p.id);
-    converted++;
+    const leadId = await convertProspectToLead(sb, p);
+    if (leadId) converted++;
   }
 
   return NextResponse.json({ converted });

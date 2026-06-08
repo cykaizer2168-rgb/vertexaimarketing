@@ -78,4 +78,9 @@ export interface Prospect {
   // Best-effort qualification (from scrape, when the source page exposes it)
   rating?: number | null;
   reviews_count?: number | null;
+  // Outreach execution + tracking
+  outreach_status?: 'to_contact' | 'contacted' | 'not_interested' | 'follow_up' | null;
+  last_channel?: string | null;
+  contacted_at?: string | null;
+  outreach_notes?: string | null;
 }

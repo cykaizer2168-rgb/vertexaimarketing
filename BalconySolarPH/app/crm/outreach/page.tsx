@@ -7,6 +7,13 @@ import { useProspects } from '@/lib/use-prospects';
 import type { Prospect } from '@/lib/supabase';
 import ProspectDetail from '@/components/crm/prospect-detail';
 
+const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
+  to_contact: { label: 'To contact', cls: 'text-gray-500 bg-gray-50 border-gray-200' },
+  contacted: { label: 'Contacted', cls: 'text-blue-700 bg-blue-50 border-blue-100' },
+  follow_up: { label: 'Follow-up', cls: 'text-amber-700 bg-amber-50 border-amber-100' },
+  not_interested: { label: 'Not interested', cls: 'text-red-600 bg-red-50 border-red-100' },
+};
+
 export default function OutreachPage() {
   const { prospects, loading, refetch } = useProspects();
   const [type, setType] = useState('');
@@ -20,6 +27,7 @@ export default function OutreachPage() {
   const [fType, setFType] = useState('all');
   const [fArea, setFArea] = useState('all');
   const [fRating, setFRating] = useState(0);
+  const [fStatus, setFStatus] = useState('all');
 
   const typeOptions = useMemo(
     () => Array.from(new Set(prospects.map((p) => p.business_type).filter(Boolean))) as string[],
@@ -36,11 +44,12 @@ export default function OutreachPage() {
           (p) =>
             (fType === 'all' || p.business_type === fType) &&
             (fArea === 'all' || p.area === fArea) &&
-            (fRating === 0 || (typeof p.rating === 'number' && p.rating >= fRating))
+            (fRating === 0 || (typeof p.rating === 'number' && p.rating >= fRating)) &&
+            (fStatus === 'all' || (p.outreach_status ?? 'to_contact') === fStatus)
         )
         // Highest-rated first (un-rated last) so qualified prospects float up.
         .sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1)),
-    [prospects, fType, fArea, fRating]
+    [prospects, fType, fArea, fRating, fStatus]
   );
 
   const toggle = (id: string) =>
@@ -153,6 +162,17 @@ export default function OutreachPage() {
               <option value={4.5}>4.5★+</option>
               <option value={5}>5.0★</option>
             </select>
+            <select
+              value={fStatus}
+              onChange={(e) => setFStatus(e.target.value)}
+              className="border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 bg-white cursor-pointer text-[11px]"
+            >
+              <option value="all">All status</option>
+              <option value="to_contact">To contact</option>
+              <option value="contacted">Contacted</option>
+              <option value="follow_up">Follow-up</option>
+              <option value="not_interested">Not interested</option>
+            </select>
             <button
               onClick={approveSelected}
               disabled={sel.size === 0}
@@ -186,6 +206,14 @@ export default function OutreachPage() {
                     <div className="text-[13px] font-medium text-gray-800 hover:text-amber-600">{p.name}</div>
                     <div className="text-[11px] text-gray-500 flex items-center gap-3 mt-0.5 flex-wrap">
                       <span>{[p.business_type, p.area].filter(Boolean).join(' · ')}</span>
+                      {(() => {
+                        const meta = STATUS_BADGE[p.outreach_status ?? 'to_contact'];
+                        return meta ? (
+                          <span className={`text-[10px] font-medium rounded-full px-1.5 border ${meta.cls}`}>
+                            {meta.label}
+                          </span>
+                        ) : null;
+                      })()}
                       {p.phone && (
                         <span className="flex items-center gap-1">
                           <Phone className="w-3 h-3" />
