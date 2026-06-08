@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
 
 // Generates a short B2B solar outreach message tailored to the business type +
-// product. Uses Claude via the Vercel AI Gateway (model string "provider/model").
+// product. Uses OpenAI (reads OPENAI_API_KEY from the environment).
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const { businessName, businessType, product } = body as {
@@ -24,7 +25,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const { text } = await generateText({
-      model: 'anthropic/claude-sonnet-4.6',
+      // Model is env-configurable so you can move to a newer OpenAI model
+      // (e.g. OPENAI_MODEL=gpt-5.4) without a code change.
+      model: openai(process.env.OPENAI_MODEL ?? 'gpt-4o-mini'),
       system,
       prompt,
       maxOutputTokens: 400,
