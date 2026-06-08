@@ -13,12 +13,10 @@ type Draft = { subject: string; body: string };
 // approve to lead).
 export default function ProspectDetail({
   prospect,
-  product,
   onClose,
   onChanged,
 }: {
   prospect: Prospect;
-  product: string;
   onClose: () => void;
   onChanged: () => void;
 }) {
@@ -57,7 +55,7 @@ export default function ProspectDetail({
     const res = await fetch('/api/outreach/compose', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ businessName: p.name, businessType: p.business_type ?? '', product }),
+      body: JSON.stringify({ businessName: p.name, businessType: p.business_type ?? '' }),
     })
       .then((r) => r.json())
       .catch(() => null);

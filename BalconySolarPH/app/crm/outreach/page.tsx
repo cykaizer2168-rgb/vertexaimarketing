@@ -9,13 +9,11 @@ import ProspectDetail from '@/components/crm/prospect-detail';
 
 const TYPES = ['Resto/cafe', 'Retail/shops', 'Offices/clinics', 'Hotels/inns'];
 const AREAS = ['Makati', 'BGC / Taguig', 'Ortigas / Pasig', 'Quezon City', 'Manila'];
-const PRODUCTS = ['Balcony Solar Kit 800W', 'Balcony Solar Kit 1.6kW', 'Custom Quote'];
 
 export default function OutreachPage() {
   const { prospects, loading, refetch } = useProspects();
   const [type, setType] = useState(TYPES[0]);
   const [area, setArea] = useState(AREAS[0]);
-  const [product, setProduct] = useState(PRODUCTS[0]);
   const [limit, setLimit] = useState(25);
   const [busy, setBusy] = useState(false);
   const [sel, setSel] = useState<Set<string>>(new Set());
@@ -55,7 +53,7 @@ export default function OutreachPage() {
       await fetch('/api/outreach/scrape', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, area, product, limit }),
+        body: JSON.stringify({ type, area, limit }),
       });
     } catch {
       // ignore — refetch below shows whatever landed
@@ -78,12 +76,7 @@ export default function OutreachPage() {
   return (
     <>
       {selected && (
-        <ProspectDetail
-          prospect={selected}
-          product={product}
-          onClose={() => setSelected(null)}
-          onChanged={refetch}
-        />
+        <ProspectDetail prospect={selected} onClose={() => setSelected(null)} onChanged={refetch} />
       )}
 
       <div className="bg-white border-b border-gray-200 px-4 h-[50px] flex items-center gap-2 shrink-0">
@@ -108,9 +101,6 @@ export default function OutreachPage() {
           </Field>
           <Field label="Area">
             <Select value={area} onChange={setArea} options={AREAS} />
-          </Field>
-          <Field label="Product">
-            <Select value={product} onChange={setProduct} options={PRODUCTS} />
           </Field>
           <Field label="Count">
             <input
