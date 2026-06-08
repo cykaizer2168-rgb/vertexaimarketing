@@ -71,4 +71,8 @@ export interface Prospect {
   ai_body: string | null;
   status: 'new' | 'approved' | 'dismissed';
   lead_id: string | null;
+  // Enrichment (from website analysis)
+  facebook?: string | null;
+  runs_ads?: boolean | null;
+  ad_platforms?: string | null;
 }
