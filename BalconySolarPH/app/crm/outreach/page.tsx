@@ -31,16 +31,18 @@ export default function OutreachPage() {
 
   async function findProspects() {
     setBusy(true);
-    await fetch('/api/outreach/scrape', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, area, product, limit }),
-    }).catch(() => {});
-    // n8n is async; give it a moment then refresh.
-    setTimeout(() => {
-      refetch();
-      setBusy(false);
-    }, 6000);
+    try {
+      // The scrape runs synchronously (AI Search + AI Scraper) and can take 1-3 min.
+      await fetch('/api/outreach/scrape', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, area, product, limit }),
+      });
+    } catch {
+      // ignore — refetch below shows whatever landed
+    }
+    await refetch();
+    setBusy(false);
   }
 
   async function compose(id: string, name: string, btype: string | null) {
