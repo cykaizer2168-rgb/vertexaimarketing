@@ -24,6 +24,11 @@ const BIZ_SCHEMA = {
   },
 };
 
+// Skip government / public-sector entries (barangay & city health centers, gov't
+// offices) — they're not commercial solar prospects.
+const GOV_RE =
+  /\b(barangay|brgy\.?|health center|city hall|municipal|municipality|national government|government center|department of|dept\.? of|bureau of|lupon|sangguniang|public market|dswd|doh|city health office|provincial|congress|senate|commission on|office of the)\b/i;
+
 // Finds B2B prospects with Oxylabs AI Studio: AI Search locates live listing pages
 // for the query, then AI Scraper extracts structured businesses from each. Results
 // are deduped + staged via importProspects().
@@ -74,15 +79,16 @@ export async function POST(req: NextRequest) {
         });
         const businesses: Array<Record<string, string | null>> = res?.data?.businesses ?? [];
         for (const b of businesses) {
-          if (b?.name) {
-            collected.push({
-              name: b.name,
-              phone: b.phone ?? undefined,
-              website: b.website ?? undefined,
-              address: b.address ?? undefined,
-              sourceUrl: url,
-            });
-          }
+          if (!b?.name) continue;
+          // Skip government / public-sector entries.
+          if (GOV_RE.test(`${b.name} ${b.address ?? ''}`)) continue;
+          collected.push({
+            name: b.name,
+            phone: b.phone ?? undefined,
+            website: b.website ?? undefined,
+            address: b.address ?? undefined,
+            sourceUrl: url,
+          });
         }
       } catch (err) {
         console.error('[outreach/scrape] page scrape failed:', url, err);
