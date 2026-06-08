@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, RefreshCw, Search, Sparkles, Check, Phone, Mail, Copy } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Search, Sparkles, Check, Phone, Mail, Copy, Zap } from 'lucide-react';
 import { useProspects } from '@/lib/use-prospects';
 
 const TYPES = ['Resto/cafe', 'Retail/shops', 'Offices/clinics', 'Hotels/inns'];
@@ -20,6 +20,7 @@ export default function OutreachPage() {
   const [busy, setBusy] = useState(false);
   const [sel, setSel] = useState<Set<string>>(new Set());
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
+  const [enriching, setEnriching] = useState<Set<string>>(new Set());
 
   const toggle = (id: string) =>
     setSel((s) => {
@@ -58,6 +59,26 @@ export default function OutreachPage() {
       ...d,
       [id]: { subject: res?.subject ?? 'Error', body: res?.body ?? 'Compose failed — try again.', loading: false },
     }));
+  }
+
+  async function enrich(id: string) {
+    setEnriching((s) => new Set(s).add(id));
+    try {
+      // Scrapes the prospect's website for a public phone/email (~1 min).
+      await fetch('/api/outreach/enrich', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prospectId: id }),
+      });
+    } catch {
+      // ignore — refetch shows whatever got filled in
+    }
+    await refetch();
+    setEnriching((s) => {
+      const n = new Set(s);
+      n.delete(id);
+      return n;
+    });
   }
 
   async function approve() {
@@ -193,13 +214,25 @@ export default function OutreachPage() {
                           </div>
                         )}
                       </div>
-                      <button
-                        onClick={() => compose(p.id, p.name, p.business_type)}
-                        className="flex items-center gap-1 text-[11px] border border-gray-200 rounded-lg px-2.5 py-1.5 hover:bg-gray-50 cursor-pointer text-gray-700 shrink-0"
-                      >
-                        <Sparkles className="w-3 h-3" />
-                        {draft ? 'Regenerate' : 'AI message'}
-                      </button>
+                      <div className="flex flex-col gap-1.5 shrink-0">
+                        {p.website && (!p.phone || !p.email) && (
+                          <button
+                            onClick={() => enrich(p.id)}
+                            disabled={enriching.has(p.id)}
+                            className="flex items-center gap-1 text-[11px] border border-gray-200 rounded-lg px-2.5 py-1.5 hover:bg-gray-50 disabled:opacity-50 cursor-pointer text-gray-700"
+                          >
+                            <Zap className="w-3 h-3" />
+                            {enriching.has(p.id) ? 'Enriching…' : 'Enrich'}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => compose(p.id, p.name, p.business_type)}
+                          className="flex items-center gap-1 text-[11px] border border-gray-200 rounded-lg px-2.5 py-1.5 hover:bg-gray-50 cursor-pointer text-gray-700"
+                        >
+                          <Sparkles className="w-3 h-3" />
+                          {draft ? 'Regenerate' : 'AI message'}
+                        </button>
+                      </div>
                     </div>
                   </li>
                 );
