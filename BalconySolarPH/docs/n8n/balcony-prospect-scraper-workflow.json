@@ -1,0 +1,119 @@
+{
+  "name": "Balcony Solar PH — Prospect Scraper (Oxylabs Google Maps)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "balcony-prospect-scraper",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://realtime.oxylabs.io/v1/queries",
+        "authentication": "genericCredentialType",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ source: \"google_maps\", query: ($json.body.type + \" in \" + $json.body.area), pages: 1, parse: true }) }}",
+        "options": {}
+      },
+      "id": "oxylabs-002",
+      "name": "Oxylabs Google Maps",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalizes Oxylabs Google Maps results -> { product, businessType, area, prospects[] }\n// for the CRM /api/leads/import endpoint. n8n Code node, \"Run Once for All Items\".\n//\n// Expects the webhook body (product, type, area) available on the first item's json\n// via $('Webhook').first().json.body, and Oxylabs results in $input.\n\nconst wh = $('Webhook').first().json.body || {};\nconst product = wh.product || '';\nconst businessType = wh.type || '';\nconst area = wh.area || '';\n\n// Oxylabs result shape varies by node; handle the common \"organic/local\" arrays.\nconst items = $input.all();\nconst out = [];\n\nfor (const item of items) {\n  const d = item.json;\n  const results =\n    d?.results ||\n    d?.data?.results ||\n    d?.local_results ||\n    (Array.isArray(d) ? d : [d]);\n\n  for (const r of results || []) {\n    const name = r.title || r.name || r.business_name;\n    if (!name) continue;\n    out.push({\n      name: String(name),\n      phone: r.phone || r.phone_number || null,\n      website: r.website || r.url || null,\n      email: r.email || null, // filled by a later enrichment node if present\n      address: r.address || r.formatted_address || null,\n      sourceUrl: r.link || r.url || r.website || null,\n      externalId:\n        r.place_id ||\n        r.cid ||\n        `${String(name).toLowerCase().replace(/\\s+/g, '-')}|${(r.phone || '').replace(/\\D/g, '')}`,\n    });\n  }\n}\n\nreturn [{ json: { product, businessType, area, prospects: out } }];\n"
+      },
+      "id": "normalize-003",
+      "name": "Normalize",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://balcony-solar-ph.vercel.app/api/leads/import",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-import-secret",
+              "value": "={{ $env.OUTREACH_IMPORT_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "send-004",
+      "name": "Send to CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Oxylabs Google Maps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Oxylabs Google Maps": {
+      "main": [
+        [
+          {
+            "node": "Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize": {
+      "main": [
+        [
+          {
+            "node": "Send to CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}
