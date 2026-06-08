@@ -47,11 +47,17 @@ export async function POST(req: NextRequest) {
     // 1) Find live listing pages for the query.
     const search = await sdk.aiSearch.search({
       query: `${type} in ${area} Philippines list with contact number and website`,
-      limit: 5,
+      limit: 8,
       return_content: false,
       geo_location: 'PH',
     });
-    const urls = (search.data ?? []).map((r) => r.url).filter(Boolean).slice(0, 2);
+    // Skip non-HTML / unscrapable results (PDFs, scribd, Google support/maps) which
+    // the AI Scraper can't extract a business list from. Keep the top few HTML pages.
+    const BAD_URL = /\.pdf(\?|$)|\.docx?(\?|$)|scribd\.com|support\.google\.com|google\.com\/(travel|maps)/i;
+    const urls = (search.data ?? [])
+      .map((r) => r.url)
+      .filter((u): u is string => !!u && !BAD_URL.test(u))
+      .slice(0, 3);
 
     // 2) Extract structured businesses from each page until we reach the cap.
     const collected: IncomingProspect[] = [];
