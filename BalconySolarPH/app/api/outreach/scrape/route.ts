@@ -44,9 +44,11 @@ export async function POST(req: NextRequest) {
   const sdk = new OxylabsAIStudioSDK({ apiKey, timeout: 120000, retryAttempts: 1 });
 
   try {
-    // 1) Find live listing pages for the query.
+    // 1) Find live listing pages for the query. Bias toward commercial/private
+    // businesses ("businesses and companies", "private") to avoid government /
+    // barangay facilities polluting results.
     const search = await sdk.aiSearch.search({
-      query: `${type} in ${area} Philippines list with contact number and website`,
+      query: `directory of private ${type} businesses and companies in ${area} Philippines with contact number and website`,
       limit: 8,
       return_content: false,
       geo_location: 'PH',

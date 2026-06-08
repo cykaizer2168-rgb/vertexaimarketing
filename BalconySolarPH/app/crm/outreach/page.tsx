@@ -7,13 +7,10 @@ import { useProspects } from '@/lib/use-prospects';
 import type { Prospect } from '@/lib/supabase';
 import ProspectDetail from '@/components/crm/prospect-detail';
 
-const TYPES = ['Resto/cafe', 'Retail/shops', 'Offices/clinics', 'Hotels/inns'];
-const AREAS = ['Makati', 'BGC / Taguig', 'Ortigas / Pasig', 'Quezon City', 'Manila'];
-
 export default function OutreachPage() {
   const { prospects, loading, refetch } = useProspects();
-  const [type, setType] = useState(TYPES[0]);
-  const [area, setArea] = useState(AREAS[0]);
+  const [type, setType] = useState('');
+  const [area, setArea] = useState('');
   const [limit, setLimit] = useState(25);
   const [busy, setBusy] = useState(false);
   const [sel, setSel] = useState<Set<string>>(new Set());
@@ -96,11 +93,21 @@ export default function OutreachPage() {
       <div className="flex-1 overflow-auto p-4 space-y-4">
         {/* Search controls */}
         <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-wrap items-end gap-3">
-          <Field label="Business type">
-            <Select value={type} onChange={setType} options={TYPES} />
+          <Field label="Business category">
+            <input
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              placeholder="hal. dental clinic, coffee shop, hardware store"
+              className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 w-60 text-gray-700"
+            />
           </Field>
-          <Field label="Area">
-            <Select value={area} onChange={setArea} options={AREAS} />
+          <Field label="Location">
+            <input
+              value={area}
+              onChange={(e) => setArea(e.target.value)}
+              placeholder="hal. Quezon City, Makati"
+              className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 w-44 text-gray-700"
+            />
           </Field>
           <Field label="Count">
             <input
@@ -114,7 +121,7 @@ export default function OutreachPage() {
           </Field>
           <button
             onClick={findProspects}
-            disabled={busy}
+            disabled={busy || !type.trim() || !area.trim()}
             className="flex items-center gap-1.5 text-[12px] bg-amber-500 text-white rounded-lg px-4 py-2 hover:bg-amber-600 disabled:opacity-50 cursor-pointer"
           >
             <Search className="w-3.5 h-3.5" />
