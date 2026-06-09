@@ -3,8 +3,9 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, RefreshCw, CalendarPlus, MapPin, Check, X, Clock } from 'lucide-react';
-import { useAppointments, type ApptWithLead } from '@/lib/use-appointments';
+import { useAppointments } from '@/lib/use-appointments';
 import { useLeads } from '@/lib/use-leads';
+import MonthCalendar from '@/components/crm/month-calendar';
 
 const TYPES = ['assessment', 'call', 'install', 'followup'];
 const STATUS_META: Record<string, { label: string; cls: string }> = {
@@ -14,19 +15,22 @@ const STATUS_META: Record<string, { label: string; cls: string }> = {
   no_show: { label: 'No-show', cls: 'text-red-600 bg-red-50 border-red-100' },
 };
 
-function fmt(dt: string) {
-  return new Date(dt).toLocaleString('en-PH', {
-    weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
-  });
+function sameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
-function dayKey(dt: string) {
-  return new Date(dt).toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' });
+function toLocalInput(d: Date) {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function dayLabel(d: Date) {
+  return d.toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 }
 
 export default function CalendarPage() {
   const { appointments, loading, refetch } = useAppointments();
   const { leads } = useLeads();
   const [showForm, setShowForm] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [saving, setSaving] = useState(false);
   const [leadId, setLeadId] = useState('');
   const [title, setTitle] = useState('Site Assessment');
@@ -35,16 +39,19 @@ export default function CalendarPage() {
   const [location, setLocation] = useState('');
   const [notes, setNotes] = useState('');
 
-  // Upcoming first; group scheduled by day.
-  const grouped = useMemo(() => {
-    const upcoming = appointments.filter((a) => a.status === 'scheduled');
-    const groups: Record<string, ApptWithLead[]> = {};
-    for (const a of upcoming) {
-      const k = dayKey(a.scheduled_at);
-      (groups[k] ||= []).push(a);
-    }
-    return Object.entries(groups);
-  }, [appointments]);
+  // Appointments on the selected calendar day (all statuses), earliest first.
+  const dayAppointments = useMemo(
+    () =>
+      appointments
+        .filter((a) => sameDay(new Date(a.scheduled_at), selectedDate))
+        .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()),
+    [appointments, selectedDate]
+  );
+
+  function openForm() {
+    if (!when) setWhen(toLocalInput(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), 10, 0)));
+    setShowForm((s) => !s);
+  }
 
   async function save() {
     if (!leadId || !when) return;
@@ -85,7 +92,7 @@ export default function CalendarPage() {
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
         </button>
         <button
-          onClick={() => setShowForm((s) => !s)}
+          onClick={openForm}
           className="flex items-center gap-1.5 text-[12px] bg-amber-500 text-white rounded-lg px-3 py-1.5 hover:bg-amber-600 cursor-pointer"
         >
           <CalendarPlus className="w-3.5 h-3.5" />
@@ -101,6 +108,8 @@ export default function CalendarPage() {
       </div>
 
       <div className="flex-1 overflow-auto p-4 space-y-4">
+        <MonthCalendar appointments={appointments} selected={selectedDate} onSelect={setSelectedDate} />
+
         {showForm && (
           <div className="bg-white border border-gray-200 rounded-xl p-4 grid grid-cols-2 gap-3">
             <label className="flex flex-col gap-1 col-span-2">
@@ -154,54 +163,54 @@ export default function CalendarPage() {
           </div>
         )}
 
-        {loading ? (
-          <div className="flex items-center justify-center py-16 text-[12px] text-gray-400">
-            <RefreshCw className="w-4 h-4 animate-spin mr-2" /> Loading…
-          </div>
-        ) : grouped.length === 0 ? (
-          <div className="py-16 text-center text-[12px] text-gray-400">Walang paparating na appointment.</div>
-        ) : (
-          grouped.map(([day, items]) => (
-            <div key={day}>
-              <div className="text-[12px] font-semibold text-gray-700 mb-2">{day}</div>
-              <div className="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
-                {items.map((a) => (
-                  <div key={a.id} className="px-4 py-3 flex items-center gap-3">
-                    <div className="flex items-center gap-1.5 text-[12px] text-gray-600 w-28 shrink-0">
-                      <Clock className="w-3.5 h-3.5 text-gray-400" />
-                      {new Date(a.scheduled_at).toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit' })}
+        <div>
+          <div className="text-[12px] font-semibold text-gray-700 mb-2">{dayLabel(selectedDate)}</div>
+          {loading ? (
+            <div className="flex items-center justify-center py-10 text-[12px] text-gray-400 bg-white border border-gray-200 rounded-xl">
+              <RefreshCw className="w-4 h-4 animate-spin mr-2" /> Loading…
+            </div>
+          ) : dayAppointments.length === 0 ? (
+            <div className="py-10 text-center text-[12px] text-gray-400 bg-white border border-gray-200 rounded-xl">
+              Walang appointment sa araw na ito — pindutin ang &quot;New appointment&quot;.
+            </div>
+          ) : (
+            <div className="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
+              {dayAppointments.map((a) => (
+                <div key={a.id} className="px-4 py-3 flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 text-[12px] text-gray-600 w-28 shrink-0">
+                    <Clock className="w-3.5 h-3.5 text-gray-400" />
+                    {new Date(a.scheduled_at).toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit' })}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-medium text-gray-800">
+                      {a.title} <span className="text-gray-400 font-normal">· {a.leads?.name ?? 'Lead'}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[13px] font-medium text-gray-800">
-                        {a.title} <span className="text-gray-400 font-normal">· {a.leads?.name ?? 'Lead'}</span>
-                      </div>
-                      <div className="text-[11px] text-gray-500 flex items-center gap-2 mt-0.5">
-                        <span className="capitalize">{a.type}</span>
-                        {a.location && (
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            {a.location}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <span className={`text-[10px] font-medium rounded-full px-2 py-0.5 border ${STATUS_META[a.status]?.cls}`}>
-                      {STATUS_META[a.status]?.label}
-                    </span>
-                    <div className="flex gap-1 shrink-0">
-                      <button onClick={() => setStatus(a.id, 'done')} title="Done" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg cursor-pointer">
-                        <Check className="w-3.5 h-3.5" />
-                      </button>
-                      <button onClick={() => setStatus(a.id, 'no_show')} title="No-show / Cancel" className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg cursor-pointer">
-                        <X className="w-3.5 h-3.5" />
-                      </button>
+                    <div className="text-[11px] text-gray-500 flex items-center gap-2 mt-0.5">
+                      <span className="capitalize">{a.type}</span>
+                      {a.location && (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          {a.location}
+                        </span>
+                      )}
                     </div>
                   </div>
-                ))}
-              </div>
+                  <span className={`text-[10px] font-medium rounded-full px-2 py-0.5 border ${STATUS_META[a.status]?.cls}`}>
+                    {STATUS_META[a.status]?.label}
+                  </span>
+                  <div className="flex gap-1 shrink-0">
+                    <button onClick={() => setStatus(a.id, 'done')} title="Done" className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg cursor-pointer">
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => setStatus(a.id, 'no_show')} title="No-show / Cancel" className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg cursor-pointer">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))
-        )}
+          )}
+        </div>
       </div>
     </>
   );
