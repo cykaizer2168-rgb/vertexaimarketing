@@ -5,6 +5,7 @@ import {
   X, Globe, Phone, Mail, Sparkles, Zap, Check, MapPin, ExternalLink, Megaphone, Copy,
 } from 'lucide-react';
 import type { Prospect } from '@/lib/supabase';
+import { scoreProspect, tierOf, TIER_META, scoreFactors } from '@/lib/lead-score';
 
 type Draft = { subject: string; body: string };
 
@@ -124,6 +125,39 @@ export default function ProspectDetail({
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Lead score */}
+        {(() => {
+          const sc = scoreProspect(p);
+          const t = TIER_META[tierOf(sc)];
+          const factors = scoreFactors(p);
+          return (
+            <div className="px-5 py-3 border-b border-gray-100">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-[12px] font-semibold text-gray-700">Lead Score</span>
+                <span className={`text-[11px] font-semibold rounded-full px-2 py-0.5 border ${t.cls}`}>
+                  {t.emoji} {t.label} · {sc}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {factors.length === 0 ? (
+                  <span className="text-[10px] text-gray-400">Walang signals pa — i-Enrich para tumaas ang score.</span>
+                ) : (
+                  factors.map((f, i) => (
+                    <span
+                      key={i}
+                      className={`text-[10px] rounded px-1.5 py-0.5 border ${
+                        f.points < 0 ? 'bg-red-50 text-red-600 border-red-100' : 'bg-gray-50 text-gray-600 border-gray-200'
+                      }`}
+                    >
+                      {f.label} {f.points >= 0 ? `+${f.points}` : f.points}
+                    </span>
+                  ))
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Details */}
         <div className="px-5 py-4 space-y-2.5 text-[13px]">

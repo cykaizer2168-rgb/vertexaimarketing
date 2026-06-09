@@ -6,6 +6,7 @@ import { ArrowLeft, RefreshCw, Search, Check, Phone, Mail, Globe, Megaphone } fr
 import { useProspects } from '@/lib/use-prospects';
 import type { Prospect } from '@/lib/supabase';
 import ProspectDetail from '@/components/crm/prospect-detail';
+import { scoreProspect, tierOf, TIER_META } from '@/lib/lead-score';
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   to_contact: { label: 'To contact', cls: 'text-gray-500 bg-gray-50 border-gray-200' },
@@ -28,6 +29,7 @@ export default function OutreachPage() {
   const [fArea, setFArea] = useState('all');
   const [fRating, setFRating] = useState(0);
   const [fStatus, setFStatus] = useState('all');
+  const [fTier, setFTier] = useState('all');
 
   const typeOptions = useMemo(
     () => Array.from(new Set(prospects.map((p) => p.business_type).filter(Boolean))) as string[],
@@ -45,11 +47,12 @@ export default function OutreachPage() {
             (fType === 'all' || p.business_type === fType) &&
             (fArea === 'all' || p.area === fArea) &&
             (fRating === 0 || (typeof p.rating === 'number' && p.rating >= fRating)) &&
-            (fStatus === 'all' || (p.outreach_status ?? 'to_contact') === fStatus)
+            (fStatus === 'all' || (p.outreach_status ?? 'to_contact') === fStatus) &&
+            (fTier === 'all' || tierOf(scoreProspect(p)) === fTier)
         )
-        // Highest-rated first (un-rated last) so qualified prospects float up.
-        .sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1)),
-    [prospects, fType, fArea, fRating, fStatus]
+        // Hottest leads first (highest score) so the best prospects float up.
+        .sort((a, b) => scoreProspect(b) - scoreProspect(a)),
+    [prospects, fType, fArea, fRating, fStatus, fTier]
   );
 
   const toggle = (id: string) =>
@@ -173,6 +176,16 @@ export default function OutreachPage() {
               <option value="follow_up">Follow-up</option>
               <option value="not_interested">Not interested</option>
             </select>
+            <select
+              value={fTier}
+              onChange={(e) => setFTier(e.target.value)}
+              className="border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 bg-white cursor-pointer text-[11px]"
+            >
+              <option value="all">All scores</option>
+              <option value="hot">🔥 Hot</option>
+              <option value="warm">🟡 Warm</option>
+              <option value="cold">🔵 Cold</option>
+            </select>
             <button
               onClick={approveSelected}
               disabled={sel.size === 0}
@@ -203,7 +216,18 @@ export default function OutreachPage() {
                     className="cursor-pointer"
                   />
                   <button onClick={() => setSelected(p)} className="flex-1 min-w-0 text-left cursor-pointer">
-                    <div className="text-[13px] font-medium text-gray-800 hover:text-amber-600">{p.name}</div>
+                    <div className="text-[13px] font-medium text-gray-800 hover:text-amber-600 flex items-center gap-2">
+                      {p.name}
+                      {(() => {
+                        const sc = scoreProspect(p);
+                        const t = TIER_META[tierOf(sc)];
+                        return (
+                          <span className={`text-[10px] font-semibold rounded-full px-1.5 border ${t.cls}`}>
+                            {t.emoji} {sc}
+                          </span>
+                        );
+                      })()}
+                    </div>
                     <div className="text-[11px] text-gray-500 flex items-center gap-3 mt-0.5 flex-wrap">
                       <span>{[p.business_type, p.area].filter(Boolean).join(' · ')}</span>
                       {(() => {
