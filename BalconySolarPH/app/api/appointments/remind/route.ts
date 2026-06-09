@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminSupabase, fireStageWebhook } from '@/lib/supabase-admin';
+import { createAdminSupabase, fireStageWebhook, fireAppointmentWebhook } from '@/lib/supabase-admin';
 
 // Daily cron: remind for appointments scheduled in the next 24h that haven't been
 // reminded yet. Fires a Telegram alert (and an n8n payload for a lead email).
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
       weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
       hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Manila',
     });
-    await fireStageWebhook({
+    const apptPayload = {
       event_type: 'appointment_reminder',
       owner_email: process.env.OWNER_EMAIL ?? 'cykaizer2168@gmail.com',
       lead_name: lead?.name,
@@ -44,7 +44,9 @@ export async function GET(req: NextRequest) {
       scheduled_at: a.scheduled_at,
       scheduled_label: scheduledLabel,
       location: a.location,
-    });
+    };
+    await fireStageWebhook(apptPayload); // Telegram
+    await fireAppointmentWebhook(apptPayload); // owner + lead emails
     await sb.from('appointments').update({ reminded_at: new Date().toISOString() }).eq('id', a.id);
     reminded++;
   }

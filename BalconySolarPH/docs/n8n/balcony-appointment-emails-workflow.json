@@ -1,0 +1,83 @@
+{
+  "name": "Balcony Solar PH — Appointment Emails",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "balcony-appointment-emails",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "appt-webhook-001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json.body.owner_email }}",
+        "subject": "={{ ($json.body.event_type === 'appointment_reminder' ? '⏰ Reminder' : '📅 New appointment') + ': ' + $json.body.lead_name + ' — ' + $json.body.scheduled_label }}",
+        "emailType": "text",
+        "message": "={{ 'Lead: ' + $json.body.lead_name + ' (' + ($json.body.lead_email || 'walang email') + ')\\n' + 'Title: ' + $json.body.appointment_title + ' (' + $json.body.appointment_type + ')\\n' + 'Kailan: ' + $json.body.scheduled_label + '\\n' + 'Saan: ' + ($json.body.location || '-') + '\\n' + 'Notes: ' + ($json.body.notes || '-') }}",
+        "options": {}
+      },
+      "id": "appt-owner-002",
+      "name": "Email Owner",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        300
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json.body.lead_email }}",
+        "subject": "={{ ($json.body.event_type === 'appointment_reminder' ? 'Reminder: ' : 'Confirmed: ') + 'ang inyong Balcony Solar appointment' }}",
+        "emailType": "text",
+        "message": "={{ 'Hi ' + $json.body.lead_name + ',\\n\\n' + ($json.body.event_type === 'appointment_reminder' ? 'Paalala sa inyong ' : 'Confirmed ang inyong ') + $json.body.appointment_title + ' sa ' + $json.body.scheduled_label + ($json.body.location ? ' (' + $json.body.location + ')' : '') + '.\\n\\nSalamat!\\n— Balcony Solar PH' }}",
+        "options": {}
+      },
+      "id": "appt-lead-003",
+      "name": "Email Lead",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        500
+      ],
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Email Owner",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

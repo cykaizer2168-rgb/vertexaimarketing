@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminSupabase, fireStageWebhook } from '@/lib/supabase-admin';
+import { createAdminSupabase, fireStageWebhook, fireAppointmentWebhook } from '@/lib/supabase-admin';
 
 // Create an appointment for a lead. Fires a Telegram alert (and an n8n payload the
 // stage workflow can use to email the lead) and logs an activity.
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Payload carries everything n8n needs to email BOTH the owner and the lead.
-  await fireStageWebhook({
+  const apptPayload = {
     event_type: 'appointment_booked',
     owner_email: process.env.OWNER_EMAIL ?? 'cykaizer2168@gmail.com',
     lead_name: lead.name,
@@ -74,7 +74,9 @@ export async function POST(req: NextRequest) {
     scheduled_label: scheduledLabel,
     location: appt.location,
     notes: appt.notes,
-  });
+  };
+  await fireStageWebhook(apptPayload); // Telegram (existing stage workflow)
+  await fireAppointmentWebhook(apptPayload); // owner + lead emails (new workflow)
 
   return NextResponse.json({ ok: true, appointment: appt });
 }
