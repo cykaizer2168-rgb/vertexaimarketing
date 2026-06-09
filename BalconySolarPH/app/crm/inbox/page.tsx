@@ -110,7 +110,7 @@ export default function InboxPage() {
               ) : messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
                   <InboxIcon className="w-9 h-9 text-gray-300 mb-3" />
-                  <p className="text-sm font-medium text-gray-600">{q ? 'Walang tugma' : 'Wala pang mensahe'}</p>
+                  <p className="text-sm font-medium text-gray-600">{q ? 'No matches' : 'No messages yet'}</p>
                 </div>
               ) : messages.map(l => {
                 const isUnread = !read.has(l.id);
@@ -149,7 +149,7 @@ export default function InboxPage() {
                 <div className="w-16 h-16 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center mb-4">
                   <Mail className="w-7 h-7 text-gray-300" />
                 </div>
-                <p className="text-sm font-medium text-gray-600">Pumili ng mensahe</p>
+                <p className="text-sm font-medium text-gray-600">Select a message</p>
                 <p className="text-xs text-gray-400 mt-1">I-click ang isang inquiry para basahin.</p>
               </div>
             ) : (
@@ -164,7 +164,7 @@ export default function InboxPage() {
                         <h2 className="text-[15px] font-semibold text-gray-900">{active.name}</h2>
                         <span className={`text-[10px] px-2 py-0.5 rounded-md border font-medium ${STAGE_COLORS[active.stage] ?? 'bg-gray-100 text-gray-500'}`}>{STAGE_LABELS[active.stage] ?? active.stage}</span>
                       </div>
-                      <p className="text-[12px] text-gray-400 mt-0.5">{active.email || 'walang email'}</p>
+                      <p className="text-[12px] text-gray-400 mt-0.5">{active.email || 'no email'}</p>
                     </div>
                     <span className="text-[11px] text-gray-400 shrink-0">{new Date(active.created_at).toLocaleString('en-PH', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
@@ -183,7 +183,7 @@ export default function InboxPage() {
                     <div className="flex items-center justify-center py-10 text-[12px] text-gray-400"><Loader2 className="w-4 h-4 animate-spin mr-2" />Loading conversation…</div>
                   ) : thread.length === 0 ? (
                     <div className="bg-white border border-gray-100 rounded-xl p-4 text-[14px] text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {active.message || 'Walang laman ang mensahe.'}
+                      {active.message || 'No message content.'}
                     </div>
                   ) : (
                     <div className="space-y-4">

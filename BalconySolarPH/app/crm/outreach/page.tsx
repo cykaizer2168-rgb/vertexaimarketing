@@ -116,7 +116,7 @@ export default function OutreachPage() {
             <input
               value={type}
               onChange={(e) => setType(e.target.value)}
-              placeholder="hal. dental clinic, coffee shop, hardware store"
+              placeholder="e.g. dental clinic, coffee shop, hardware store"
               className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 w-60 text-gray-700"
             />
           </Field>
@@ -124,7 +124,7 @@ export default function OutreachPage() {
             <input
               value={area}
               onChange={(e) => setArea(e.target.value)}
-              placeholder="hal. Quezon City, Makati"
+              placeholder="e.g. Quezon City, Makati"
               className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 w-44 text-gray-700"
             />
           </Field>
@@ -202,7 +202,7 @@ export default function OutreachPage() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="py-16 text-center text-[12px] text-gray-400">
-              Walang prospects — mag-&quot;Find Prospects&quot; sa itaas (o i-adjust ang filters).
+              No prospects yet — click &quot;Find Prospects&quot; above (or adjust the filters).
             </div>
           ) : (
             <ul className="divide-y divide-gray-100">

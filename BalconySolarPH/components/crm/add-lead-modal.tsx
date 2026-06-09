@@ -106,7 +106,7 @@ export default function AddLeadModal({ onClose, onSaved }: Props) {
               <div className="text-[11px] font-semibold text-gray-400 mb-2">📧 Email #1 Preview — Welcome + Quote Summary</div>
               <div className="text-[11.5px] text-gray-700 leading-relaxed">
                 Hi [Name],<br /><br />
-                Salamat sa iyong interes sa solar! ☀️<br /><br />
+                Thank you for your interest in solar! ☀️<br /><br />
                 Based on your monthly bill of <strong>[bill]</strong>, we&apos;ve sized a system that can save you up to <strong>₱2,500+/month</strong> — that&apos;s a <strong>3–4 year payback</strong>.<br /><br />
                 <span className="text-gray-400 italic">[ROI breakdown + Book Assessment CTA follow in body]</span>
               </div>

@@ -141,7 +141,7 @@ export default function ProspectDetail({
               </div>
               <div className="flex flex-wrap gap-1">
                 {factors.length === 0 ? (
-                  <span className="text-[10px] text-gray-400">Walang signals pa — i-Enrich para tumaas ang score.</span>
+                  <span className="text-[10px] text-gray-400">No signals yet — Enrich to raise the score.</span>
                 ) : (
                   factors.map((f, i) => (
                     <span
@@ -176,7 +176,7 @@ export default function ProspectDetail({
             {p.phone || <span className="text-gray-400">—</span>}
           </Row>
           <Row icon={<Mail className="w-4 h-4 text-gray-400" />} label="Email">
-            {p.email || <span className="text-gray-400">— (i-Enrich para hanapin)</span>}
+            {p.email || <span className="text-gray-400">— (Enrich to find)</span>}
           </Row>
           <Row icon={<Globe className="w-4 h-4 text-gray-400" />} label="Website">
             {p.website ? (
@@ -195,19 +195,19 @@ export default function ProspectDetail({
                 <ExternalLink className="w-3 h-3" />
               </a>
             ) : (
-              <span className="text-gray-400">— (i-Enrich para hanapin)</span>
+              <span className="text-gray-400">— (Enrich to find)</span>
             )}
           </Row>
-          <Row icon={<Megaphone className="w-4 h-4 text-gray-400" />} label="Nag-ads?">
+          <Row icon={<Megaphone className="w-4 h-4 text-gray-400" />} label="Runs ads?">
             {!adsKnown ? (
-              <span className="text-gray-400">— (i-Enrich para suriin)</span>
+              <span className="text-gray-400">— (Enrich to check)</span>
             ) : p.runs_ads ? (
               <span className="inline-flex items-center gap-1 text-[11px] font-medium text-green-700 bg-green-50 border border-green-100 rounded-full px-2 py-0.5">
-                ● Oo — {p.ad_platforms}
+                ● Yes — {p.ad_platforms}
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-full px-2 py-0.5">
-                Walang na-detect na ad pixel{p.ad_platforms ? ` (${p.ad_platforms})` : ''}
+                No ad pixels detected{p.ad_platforms ? ` (${p.ad_platforms})` : ''}
               </span>
             )}
           </Row>
@@ -300,7 +300,7 @@ export default function ProspectDetail({
             className="flex items-center gap-1.5 text-[12px] border border-gray-200 rounded-lg px-3 py-2 hover:bg-gray-50 disabled:opacity-50 cursor-pointer text-gray-700"
           >
             <Zap className="w-3.5 h-3.5" />
-            {enriching ? 'Sinusuri…' : 'Enrich (FB + ads + email)'}
+            {enriching ? 'Checking…' : 'Enrich (FB + ads + email)'}
           </button>
           <button
             onClick={compose}

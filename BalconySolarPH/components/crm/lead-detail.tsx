@@ -138,7 +138,7 @@ export default function LeadDetail({ lead, onClose, onUpdated }: Props) {
           <div>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Activity</p>
             <div className="space-y-0">
-              {activities.length === 0 && <p className="text-xs text-gray-400">Wala pang activity.</p>}
+              {activities.length === 0 && <p className="text-xs text-gray-400">No activity yet.</p>}
               {activities.map((a, i) => {
                 const Icon = ACT_ICON[a.type] ?? Clock;
                 return (

@@ -146,7 +146,7 @@ export default function CalendarPage() {
                     onChange={(e) => setLeadId(e.target.value)}
                     className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 bg-white"
                   >
-                    <option value="">— Pumili ng lead —</option>
+                    <option value="">— Select a lead —</option>
                     {leads.map((l) => (
                       <option key={l.id} value={l.id}>
                         {l.name} {l.mobile ? `(${l.mobile})` : ''}
@@ -207,7 +207,7 @@ export default function CalendarPage() {
             </div>
           ) : dayAppointments.length === 0 ? (
             <div className="py-10 text-center text-[12px] text-gray-400 bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
-              Walang appointment sa araw na ito — pindutin ang &quot;New appointment&quot;.
+              No appointments on this day — click &quot;New appointment&quot;.
             </div>
           ) : (
             <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] divide-y divide-gray-100">
