@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Columns2, Users, Inbox, FormInput, SunMedium, BarChart2, Settings, LogOut, Megaphone } from 'lucide-react';
+import { LayoutDashboard, Columns2, Users, Inbox, FormInput, SunMedium, BarChart2, Settings, LogOut, Megaphone, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createBrowserSupabase } from '@/lib/supabase-browser';
 
@@ -15,6 +15,7 @@ const nav = [
   { label: 'Inbox',           href: '/crm/inbox',      icon: Inbox,           badge: null },
   { label: 'Lead Capture',    href: '/crm/capture',    icon: FormInput,       badge: null },
   { label: 'AI Outreach',     href: '/crm/outreach',   icon: Megaphone,       badge: null },
+  { label: 'Calendar',        href: '/crm/calendar',   icon: CalendarDays,    badge: null },
   { section: 'Tools' },
   { label: 'Projects',        href: '/crm/projects',   icon: SunMedium,       badge: null },
   { label: 'Reports',         href: '#',               icon: BarChart2,       badge: null },

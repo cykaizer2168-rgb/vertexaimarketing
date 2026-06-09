@@ -40,6 +40,20 @@ export interface Activity {
   actor: string;
 }
 
+export interface Appointment {
+  id: string;
+  created_at: string;
+  lead_id: string;
+  title: string | null;
+  type: string;
+  scheduled_at: string;
+  duration_min: number | null;
+  location: string | null;
+  notes: string | null;
+  status: 'scheduled' | 'done' | 'cancelled' | 'no_show';
+  reminded_at: string | null;
+}
+
 export interface Message {
   id: string;
   lead_id: string;
