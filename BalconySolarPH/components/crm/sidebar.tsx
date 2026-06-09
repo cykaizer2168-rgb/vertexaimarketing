@@ -1,8 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Columns2, Users, Inbox, FormInput, SunMedium, BarChart2, Settings, LogOut, Megaphone, CalendarDays } from 'lucide-react';
+import { LayoutDashboard, Columns2, Users, Inbox, FormInput, SunMedium, BarChart2, Settings, LogOut, Megaphone, CalendarDays, UserCog } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createBrowserSupabase } from '@/lib/supabase-browser';
 
@@ -19,12 +20,21 @@ const nav = [
   { section: 'Tools' },
   { label: 'Projects',        href: '/crm/projects',   icon: SunMedium,       badge: null },
   { label: 'Reports',         href: '#',               icon: BarChart2,       badge: null },
+  { label: 'Users',           href: '/crm/users',      icon: UserCog,         badge: null, adminOnly: true },
   { label: 'Settings',        href: '#',               icon: Settings,        badge: null },
 ];
 
 export default function CrmSidebar() {
   const path = usePathname();
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/me')
+      .then((r) => r.json())
+      .then((d) => setIsAdmin(!!d.isAdmin))
+      .catch(() => {});
+  }, []);
 
   const handleLogout = async () => {
     const supabase = createBrowserSupabase();
@@ -45,6 +55,7 @@ export default function CrmSidebar() {
       {/* Nav */}
       <nav className="flex-1 px-2 pb-2 overflow-y-auto">
         {nav.map((item, i) => {
+          if ('adminOnly' in item && item.adminOnly && !isAdmin) return null;
           if ('section' in item) {
             return (
               <div key={i} className="px-3 pt-4 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-[0.08em]">
