@@ -13,17 +13,22 @@ const MO = [
 function sameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
+function shortTime(dt: string) {
+  return new Date(dt).toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit' }).replace(' ', '');
+}
 
-// A self-contained month grid (no deps). Shows a dot on days with scheduled
-// appointments; clicking a day selects it.
+// Month grid with Google-Calendar-style event chips inside each day cell.
+// Click an empty part of a day -> onPickDay (book). Click an event -> onPickEvent.
 export default function MonthCalendar({
   appointments,
   selected,
-  onSelect,
+  onPickDay,
+  onPickEvent,
 }: {
   appointments: ApptWithLead[];
   selected: Date;
-  onSelect: (d: Date) => void;
+  onPickDay: (d: Date) => void;
+  onPickEvent: (d: Date) => void;
 }) {
   const today = new Date();
   const [view, setView] = useState(() => new Date(selected.getFullYear(), selected.getMonth(), 1));
@@ -40,13 +45,17 @@ export default function MonthCalendar({
     return arr;
   }, [view]);
 
-  const countByDay = useMemo(() => {
-    const m: Record<string, number> = {};
+  // Active appointments (scheduled/done) grouped by day, earliest first.
+  const byDay = useMemo(() => {
+    const m: Record<string, ApptWithLead[]> = {};
     for (const a of appointments) {
-      if (a.status !== 'scheduled') continue;
+      if (a.status === 'cancelled' || a.status === 'no_show') continue;
       const d = new Date(a.scheduled_at);
       const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-      m[k] = (m[k] || 0) + 1;
+      (m[k] ||= []).push(a);
+    }
+    for (const k of Object.keys(m)) {
+      m[k].sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime());
     }
     return m;
   }, [appointments]);
@@ -58,22 +67,13 @@ export default function MonthCalendar({
           {MO[view.getMonth()]} {view.getFullYear()}
         </span>
         <div className="flex items-center gap-1">
-          <button
-            onClick={() => setView((v) => new Date(v.getFullYear(), v.getMonth() - 1, 1))}
-            className="p-1 hover:bg-gray-100 rounded cursor-pointer text-gray-500"
-          >
+          <button onClick={() => setView((v) => new Date(v.getFullYear(), v.getMonth() - 1, 1))} className="p-1 hover:bg-gray-100 rounded cursor-pointer text-gray-500">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <button
-            onClick={() => setView(new Date(today.getFullYear(), today.getMonth(), 1))}
-            className="text-[11px] px-2 py-0.5 hover:bg-gray-100 rounded cursor-pointer text-gray-600"
-          >
+          <button onClick={() => setView(new Date(today.getFullYear(), today.getMonth(), 1))} className="text-[11px] px-2 py-0.5 hover:bg-gray-100 rounded cursor-pointer text-gray-600">
             Today
           </button>
-          <button
-            onClick={() => setView((v) => new Date(v.getFullYear(), v.getMonth() + 1, 1))}
-            className="p-1 hover:bg-gray-100 rounded cursor-pointer text-gray-500"
-          >
+          <button onClick={() => setView((v) => new Date(v.getFullYear(), v.getMonth() + 1, 1))} className="p-1 hover:bg-gray-100 rounded cursor-pointer text-gray-500">
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -81,36 +81,61 @@ export default function MonthCalendar({
 
       <div className="grid grid-cols-7 gap-1 mb-1">
         {WD.map((w) => (
-          <div key={w} className="text-[10px] font-medium text-gray-400 text-center py-1">
-            {w}
-          </div>
+          <div key={w} className="text-[10px] font-medium text-gray-400 text-center py-1">{w}</div>
         ))}
       </div>
 
       <div className="grid grid-cols-7 gap-1">
         {cells.map((d, i) => {
-          if (!d) return <div key={i} />;
+          if (!d) return <div key={i} className="min-h-[92px]" />;
           const k = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-          const count = countByDay[k] || 0;
+          const items = byDay[k] || [];
           const isToday = sameDay(d, today);
           const isSel = sameDay(d, selected);
           return (
-            <button
+            <div
               key={i}
-              onClick={() => onSelect(d)}
-              className={`aspect-square rounded-lg flex flex-col items-center justify-center text-[12px] cursor-pointer border transition-colors ${
-                isSel
-                  ? 'bg-amber-500 text-white border-amber-500'
-                  : isToday
-                    ? 'border-amber-300 text-gray-800'
-                    : 'border-transparent text-gray-700 hover:bg-gray-50'
+              onClick={() => onPickDay(d)}
+              className={`min-h-[92px] rounded-lg border p-1 cursor-pointer flex flex-col gap-0.5 overflow-hidden ${
+                isSel ? 'border-amber-400 bg-amber-50/40' : 'border-gray-100 hover:bg-gray-50'
               }`}
             >
-              <span>{d.getDate()}</span>
-              {count > 0 && (
-                <span className={`mt-0.5 w-1.5 h-1.5 rounded-full ${isSel ? 'bg-white' : 'bg-amber-500'}`} />
+              <div
+                className={`text-[11px] font-medium self-start rounded-full w-5 h-5 flex items-center justify-center ${
+                  isToday ? 'bg-amber-500 text-white' : 'text-gray-600'
+                }`}
+              >
+                {d.getDate()}
+              </div>
+              {items.slice(0, 3).map((a) => (
+                <button
+                  key={a.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPickEvent(d);
+                  }}
+                  title={`${shortTime(a.scheduled_at)} ${a.title ?? ''} · ${a.leads?.name ?? ''}`}
+                  className={`text-left text-[9px] leading-tight rounded px-1 py-0.5 truncate cursor-pointer ${
+                    a.status === 'done'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+                  }`}
+                >
+                  <span className="font-semibold">{shortTime(a.scheduled_at)}</span> {a.title}
+                </button>
+              ))}
+              {items.length > 3 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPickEvent(d);
+                  }}
+                  className="text-[9px] text-gray-400 hover:text-gray-600 text-left cursor-pointer"
+                >
+                  +{items.length - 3} more
+                </button>
               )}
-            </button>
+            </div>
           );
         })}
       </div>
