@@ -53,6 +53,13 @@ export default function CalendarPage() {
     setShowForm((s) => !s);
   }
 
+  // Clicking a calendar day opens the new-appointment form pre-filled for that day.
+  function selectDay(d: Date) {
+    setSelectedDate(d);
+    setWhen(toLocalInput(new Date(d.getFullYear(), d.getMonth(), d.getDate(), 10, 0)));
+    setShowForm(true);
+  }
+
   async function save() {
     if (!leadId || !when) return;
     setSaving(true);
@@ -108,7 +115,7 @@ export default function CalendarPage() {
       </div>
 
       <div className="flex-1 overflow-auto p-4 space-y-4">
-        <MonthCalendar appointments={appointments} selected={selectedDate} onSelect={setSelectedDate} />
+        <MonthCalendar appointments={appointments} selected={selectedDate} onSelect={selectDay} />
 
         {showForm && (
           <div className="bg-white border border-gray-200 rounded-xl p-4 grid grid-cols-2 gap-3">
