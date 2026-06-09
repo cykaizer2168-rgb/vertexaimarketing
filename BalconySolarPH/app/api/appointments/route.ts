@@ -53,14 +53,25 @@ export async function POST(req: NextRequest) {
     actor: 'Admin',
   });
 
+  const scheduledLabel = new Date(scheduledAt).toLocaleString('en-PH', {
+    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+    hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Manila',
+  });
+
+  // Payload carries everything n8n needs to email BOTH the owner and the lead.
   await fireStageWebhook({
     event_type: 'appointment_booked',
-    name: lead.name,
+    owner_email: process.env.OWNER_EMAIL ?? 'cykaizer2168@gmail.com',
+    lead_name: lead.name,
+    lead_email: lead.email,
+    name: lead.name, // kept for existing Telegram template
     email: lead.email,
     stage: lead.stage,
     stage_label: 'Appointment booked',
     appointment_title: apptTitle,
+    appointment_type: appt.type,
     scheduled_at: scheduledAt,
+    scheduled_label: scheduledLabel,
     location: appt.location,
     notes: appt.notes,
   });
