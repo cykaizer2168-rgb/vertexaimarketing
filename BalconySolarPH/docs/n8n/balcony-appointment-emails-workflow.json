@@ -24,7 +24,7 @@
         "sendTo": "={{ $json.body.owner_email }}",
         "subject": "={{ ($json.body.event_type === 'appointment_reminder' ? '⏰ Reminder' : '📅 New appointment') + ': ' + $json.body.lead_name + ' — ' + $json.body.scheduled_label }}",
         "emailType": "text",
-        "message": "={{ 'Lead: ' + $json.body.lead_name + ' (' + ($json.body.lead_email || 'walang email') + ')\\n' + 'Title: ' + $json.body.appointment_title + ' (' + $json.body.appointment_type + ')\\n' + 'Kailan: ' + $json.body.scheduled_label + '\\n' + 'Saan: ' + ($json.body.location || '-') + '\\n' + 'Notes: ' + ($json.body.notes || '-') }}",
+        "message": "={{ 'Lead: ' + $json.body.lead_name + ' (' + ($json.body.lead_email || 'no email') + ')\\n' + 'Title: ' + $json.body.appointment_title + ' (' + $json.body.appointment_type + ')\\n' + 'When: ' + $json.body.scheduled_label + '\\n' + 'Where: ' + ($json.body.location || '-') + '\\n' + 'Notes: ' + ($json.body.notes || '-') }}",
         "options": {}
       },
       "id": "appt-owner-002",
@@ -42,9 +42,9 @@
         "resource": "message",
         "operation": "send",
         "sendTo": "={{ $json.body.lead_email }}",
-        "subject": "={{ ($json.body.event_type === 'appointment_reminder' ? 'Reminder: ' : 'Confirmed: ') + 'ang inyong Balcony Solar appointment' }}",
+        "subject": "={{ ($json.body.event_type === 'appointment_reminder' ? 'Reminder: ' : 'Confirmed: ') + 'your Balcony Solar appointment' }}",
         "emailType": "text",
-        "message": "={{ 'Hi ' + $json.body.lead_name + ',\\n\\n' + ($json.body.event_type === 'appointment_reminder' ? 'Paalala sa inyong ' : 'Confirmed ang inyong ') + $json.body.appointment_title + ' sa ' + $json.body.scheduled_label + ($json.body.location ? ' (' + $json.body.location + ')' : '') + '.\\n\\nSalamat!\\n— Balcony Solar PH' }}",
+        "message": "={{ 'Hi ' + $json.body.lead_name + ',\\n\\nYour ' + $json.body.appointment_title + ($json.body.event_type === 'appointment_reminder' ? ' is coming up on ' : ' is confirmed for ') + $json.body.scheduled_label + ($json.body.location ? ' (' + $json.body.location + ')' : '') + '.\\n\\nThank you!\\n— Balcony Solar PH' }}",
         "options": {}
       },
       "id": "appt-lead-003",

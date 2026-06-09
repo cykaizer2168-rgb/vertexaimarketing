@@ -14,10 +14,10 @@ export async function POST(req: NextRequest) {
   if (!businessName) return NextResponse.json({ error: 'businessName required' }, { status: 400 });
 
   const system = [
-    'Ikaw ay sales rep ng Balcony Solar PH na nagbebenta ng murang plug-in solar sa maliliit na negosyo sa Pilipinas.',
-    'Sumulat ng maikli (80-120 words), magalang, Taglish na cold outreach email.',
-    'Naka-angkop sa uri ng negosyo ang benepisyo (hal. resto = bawas sa kuryente ng aircon/kitchen).',
-    'Banggitin ang produkto. Magtapos ng simpleng call-to-action (libreng assessment).',
+    'You are a sales rep for Balcony Solar PH selling affordable plug-in solar to small businesses in the Philippines.',
+    'Write a short (80-120 words), polite, professional cold outreach email in English.',
+    'Tailor the benefit to the business type (e.g. a restaurant = lower electricity bills from aircon and kitchen load).',
+    'Mention the product. End with a simple call-to-action (a free assessment).',
     'Output format EXACTLY:\nSUBJECT: <one line>\nBODY:\n<body>',
   ].join(' ');
 
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     });
     const subjMatch = text.match(/SUBJECT:\s*(.+)/i);
     const bodyMatch = text.match(/BODY:\s*([\s\S]+)/i);
-    const subject = (subjMatch?.[1] ?? 'Solar savings para sa inyong negosyo').trim();
+    const subject = (subjMatch?.[1] ?? 'Solar savings for your business').trim();
     const bodyText = (bodyMatch?.[1] ?? text).trim();
     return NextResponse.json({ subject, body: bodyText });
   } catch (err) {

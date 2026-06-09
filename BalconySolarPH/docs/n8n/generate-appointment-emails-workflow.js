@@ -8,11 +8,11 @@ const path = require('path');
 const ownerSubject =
   "={{ ($json.body.event_type === 'appointment_reminder' ? '⏰ Reminder' : '📅 New appointment') + ': ' + $json.body.lead_name + ' — ' + $json.body.scheduled_label }}";
 const ownerMessage =
-  "={{ 'Lead: ' + $json.body.lead_name + ' (' + ($json.body.lead_email || 'walang email') + ')\\n' + 'Title: ' + $json.body.appointment_title + ' (' + $json.body.appointment_type + ')\\n' + 'Kailan: ' + $json.body.scheduled_label + '\\n' + 'Saan: ' + ($json.body.location || '-') + '\\n' + 'Notes: ' + ($json.body.notes || '-') }}";
+  "={{ 'Lead: ' + $json.body.lead_name + ' (' + ($json.body.lead_email || 'no email') + ')\\n' + 'Title: ' + $json.body.appointment_title + ' (' + $json.body.appointment_type + ')\\n' + 'When: ' + $json.body.scheduled_label + '\\n' + 'Where: ' + ($json.body.location || '-') + '\\n' + 'Notes: ' + ($json.body.notes || '-') }}";
 const leadSubject =
-  "={{ ($json.body.event_type === 'appointment_reminder' ? 'Reminder: ' : 'Confirmed: ') + 'ang inyong Balcony Solar appointment' }}";
+  "={{ ($json.body.event_type === 'appointment_reminder' ? 'Reminder: ' : 'Confirmed: ') + 'your Balcony Solar appointment' }}";
 const leadMessage =
-  "={{ 'Hi ' + $json.body.lead_name + ',\\n\\n' + ($json.body.event_type === 'appointment_reminder' ? 'Paalala sa inyong ' : 'Confirmed ang inyong ') + $json.body.appointment_title + ' sa ' + $json.body.scheduled_label + ($json.body.location ? ' (' + $json.body.location + ')' : '') + '.\\n\\nSalamat!\\n— Balcony Solar PH' }}";
+  "={{ 'Hi ' + $json.body.lead_name + ',\\n\\nYour ' + $json.body.appointment_title + ($json.body.event_type === 'appointment_reminder' ? ' is coming up on ' : ' is confirmed for ') + $json.body.scheduled_label + ($json.body.location ? ' (' + $json.body.location + ')' : '') + '.\\n\\nThank you!\\n— Balcony Solar PH' }}";
 
 function gmailNode(id, name, sendTo, subject, message, pos) {
   return {
