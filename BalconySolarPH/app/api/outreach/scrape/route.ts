@@ -29,7 +29,7 @@ const BIZ_SCHEMA = {
 // Skip government / public-sector entries (barangay & city health centers, gov't
 // offices) — they're not commercial solar prospects.
 const GOV_RE =
-  /\b(barangay|brgy\.?|health center|city hall|municipal|municipality|national government|government center|department of|dept\.? of|bureau of|lupon|sangguniang|public market|dswd|doh|city health office|provincial|congress|senate|commission on|office of the)\b/i;
+  /\b(barangay|brgy\.?|health center|city hall|municipal|municipality|national government|government center|department of|dept\.? of|bureau of|lupon|sangguniang|public market|dswd|doh|city health office|provincial|congress|senate|commission on|office of the|elementary school|integrated school|national high school|central school|barangay high school|paaralan|deped)\b/i;
 
 function toNum(v: unknown): number | undefined {
   if (typeof v === 'number') return Number.isFinite(v) ? v : undefined;
