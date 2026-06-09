@@ -21,6 +21,7 @@ export default function UsersPage() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [mode, setMode] = useState<'invite' | 'set'>('invite');
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
 
@@ -44,15 +45,24 @@ export default function UsersPage() {
 
   async function addUser() {
     setErr('');
-    if (!email.trim() || password.length < 6) {
-      setErr('Email and a password (min 6 chars) are required.');
+    if (!email.trim()) {
+      setErr('Email is required.');
+      return;
+    }
+    if (mode === 'set' && password.length < 6) {
+      setErr('Password must be at least 6 characters.');
       return;
     }
     setSaving(true);
     const res = await fetch('/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.trim(), name: name.trim(), password }),
+      body: JSON.stringify({
+        email: email.trim(),
+        name: name.trim(),
+        password: mode === 'set' ? password : undefined,
+        mode,
+      }),
     });
     const d = await res.json().catch(() => ({}));
     setSaving(false);
@@ -93,24 +103,44 @@ export default function UsersPage() {
               </button>
             </div>
             <div className="p-5 space-y-3">
+              <div className="flex gap-1.5 p-1 bg-gray-100 rounded-lg">
+                <button
+                  onClick={() => setMode('invite')}
+                  className={`flex-1 text-[12px] rounded-md px-2 py-1.5 cursor-pointer transition-colors ${mode === 'invite' ? 'bg-white shadow-sm font-medium text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Send invite email
+                </button>
+                <button
+                  onClick={() => setMode('set')}
+                  className={`flex-1 text-[12px] rounded-md px-2 py-1.5 cursor-pointer transition-colors ${mode === 'set' ? 'bg-white shadow-sm font-medium text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Set password
+                </button>
+              </div>
               <Field label="Email">
                 <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="user@example.com" className="w-full text-[13px] border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800" />
               </Field>
               <Field label="Name (optional)">
                 <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Juan Dela Cruz" className="w-full text-[13px] border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800" />
               </Field>
-              <Field label="Password">
-                <input value={password} onChange={(e) => setPassword(e.target.value)} type="text" placeholder="min 6 characters" className="w-full text-[13px] border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800" />
-              </Field>
+              {mode === 'set' && (
+                <Field label="Password">
+                  <input value={password} onChange={(e) => setPassword(e.target.value)} type="text" placeholder="min 6 characters" className="w-full text-[13px] border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800" />
+                </Field>
+              )}
               {err && <div className="text-[12px] text-red-600">{err}</div>}
-              <p className="text-[11px] text-gray-400">Share the email + password with the new user. They can change it after signing in.</p>
+              <p className="text-[11px] text-gray-400">
+                {mode === 'invite'
+                  ? 'An invite email with a link to set their own password will be sent to them.'
+                  : 'Share the email + password with the new user. They can change it after signing in.'}
+              </p>
             </div>
             <div className="px-5 py-4 border-t border-gray-100 flex justify-end gap-2">
               <button onClick={() => setShowForm(false)} className="text-[12px] border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 cursor-pointer text-gray-700">
                 Cancel
               </button>
               <button onClick={addUser} disabled={saving} className="text-[12px] bg-amber-500 text-white rounded-lg px-4 py-2 hover:bg-amber-600 disabled:opacity-50 cursor-pointer">
-                {saving ? 'Adding…' : 'Add user'}
+                {saving ? (mode === 'invite' ? 'Sending…' : 'Adding…') : mode === 'invite' ? 'Send invite' : 'Add user'}
               </button>
             </div>
           </div>

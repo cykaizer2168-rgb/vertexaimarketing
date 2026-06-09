@@ -30,14 +30,32 @@ export async function POST(req: NextRequest) {
   if (!gate.ok) return NextResponse.json({ error: 'Forbidden' }, { status: gate.status });
 
   const body = await req.json().catch(() => ({}));
-  const { email, password, name } = body as { email?: string; password?: string; name?: string };
-  if (!email || !password || password.length < 6) {
-    return NextResponse.json({ error: 'Email and a password (min 6 chars) are required' }, { status: 400 });
-  }
+  const { email, password, name, mode } = body as {
+    email?: string;
+    password?: string;
+    name?: string;
+    mode?: string;
+  };
+  if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 });
 
   const sb = createAdminSupabase();
   if (!sb) return NextResponse.json({ error: 'Supabase not configured' }, { status: 500 });
 
+  // Invite mode: Supabase emails the user a link to set their own password.
+  if (mode === 'invite') {
+    const origin = new URL(req.url).origin;
+    const { data, error } = await sb.auth.admin.inviteUserByEmail(email, {
+      data: { name: name ?? '' },
+      redirectTo: `${origin}/crm/set-password`,
+    });
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ ok: true, invited: true, id: data.user?.id });
+  }
+
+  // Set-password mode: create the user with the given password.
+  if (!password || password.length < 6) {
+    return NextResponse.json({ error: 'A password (min 6 chars) is required' }, { status: 400 });
+  }
   const { data, error } = await sb.auth.admin.createUser({
     email,
     password,
