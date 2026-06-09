@@ -40,7 +40,7 @@ export default function PipelinePage() {
       </div>
 
       <div className="flex-1 overflow-auto p-4">
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden h-full">
+        <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden h-full">
           <div className="grid grid-cols-5 h-full min-h-[500px]">
             {COLUMNS.map(({ key, label }) => {
               const colLeads = leads.filter(l => l.stage === key);

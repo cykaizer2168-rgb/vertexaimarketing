@@ -128,7 +128,7 @@ export default function CalendarPage() {
             onClick={() => setShowForm(false)}
           >
             <div
-              className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-auto"
+              className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_24px_70px_-20px_rgba(0,0,0,0.35)] w-full max-w-lg max-h-[90vh] overflow-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
@@ -202,15 +202,15 @@ export default function CalendarPage() {
         <div>
           <div className="text-[12px] font-semibold text-gray-700 mb-2">{dayLabel(selectedDate)}</div>
           {loading ? (
-            <div className="flex items-center justify-center py-10 text-[12px] text-gray-400 bg-white border border-gray-200 rounded-xl">
+            <div className="flex items-center justify-center py-10 text-[12px] text-gray-400 bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
               <RefreshCw className="w-4 h-4 animate-spin mr-2" /> Loading…
             </div>
           ) : dayAppointments.length === 0 ? (
-            <div className="py-10 text-center text-[12px] text-gray-400 bg-white border border-gray-200 rounded-xl">
+            <div className="py-10 text-center text-[12px] text-gray-400 bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
               Walang appointment sa araw na ito — pindutin ang &quot;New appointment&quot;.
             </div>
           ) : (
-            <div className="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
+            <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] divide-y divide-gray-100">
               {dayAppointments.map((a) => (
                 <div key={a.id} className="px-4 py-3 flex items-center gap-3">
                   <div className="flex items-center gap-1.5 text-[12px] text-gray-600 w-28 shrink-0">

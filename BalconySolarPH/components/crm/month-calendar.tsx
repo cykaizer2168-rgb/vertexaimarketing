@@ -61,7 +61,7 @@ export default function MonthCalendar({
   }, [appointments]);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
+    <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] p-4">
       <div className="flex items-center justify-between mb-3">
         <span className="text-[13px] font-semibold text-gray-800">
           {MO[view.getMonth()]} {view.getFullYear()}

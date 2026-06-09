@@ -111,7 +111,7 @@ export default function OutreachPage() {
 
       <div className="flex-1 overflow-auto p-4 space-y-4">
         {/* Search controls */}
-        <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-wrap items-end gap-3">
+        <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] p-4 flex flex-wrap items-end gap-3">
           <Field label="Business category">
             <input
               value={type}
@@ -149,7 +149,7 @@ export default function OutreachPage() {
         </div>
 
         {/* Review table */}
-        <div className="bg-white border border-gray-200 rounded-xl">
+        <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
           <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-gray-200">
             <span className="text-[12px] font-semibold text-gray-700">Prospects ({filtered.length})</span>
             {/* Filters */}

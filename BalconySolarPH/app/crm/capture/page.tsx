@@ -46,7 +46,7 @@ export default function CapturePage() {
       <div className="flex-1 overflow-auto p-4">
         <div className="grid grid-cols-2 gap-4">
           {sources.map(s => (
-            <div key={s.title} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div key={s.title} className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200">
                 <span className="flex-1 text-[13px] font-semibold text-gray-800">{s.emoji} {s.title}</span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${s.statusColor}`}>{s.status}</span>
@@ -67,7 +67,7 @@ export default function CapturePage() {
           ))}
 
           {/* Flow diagram */}
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200">
               <span className="text-[13px] font-semibold text-gray-800">🔁 Capture → CRM Flow</span>
             </div>

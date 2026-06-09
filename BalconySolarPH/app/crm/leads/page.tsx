@@ -42,7 +42,7 @@ export default function LeadsPage() {
       </div>
 
       <div className="flex-1 overflow-auto p-4">
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-16 text-[12px] text-gray-400">
               <RefreshCw className="w-4 h-4 animate-spin mr-2" /> Loading leads from Supabase…

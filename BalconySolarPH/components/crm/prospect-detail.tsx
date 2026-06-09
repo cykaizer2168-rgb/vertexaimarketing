@@ -110,7 +110,7 @@ export default function ProspectDetail({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-auto"
+        className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_24px_70px_-20px_rgba(0,0,0,0.35)] w-full max-w-lg max-h-[90vh] overflow-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

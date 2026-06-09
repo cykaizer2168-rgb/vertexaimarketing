@@ -15,7 +15,7 @@ export default function CrmLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="crm-shell flex h-screen overflow-hidden bg-[#f5f5f7] bg-[radial-gradient(125%_125%_at_50%_0%,#ffffff_0%,#f4f4f6_42%,#eceef1_100%)] text-gray-900">
       <CrmSidebar />
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">{children}</div>
+      <div key={path} className="crm-page-in flex-1 flex flex-col min-w-0 overflow-hidden">{children}</div>
     </div>
   );
 }

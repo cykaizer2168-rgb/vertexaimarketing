@@ -44,7 +44,7 @@ export default function SequencesPage() {
       <div className="flex-1 overflow-auto p-4">
         <div className="grid grid-cols-2 gap-4">
           {sequences.map(seq => (
-            <div key={seq.title} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div key={seq.title} className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200">
                 <span className="flex-1 text-[13px] font-semibold text-gray-800">{seq.emoji} {seq.title}</span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${seq.statusColor}`}>● {seq.status}</span>
@@ -74,7 +74,7 @@ export default function SequencesPage() {
           ))}
 
           {/* Win-back full width */}
-          <div className="col-span-2 bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="col-span-2 bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200">
               <span className="flex-1 text-[13px] font-semibold text-gray-800">🔁 Win-Back / Cold Lead Reactivation</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full border border-gray-200 text-gray-500 font-medium bg-gray-50">Draft</span>

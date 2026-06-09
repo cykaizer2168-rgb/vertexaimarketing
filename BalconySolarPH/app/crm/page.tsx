@@ -67,7 +67,7 @@ export default function CrmDashboard() {
         {/* Stat cards */}
         <div className="grid grid-cols-4 gap-3">
           {statCards.map(({ icon: Icon, label, val, sub, color }) => (
-            <div key={label} className="bg-white border border-gray-200 rounded-xl p-3">
+            <div key={label} className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] p-3">
               <div className="flex items-center justify-between text-[11px] text-gray-500 mb-1">
                 {label}<Icon className={`w-4 h-4 ${color}`} />
               </div>
@@ -81,7 +81,7 @@ export default function CrmDashboard() {
         <div className="grid grid-cols-[1fr_300px] gap-3">
 
           {/* Pipeline preview */}
-          <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+          <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-200">
               <span className="flex-1 text-[13px] font-semibold text-gray-800">
                 Lead Pipeline
@@ -124,7 +124,7 @@ export default function CrmDashboard() {
           {/* Right column */}
           <div className="flex flex-col gap-3">
             {/* Active sequence */}
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-200">
                 <Mail className="w-4 h-4 text-blue-500" />
                 <span className="flex-1 text-[13px] font-semibold text-gray-800">Active Sequence</span>
@@ -152,7 +152,7 @@ export default function CrmDashboard() {
             </div>
 
             {/* Activity */}
-            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-2.5 border-b border-gray-200">
                 <Bell className="w-4 h-4 text-blue-500" />
                 <span className="text-[13px] font-semibold text-gray-800">Recent Activity</span>

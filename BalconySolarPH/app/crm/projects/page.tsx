@@ -12,7 +12,7 @@ export default function ProjectsPage() {
         <button className="flex items-center gap-1 text-[12px] bg-blue-600 text-white rounded-lg px-3 py-1.5 hover:bg-blue-700 cursor-pointer">+ New Project</button>
       </div>
       <div className="flex-1 overflow-auto p-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
+        <div className="bg-white rounded-2xl ring-1 ring-black/[0.06] shadow-[0_1px_3px_rgba(0,0,0,0.05)] p-6 text-center">
           <div className="text-4xl mb-3">☀️</div>
           <h3 className="text-[14px] font-semibold text-gray-800 mb-2">Link Solar Projects to Leads</h3>
           <p className="text-[12.5px] text-gray-500 max-w-sm mx-auto mb-4">
