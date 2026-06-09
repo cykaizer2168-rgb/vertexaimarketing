@@ -95,7 +95,7 @@ export default function OutreachPage() {
         <ProspectDetail prospect={selected} onClose={() => setSelected(null)} onChanged={refetch} />
       )}
 
-      <div className="bg-white border-b border-gray-200 px-4 h-[50px] flex items-center gap-2 shrink-0">
+      <div className="bg-white/65 backdrop-blur-2xl border-b border-black/[0.06] px-4 h-[50px] flex items-center gap-2 shrink-0">
         <span className="flex-1 text-[14px] font-semibold text-gray-800">AI Outreach</span>
         <button onClick={refetch} className="p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer text-gray-500">
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />

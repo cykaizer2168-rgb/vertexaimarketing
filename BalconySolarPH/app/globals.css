@@ -1,0 +1,41 @@
+@import "tailwindcss" source(none);
+
+@source "../app/**/*.{tsx,ts,jsx,js}";
+@source "../components/**/*.{tsx,ts,jsx,js}";
+@source "../lib/**/*.{ts,js}";
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Apple-grade refinement, scoped to the CRM shell */
+.crm-shell {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    "Helvetica Neue", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.011em;
+}
+.crm-shell ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.crm-shell ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.14);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.crm-shell ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.26);
+  background-clip: content-box;
+}
+.crm-shell ::-webkit-scrollbar-track {
+  background: transparent;
+}

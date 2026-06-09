@@ -34,24 +34,20 @@ export default function CrmSidebar() {
   };
 
   return (
-    <aside className="w-[210px] min-w-[210px] bg-[#0c1f44] flex flex-col h-screen sticky top-0">
-      {/* Logo — white card so it stands out on navy */}
-      <div className="px-3 py-4 border-b border-white/10">
-        <div className="bg-white rounded-xl px-3 py-2.5 shadow-md flex items-center justify-center">
-          <img
-            src="/images/logo.png"
-            alt="Balcony Solar PH"
-            className="h-10 w-auto object-contain"
-          />
+    <aside className="w-[224px] min-w-[224px] flex flex-col h-screen sticky top-0 bg-white/55 backdrop-blur-2xl border-r border-black/[0.06]">
+      {/* Logo */}
+      <div className="px-4 py-4">
+        <div className="bg-white rounded-2xl px-3 py-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.04] flex items-center justify-center">
+          <img src="/images/logo.png" alt="Balcony Solar PH" className="h-9 w-auto object-contain" />
         </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-2 overflow-y-auto">
+      <nav className="flex-1 px-2 pb-2 overflow-y-auto">
         {nav.map((item, i) => {
           if ('section' in item) {
             return (
-              <div key={i} className="px-4 pt-4 pb-1 text-[10px] font-semibold text-white/35 uppercase tracking-wider">
+              <div key={i} className="px-3 pt-4 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-[0.08em]">
                 {item.section}
               </div>
             );
@@ -59,17 +55,25 @@ export default function CrmSidebar() {
           const active = item.href !== '#' && (item.href === '/crm' ? path === '/crm' : path.startsWith(item.href));
           const Icon = item.icon;
           return (
-            <Link key={item.href} href={item.href}
+            <Link
+              key={item.href}
+              href={item.href}
               className={cn(
-                'flex items-center gap-2.5 px-4 py-[9px] text-[12.5px] border-l-[3px] transition-all duration-100',
+                'group flex items-center gap-2.5 px-3 py-[8px] my-[1px] rounded-xl text-[13px] transition-all duration-150',
                 active
-                  ? 'bg-white/10 text-white border-yellow-400 font-semibold'
-                  : 'text-white/65 border-transparent hover:bg-white/5 hover:text-white'
-              )}>
-              <Icon className="w-4 h-4 shrink-0" />
+                  ? 'bg-white text-gray-900 font-semibold shadow-[0_1px_2px_rgba(0,0,0,0.06)] ring-1 ring-black/[0.05]'
+                  : 'text-gray-500 hover:bg-black/[0.04] hover:text-gray-900'
+              )}
+            >
+              <Icon className={cn('w-[17px] h-[17px] shrink-0 transition-colors', active ? 'text-amber-500' : 'text-gray-400 group-hover:text-gray-600')} />
               <span className="flex-1">{item.label}</span>
               {item.badge && (
-                <span className={cn('text-[10px] rounded-full px-1.5 py-0.5 font-semibold', active ? 'bg-yellow-400 text-black' : 'bg-green-400/20 text-green-300')}>
+                <span
+                  className={cn(
+                    'text-[10px] rounded-full px-1.5 py-0.5 font-semibold',
+                    active ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-600'
+                  )}
+                >
                   {item.badge}
                 </span>
               )}
@@ -79,17 +83,19 @@ export default function CrmSidebar() {
       </nav>
 
       {/* User footer */}
-      <div className="px-4 py-3 border-t border-white/10">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-white/10 text-white text-[11px] font-bold flex items-center justify-center shrink-0">BS</div>
+      <div className="px-3 py-3 border-t border-black/[0.06]">
+        <div className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 hover:bg-black/[0.03] transition-colors">
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-white text-[11px] font-bold flex items-center justify-center shrink-0 shadow-sm">
+            BS
+          </div>
           <div className="flex-1 min-w-0">
-            <div className="text-[12px] font-medium text-white">Admin</div>
-            <div className="text-[10px] text-white/45">Balcony Solar PH</div>
+            <div className="text-[12.5px] font-semibold text-gray-900">Admin</div>
+            <div className="text-[10.5px] text-gray-400">Balcony Solar PH</div>
           </div>
           <button
             onClick={handleLogout}
             title="Sign out"
-            className="p-1.5 rounded-lg text-white/50 hover:text-red-300 hover:bg-red-500/20 transition-colors cursor-pointer shrink-0"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
           >
             <LogOut className="w-4 h-4" />
           </button>
