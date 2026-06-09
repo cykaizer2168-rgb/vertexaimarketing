@@ -118,54 +118,78 @@ export default function CalendarPage() {
         <MonthCalendar appointments={appointments} selected={selectedDate} onSelect={selectDay} />
 
         {showForm && (
-          <div className="bg-white border border-gray-200 rounded-xl p-4 grid grid-cols-2 gap-3">
-            <label className="flex flex-col gap-1 col-span-2">
-              <span className="text-[10px] font-medium text-gray-500 uppercase">Lead</span>
-              <select
-                value={leadId}
-                onChange={(e) => setLeadId(e.target.value)}
-                className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 bg-white"
-              >
-                <option value="">— Pumili ng lead —</option>
-                {leads.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name} {l.mobile ? `(${l.mobile})` : ''}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-[10px] font-medium text-gray-500 uppercase">Title</span>
-              <input value={title} onChange={(e) => setTitle(e.target.value)} className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700" />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-[10px] font-medium text-gray-500 uppercase">Type</span>
-              <select value={type} onChange={(e) => setType(e.target.value)} className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 bg-white">
-                {TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-[10px] font-medium text-gray-500 uppercase">When</span>
-              <input type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700" />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-[10px] font-medium text-gray-500 uppercase">Location</span>
-              <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="(default: lead location)" className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700" />
-            </label>
-            <label className="flex flex-col gap-1 col-span-2">
-              <span className="text-[10px] font-medium text-gray-500 uppercase">Notes</span>
-              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700" />
-            </label>
-            <div className="col-span-2 flex justify-end">
-              <button
-                onClick={save}
-                disabled={saving || !leadId || !when}
-                className="text-[12px] bg-amber-500 text-white rounded-lg px-4 py-2 hover:bg-amber-600 disabled:opacity-50 cursor-pointer"
-              >
-                {saving ? 'Saving…' : 'Save appointment'}
-              </button>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => setShowForm(false)}
+          >
+            <div
+              className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <h2 className="text-[15px] font-semibold text-gray-900">New appointment · {dayLabel(selectedDate)}</h2>
+                <button onClick={() => setShowForm(false)} className="p-1 text-gray-400 hover:text-gray-700 cursor-pointer">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-5 grid grid-cols-2 gap-3">
+                <label className="flex flex-col gap-1 col-span-2">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase">Lead</span>
+                  <select
+                    value={leadId}
+                    onChange={(e) => setLeadId(e.target.value)}
+                    className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 bg-white"
+                  >
+                    <option value="">— Pumili ng lead —</option>
+                    {leads.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.name} {l.mobile ? `(${l.mobile})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase">Title</span>
+                  <input value={title} onChange={(e) => setTitle(e.target.value)} className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700" />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase">Type</span>
+                  <select value={type} onChange={(e) => setType(e.target.value)} className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 bg-white">
+                    {TYPES.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase">When</span>
+                  <input type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700" />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase">Location</span>
+                  <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="(default: lead location)" className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700" />
+                </label>
+                <label className="flex flex-col gap-1 col-span-2">
+                  <span className="text-[10px] font-medium text-gray-500 uppercase">Notes</span>
+                  <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="text-[12px] border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700" />
+                </label>
+              </div>
+
+              <div className="px-5 py-4 border-t border-gray-100 flex justify-end gap-2">
+                <button
+                  onClick={() => setShowForm(false)}
+                  className="text-[12px] border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 cursor-pointer text-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={save}
+                  disabled={saving || !leadId || !when}
+                  className="text-[12px] bg-amber-500 text-white rounded-lg px-4 py-2 hover:bg-amber-600 disabled:opacity-50 cursor-pointer"
+                >
+                  {saving ? 'Saving…' : 'Save appointment'}
+                </button>
+              </div>
             </div>
           </div>
         )}
