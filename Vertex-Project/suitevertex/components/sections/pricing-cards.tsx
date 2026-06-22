@@ -18,8 +18,8 @@ export function PricingCards({ plans }: { plans: PricingPlan[] }) {
             {p.bestFor && <p className="mt-1 text-sm text-navy-800/60">{p.bestFor}</p>}
             <p className="mt-4 text-4xl font-bold">{p.price}<span className="text-base font-normal text-navy-800/50">{p.cadence === "/mo" ? "/mo" : ""}</span></p>
             <ul className="mt-6 space-y-2 text-sm">
-              {(p.features ?? []).map((f) => (
-                <li key={f} className="flex gap-2"><Check className="size-4 shrink-0 text-teal-500" />{f}</li>
+              {(p.features ?? []).map((f, i) => (
+                <li key={`${f}-${i}`} className="flex gap-2"><Check className="size-4 shrink-0 text-teal-500" />{f}</li>
               ))}
             </ul>
             <ButtonLink href="/contact" className="mt-6 w-full" variant={p.featured ? "primary" : "outline"}>{p.ctaLabel ?? "Book intro call"}</ButtonLink>
