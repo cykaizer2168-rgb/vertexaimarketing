@@ -1,0 +1,16 @@
+export const PRICING_PLANS_QUERY = `*[_type == "pricingPlan"]|order(order asc){_id,name,price,cadence,bestFor,featured,features,ctaLabel}`;
+export const SERVICES_QUERY = `*[_type == "service"]|order(order asc){_id,title,description,icon,category}`;
+export const COMPARISONS_QUERY = `*[_type == "comparison"]|order(order asc){_id,optionLabel,title,body,costNote}`;
+export const STATS_QUERY = `*[_type == "stat"]|order(order asc){_id,value,label}`;
+export const TESTIMONIALS_QUERY = `*[_type == "testimonial"]{_id,quote,name,role,company,logo}`;
+export const CLIENT_LOGOS_QUERY = `*[_type == "clientLogo"]|order(order asc){_id,name,logo}`;
+export const FAQS_QUERY = `*[_type == "faq" && page == $page]|order(order asc){_id,question,answer}`;
+export const POSTS_QUERY = `*[_type == "post"]|order(publishedAt desc){_id,title,"slug":slug.current,excerpt,coverImage,publishedAt}`;
+export const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{_id,title,"slug":slug.current,excerpt,coverImage,publishedAt,body,seoDescription,author->{name,role,avatar}}`;
+export const POST_SLUGS_QUERY = `*[_type == "post" && defined(slug.current)]{"slug":slug.current}`;
+export const JOBS_QUERY = `*[_type == "job" && active == true]{_id,title,"slug":slug.current,location,employmentType}`;
+export const JOB_QUERY = `*[_type == "job" && slug.current == $slug][0]{_id,title,"slug":slug.current,location,employmentType,salaryRange,applyUrl,description}`;
+export const JOB_SLUGS_QUERY = `*[_type == "job" && defined(slug.current)]{"slug":slug.current}`;
+export const LEGAL_QUERY = `*[_type == "legalPage" && slug.current == $slug][0]{_id,title,"slug":slug.current,updatedAt,body}`;
+export const LEGAL_SLUGS_QUERY = `*[_type == "legalPage" && defined(slug.current)]{"slug":slug.current}`;
+export const SITE_SETTINGS_QUERY = `*[_type == "siteSettings"][0]{brandName,tagline,contactEmail,seoDescription}`;
