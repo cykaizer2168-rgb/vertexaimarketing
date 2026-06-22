@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const revalidateTag = vi.fn();
-vi.mock("next/cache", () => ({ revalidateTag: (t: string) => revalidateTag(t) }));
+vi.mock("next/cache", () => ({ revalidateTag: (t: string, profile?: string) => revalidateTag(t, profile) }));
 vi.mock("next/server", () => ({ NextResponse: { json: (b: unknown, i?: unknown) => ({ body: b, init: i }) } }));
 
 describe("revalidate route", () => {
@@ -19,6 +19,6 @@ describe("revalidate route", () => {
     const { POST } = await import("./route");
     const req = new Request("http://x/api/revalidate?secret=shh", { method: "POST", body: JSON.stringify({ _type: "post" }) });
     await POST(req);
-    expect(revalidateTag).toHaveBeenCalledWith("post");
+    expect(revalidateTag).toHaveBeenCalledWith("post", "max");
   });
 });

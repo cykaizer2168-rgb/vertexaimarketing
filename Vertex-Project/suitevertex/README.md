@@ -96,6 +96,8 @@ npm run test:watch # Vitest in watch mode
 
 These are intentionally not implemented in v1 and must be resolved before or shortly after launch:
 
+> **LAUNCH BLOCKER — force-dynamic + ISR revalidation:** Several Sanity-fetching pages (e.g. `app/blog/page.tsx`, `app/blog/[slug]/page.tsx`) currently have `export const dynamic = "force-dynamic"` set for development convenience. **Before going to production, you MUST remove these `force-dynamic` exports** and set a real `NEXT_PUBLIC_SANITY_PROJECT_ID`. While `force-dynamic` is in place, Next.js bypasses the ISR tag cache entirely, so the `/api/revalidate` webhook (which calls `revalidateTag`) has NO EFFECT — editors will never see published content reflected without a full redeploy.
+
 1. **Vertex CRM contract** — confirm endpoint path, auth scheme, and request payload; update `lib/crm.ts` and its test.
 2. **Book-a-call tool** — embed Cal.com or Calendly on Contact/CTA once the vendor is chosen.
 3. **Final brand tokens** — confirm color hex values and upload the logo asset to `siteSettings` in Studio.
