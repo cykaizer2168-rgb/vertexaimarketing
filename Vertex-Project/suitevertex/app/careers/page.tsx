@@ -7,6 +7,8 @@ import { sanityFetch } from "@/sanity/lib/fetch";
 import { JOBS_QUERY } from "@/sanity/lib/queries";
 import type { JobListItem } from "@/sanity/lib/types";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Careers",
   description: "Join SuiteVertex — senior NetSuite engineers and operators.",

@@ -7,6 +7,8 @@ import { sanityFetch } from "@/sanity/lib/fetch";
 import * as Q from "@/sanity/lib/queries";
 import type { Stat } from "@/sanity/lib/types";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: "About", description: "SuiteVertex is a team of senior NetSuite engineers serving US mid-market finance and operations teams." };
 
 export default async function AboutPage() {

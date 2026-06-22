@@ -10,6 +10,8 @@ import { sanityFetch } from "@/sanity/lib/fetch";
 import * as Q from "@/sanity/lib/queries";
 import type { Stat, PricingPlan, Comparison as C, Service, Testimonial, Faq as F } from "@/sanity/lib/types";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [stats, plans, comparisons, services, testimonials, faqs] = await Promise.all([
     sanityFetch<Stat[]>({ query: Q.STATS_QUERY, tags: ["stat"] }),

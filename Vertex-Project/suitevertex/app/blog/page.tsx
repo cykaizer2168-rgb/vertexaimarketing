@@ -6,6 +6,8 @@ import { sanityFetch } from "@/sanity/lib/fetch";
 import { POSTS_QUERY } from "@/sanity/lib/queries";
 import type { PostListItem } from "@/sanity/lib/types";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Blog",
   description: "NetSuite insights from the SuiteVertex team.",

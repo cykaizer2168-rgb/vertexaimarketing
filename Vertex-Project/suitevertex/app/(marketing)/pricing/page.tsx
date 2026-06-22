@@ -6,6 +6,8 @@ import { sanityFetch } from "@/sanity/lib/fetch";
 import * as Q from "@/sanity/lib/queries";
 import type { PricingPlan, Faq as F } from "@/sanity/lib/types";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: "Pricing", description: "Flat monthly NetSuite plans from $2,499. No commitment, cancel anytime." };
 
 export default async function PricingPage() {

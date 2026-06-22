@@ -9,7 +9,7 @@ export function SocialProof({ items }: { items: Testimonial[] }) {
       <Container className="grid gap-6 md:grid-cols-2">
         {items.map((t) => (
           <Card key={t._id}>
-            <p className="text-lg">"{t.quote}"</p>
+            <p className="text-lg">&ldquo;{t.quote}&rdquo;</p>
             <p className="mt-4 text-sm font-medium">{t.name}{t.role ? `, ${t.role}` : ""}{t.company ? ` · ${t.company}` : ""}</p>
           </Card>
         ))}

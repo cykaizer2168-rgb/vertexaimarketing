@@ -10,7 +10,7 @@ describe("revalidate route", () => {
   it("rejects a bad secret", async () => {
     const { POST } = await import("./route");
     const req = new Request("http://x/api/revalidate?secret=wrong", { method: "POST", body: JSON.stringify({ _type: "post" }) });
-    const res = await POST(req);
+    const res = await POST(req) as unknown as { body: unknown; init?: { status: number } };
     expect(res.init?.status).toBe(401);
     expect(revalidateTag).not.toHaveBeenCalled();
   });

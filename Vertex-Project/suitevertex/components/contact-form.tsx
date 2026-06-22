@@ -23,7 +23,7 @@ export function ContactForm() {
   }
 
   if (status === "success") {
-    return <p className="rounded-xl bg-teal-500/10 p-6 text-teal-700">Thanks — we'll be in touch within one business day.</p>;
+    return <p className="rounded-xl bg-teal-500/10 p-6 text-teal-700">Thanks &mdash; we&apos;ll be in touch within one business day.</p>;
   }
 
   return (

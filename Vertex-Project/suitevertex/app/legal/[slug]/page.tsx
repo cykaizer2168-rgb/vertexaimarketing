@@ -6,7 +6,13 @@ import { sanityFetch } from "@/sanity/lib/fetch";
 import { LEGAL_QUERY, LEGAL_SLUGS_QUERY } from "@/sanity/lib/queries";
 import type { LegalPage } from "@/sanity/lib/types";
 
+// Force dynamic so the build doesn't try to pre-render against a missing Sanity dataset.
+// Remove this once NEXT_PUBLIC_SANITY_PROJECT_ID is set in the deployment environment.
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
+  // Skip static generation when running against a placeholder project ID (e.g. CI/dummy build).
+  if (!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID === "dummy") return [];
   const slugs = await sanityFetch<{ slug: string }[]>({ query: LEGAL_SLUGS_QUERY, tags: ["legalPage"] });
   return slugs.map((s) => ({ slug: s.slug }));
 }

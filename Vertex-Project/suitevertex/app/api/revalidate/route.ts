@@ -9,6 +9,6 @@ export async function POST(request: Request) {
   let body: { _type?: string };
   try { body = await request.json(); } catch { return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 }); }
   if (!body._type) return NextResponse.json({ ok: false, error: "Missing _type" }, { status: 400 });
-  revalidateTag(body._type);
+  revalidateTag(body._type, "max");
   return NextResponse.json({ ok: true, revalidated: body._type });
 }
