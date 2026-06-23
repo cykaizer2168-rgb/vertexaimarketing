@@ -50,9 +50,9 @@ export const TRUST = {
   label: "Works with",
   items: [
     { name: "NetSuite", logo: "/logos/netsuite.png" },
-    { name: "Shopify" },
-    { name: "HubSpot" },
-    { name: "Salesforce" },
+    { name: "Shopify", logo: "/logos/shopify.png" },
+    { name: "HubSpot", logo: "/logos/hubspot.png" },
+    { name: "Salesforce", logo: "/logos/salesforce.png" },
     { name: "Celigo" },
     { name: "Slack" },
   ] satisfies TrustItem[],
