@@ -53,8 +53,8 @@ export const TRUST = {
     { name: "Shopify", logo: "/logos/shopify.png" },
     { name: "HubSpot", logo: "/logos/hubspot.png" },
     { name: "Salesforce", logo: "/logos/salesforce.png" },
-    { name: "Celigo" },
-    { name: "Slack" },
+    { name: "Celigo", logo: "/logos/celigo.png" },
+    { name: "Slack", logo: "/logos/slack.png" },
   ] satisfies TrustItem[],
 } as const;
 
