@@ -28,3 +28,68 @@ export const HERO = {
     "Cancel anytime",
   ],
 } as const;
+
+export const PRICING = {
+  eyebrow: "Pricing",
+  title: "Simple monthly plans. No surprise hourly invoices.",
+  subtitle:
+    "Pick a tier, add work to a shared backlog, and get senior delivery for one predictable monthly fee.",
+} as const;
+
+export type Plan = {
+  name: string;
+  price: string;
+  cadence?: string;
+  bestFor: string;
+  features: string[];
+  featured?: boolean;
+  ctaLabel: string;
+};
+
+export const PLANS: Plan[] = [
+  {
+    name: "Starter",
+    price: "$2,499",
+    cadence: "/mo",
+    bestFor: "Best for small ERP teams",
+    features: [
+      "Backlog-based ERP support",
+      "Saved searches and reports",
+      "Workflow fixes",
+      "Minor integrations",
+      "Weekly progress digest",
+    ],
+    ctaLabel: "Start with Starter",
+  },
+  {
+    name: "Growth",
+    price: "$3,999",
+    cadence: "/mo",
+    bestFor: "Best for growing operations teams",
+    featured: true,
+    features: [
+      "Everything in Starter",
+      "NetSuite + HubSpot + Shopify integrations",
+      "Celigo / n8n workflows",
+      "AI automation support",
+      "Priority response",
+    ],
+    ctaLabel: "Choose Growth",
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    bestFor: "Best for complex operations",
+    features: [
+      "Dedicated delivery lead",
+      "Multi-system architecture",
+      "Advanced integrations",
+      "Custom dashboards",
+      "Security and role reviews",
+    ],
+    ctaLabel: "Talk to us",
+  },
+];
+
+export const SPRINT_NOTE =
+  "Need one project? AI + Integration Sprints start at $4,999.";

@@ -1,5 +1,6 @@
 import { CtaProvider, BookCallButton } from "@/components/landing/cta-modal";
 import { Hero } from "@/components/landing/hero";
+import { Pricing } from "@/components/landing/pricing";
 import { NAV_LINKS, BRAND } from "@/content/landing";
 
 export default function LandingPage() {
@@ -9,6 +10,7 @@ export default function LandingPage() {
         <SiteHeader />
         <main>
           <Hero />
+          <Pricing />
         </main>
       </div>
     </CtaProvider>
