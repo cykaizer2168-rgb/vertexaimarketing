@@ -49,6 +49,11 @@ export const HERO = {
   ],
 } as const;
 
+export const TRUST = {
+  label: "Works with",
+  items: ["NetSuite", "Shopify", "HubSpot", "Salesforce", "Celigo", "Slack"],
+} as const;
+
 export const STATS = [
   { value: "7+", label: "Years NetSuite experience" },
   { value: "50+", label: "Workflows & automations shipped" },
