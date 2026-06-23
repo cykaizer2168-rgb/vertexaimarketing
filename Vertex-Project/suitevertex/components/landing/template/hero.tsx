@@ -59,7 +59,7 @@ export function TemplateHero() {
           animate="visible"
           className="mb-5 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
         >
-          {HERO.headlineTop} —<br />
+          {HERO.headlineTop}<br />
           <span
             className="bg-clip-text text-transparent"
             style={{ backgroundImage: "linear-gradient(90deg,#60a5fa 0%,#818cf8 50%,#a78bfa 100%)" }}

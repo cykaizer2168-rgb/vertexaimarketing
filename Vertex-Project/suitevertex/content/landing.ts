@@ -31,9 +31,9 @@ export const FOOTER_LEGAL = [
 
 export const HERO = {
   eyebrow: "ERP + AI + Automation — as a Service",
-  headlineTop: "Your ERP, AI Automation, and Integration Team",
-  headlineAccent: "on a Monthly Plan.",
-  sub: "NetSuite support, integrations, workflows, AI agents, CRM automation, and custom internal tools handled by senior consultants for one predictable monthly fee.",
+  headlineTop: "Run Your Operations with AI.",
+  headlineAccent: "Not More Headcount.",
+  sub: "SuiteVertex combines ERP expertise, AI automation, integrations, and custom operations support into one monthly subscription.",
   primaryCta: "Book a 15-min call",
   secondaryCta: "See plans",
   badges: [
