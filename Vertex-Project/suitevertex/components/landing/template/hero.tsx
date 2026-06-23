@@ -120,11 +120,14 @@ export function TemplateHero() {
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
             {TRUST.items.map((item) =>
               item.logo ? (
-                <span
-                  key={item.name}
-                  className="relative block h-8 w-28 overflow-hidden rounded-md ring-1 ring-white/10"
-                >
-                  <Image src={item.logo} alt={item.name} fill sizes="112px" className="object-cover object-center" />
+                <span key={item.name} className="relative block h-9 w-28 overflow-hidden">
+                  <Image
+                    src={item.logo}
+                    alt={item.name}
+                    fill
+                    sizes="112px"
+                    className="object-cover object-center mix-blend-screen"
+                  />
                 </span>
               ) : (
                 <div key={item.name} className="flex items-center gap-2 text-white/55">
