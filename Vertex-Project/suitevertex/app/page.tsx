@@ -1,7 +1,7 @@
 import { CtaProvider } from "@/components/landing/cta-modal";
 import { TemplateNavbar } from "@/components/landing/template/navbar";
 import { TemplateHero } from "@/components/landing/template/hero";
-import { TemplateSolution } from "@/components/landing/template/solution";
+import { TemplateWhyDifferent } from "@/components/landing/template/why-different";
 import { TemplateServices } from "@/components/landing/template/services";
 import { TemplateHowItWorks } from "@/components/landing/template/how-it-works";
 import { TemplateAudience } from "@/components/landing/template/audience";
@@ -18,7 +18,7 @@ export default function LandingPage() {
       <main className="bg-white">
         <TemplateNavbar />
         <TemplateHero />
-        <TemplateSolution />
+        <TemplateWhyDifferent />
         <TemplateServices />
         <TemplateHowItWorks />
         <TemplateAudience />

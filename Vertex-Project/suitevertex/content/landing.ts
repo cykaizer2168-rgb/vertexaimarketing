@@ -58,17 +58,18 @@ export const TRUST = {
   ] satisfies TrustItem[],
 } as const;
 
-export const SOLUTION = {
-  eyebrow: "What we built instead",
-  title: "A monthly technical operations team for the systems that run your business.",
-  body: "Instead of hiring, scoping, and chasing invoices, you get one senior team working a shared backlog — shipping fixes, integrations, and automations every week.",
-  highlights: [
-    "Predictable monthly cost",
-    "Senior review on every critical change",
-    "No annual lock-in",
-    "Backlog-driven delivery",
-    "Weekly progress digest",
-    "Clear documentation",
+export const WHY_DIFFERENT = {
+  eyebrow: "Why we're different",
+  headlineLead: "We're not an agency.",
+  headlineSub: "We're not a staffing firm either.",
+  copy: [
+    "SuiteVertex sits between consulting and execution.",
+    "You get a senior team that manages ERP systems, integrations, AI automations, reporting, and operational workflows through one predictable monthly engagement.",
+  ],
+  metrics: [
+    { value: "70%+", label: "Lower cost than building an internal team" },
+    { value: "100%", label: "Senior-reviewed deliverables" },
+    { value: "0", label: "Annual contracts" },
   ],
 } as const;
 
