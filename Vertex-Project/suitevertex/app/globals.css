@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  /* Brand tokens (used by the light /marketing CMS pages) */
   --color-navy-950: #0a0f1f;
   --color-navy-900: #0f172a;
   --color-navy-800: #1e293b;
@@ -8,8 +9,37 @@
   --color-indigo-500: #6366f1;
   --color-teal-500: #14b8a6;
   --color-teal-400: #2dd4bf;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Landing (dark) ink ramp */
+  --color-ink-950: #06060e;
+  --color-ink-900: #0b0b16;
+  --color-ink-800: #11111f;
+
+  /* Type pairing */
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
 }
 
-html { scroll-behavior: smooth; }
-body { @apply bg-white text-navy-900 antialiased; }
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ink-950 text-slate-100 antialiased;
+}
+
+/* Soft staggered entrance used by the hero. */
+@keyframes sv-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sv-rise {
+  animation: sv-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
