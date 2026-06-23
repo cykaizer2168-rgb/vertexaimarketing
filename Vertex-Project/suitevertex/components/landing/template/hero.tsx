@@ -1,22 +1,23 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle2, ImageIcon } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { fadeUp, BookButton } from "./ui";
 import { HERO } from "@/content/landing";
 
 export function TemplateHero() {
   return (
-    <section id="top" className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
-      {/* background image placeholder */}
-      <div className="absolute inset-0 bg-[#070a14]" aria-hidden>
-        <div className="absolute inset-0 flex items-center justify-center opacity-[0.06]">
-          <div className="flex flex-col items-center gap-2 text-white">
-            <ImageIcon className="size-16" />
-            <span className="text-sm font-medium">Hero background image</span>
-          </div>
-        </div>
-      </div>
+    <section id="top" className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#070a14]">
+      {/* video background */}
+      <video
+        className="absolute inset-0 h-full w-full scale-105 object-cover"
+        src="/hero-bg.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        aria-hidden="true"
+      />
 
       {/* overlays */}
       <div
