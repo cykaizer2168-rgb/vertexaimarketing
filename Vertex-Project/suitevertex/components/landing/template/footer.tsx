@@ -1,10 +1,11 @@
 import { ImageIcon } from "lucide-react";
-import { BRAND, FOOTER_LINKS } from "@/content/landing";
+import { BRAND, FOOTER_NAV, FOOTER_LEGAL } from "@/content/landing";
 
 export function TemplateFooter() {
   return (
     <footer className="bg-[#070a14] text-white">
-      <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-14 sm:px-6 md:flex-row md:items-start md:justify-between lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr] lg:px-8">
+        {/* Brand */}
         <div className="max-w-sm">
           <div className="flex items-center gap-2.5">
             {/* logo image placeholder */}
@@ -16,13 +17,33 @@ export function TemplateFooter() {
           <p className="mt-4 text-sm leading-relaxed text-white/50">{BRAND.footerLine}</p>
         </div>
 
-        <nav className="flex flex-wrap gap-x-8 gap-y-3">
-          {FOOTER_LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="text-sm text-white/60 transition hover:text-white">
-              {l.label}
-            </a>
-          ))}
-        </nav>
+        {/* Company */}
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-white/40">Company</h3>
+          <ul className="mt-4 space-y-3">
+            {FOOTER_NAV.map((l) => (
+              <li key={l.href}>
+                <a href={l.href} className="text-sm text-white/60 transition hover:text-white">
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Legal */}
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-white/40">Legal</h3>
+          <ul className="mt-4 space-y-3">
+            {FOOTER_LEGAL.map((l) => (
+              <li key={l.href}>
+                <a href={l.href} className="text-sm text-white/60 transition hover:text-white">
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div className="border-t border-white/[0.06]">

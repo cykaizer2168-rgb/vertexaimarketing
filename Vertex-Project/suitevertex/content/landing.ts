@@ -14,13 +14,19 @@ export const NAV_LINKS = [
   { label: "FAQ", href: "#faq" },
 ] as const;
 
-export const FOOTER_LINKS = [
-  { label: "Services", href: "#services" },
-  { label: "How it Works", href: "#how-it-works" },
-  { label: "Pricing", href: "#pricing" },
+export const FOOTER_NAV = [
+  { label: "How it works", href: "#how-it-works" },
+  { label: "About", href: "/about" },
+  { label: "Blog", href: "/blog" },
+  { label: "Careers", href: "/careers" },
   { label: "Contact", href: "#contact" },
-  { label: "Privacy", href: "/legal/privacy" },
+] as const;
+
+export const FOOTER_LEGAL = [
   { label: "Terms", href: "/legal/terms" },
+  { label: "SLA", href: "/legal/sla" },
+  { label: "Privacy", href: "/legal/privacy" },
+  { label: "Money-back guarantee", href: "/legal/guarantee" },
 ] as const;
 
 export const HERO = {
