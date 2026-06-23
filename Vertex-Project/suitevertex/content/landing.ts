@@ -58,13 +58,6 @@ export const TRUST = {
   ] satisfies TrustItem[],
 } as const;
 
-export const STATS = [
-  { value: "7+", label: "Years NetSuite experience" },
-  { value: "50+", label: "Workflows & automations shipped" },
-  { value: "ERP·CRM·AI", label: "Coverage across your stack" },
-  { value: "< 1 day", label: "Typical response time" },
-] as const;
-
 export const SOLUTION = {
   eyebrow: "What we built instead",
   title: "A monthly technical operations team for the systems that run your business.",
