@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, ImageIcon } from "lucide-react";
 import { fadeUp, BookButton } from "./ui";
-import { HERO } from "@/content/landing";
+import { HERO, TRUST } from "@/content/landing";
 
 export function TemplateHero() {
   return (
@@ -111,22 +112,31 @@ export function TemplateHero() {
           </a>
         </motion.div>
 
-        <motion.div
-          variants={fadeUp}
-          custom={0.65}
-          initial="hidden"
-          animate="visible"
-          className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3"
-        >
-          {HERO.stats.map((s) => (
-            <div
-              key={s.label}
-              className="flex flex-col items-center gap-1 rounded-2xl border border-white/20 bg-white/10 px-6 py-6 shadow-lg backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/15"
-            >
-              <span className="text-2xl font-bold tracking-tight text-white sm:text-3xl">{s.value}</span>
-              <span className="text-center text-xs leading-snug text-white/55">{s.label}</span>
-            </div>
-          ))}
+        {/* Trust bar */}
+        <motion.div variants={fadeUp} custom={0.65} initial="hidden" animate="visible" className="w-full">
+          <p className="mb-5 text-center text-xs font-semibold uppercase tracking-widest text-white/40">
+            {TRUST.label}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            {TRUST.items.map((item) =>
+              item.logo ? (
+                <span
+                  key={item.name}
+                  className="relative block h-8 w-28 overflow-hidden rounded-md ring-1 ring-white/10"
+                >
+                  <Image src={item.logo} alt={item.name} fill sizes="112px" className="object-cover object-center" />
+                </span>
+              ) : (
+                <div key={item.name} className="flex items-center gap-2 text-white/55">
+                  {/* logo image placeholder */}
+                  <span className="grid size-7 place-items-center rounded-md border border-dashed border-white/20 bg-white/[0.04]">
+                    <ImageIcon className="size-3.5" />
+                  </span>
+                  <span className="text-sm font-bold tracking-tight text-white/70">{item.name}</span>
+                </div>
+              )
+            )}
+          </div>
         </motion.div>
       </div>
     </section>

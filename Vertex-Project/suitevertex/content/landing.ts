@@ -42,11 +42,6 @@ export const HERO = {
     "Response < 1 business day",
     "Cancel anytime",
   ],
-  stats: [
-    { value: "7+ yrs", label: "NetSuite experience" },
-    { value: "50+", label: "Automations shipped" },
-    { value: "< 1 day", label: "Typical response" },
-  ],
 } as const;
 
 export type TrustItem = { name: string; logo?: string };
