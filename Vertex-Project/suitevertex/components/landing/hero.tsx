@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Check, ArrowRight, Sparkles } from "lucide-react";
 import { BookCallButton } from "./cta-modal";
 import { HERO } from "@/content/landing";
@@ -47,12 +48,12 @@ export function Hero() {
               {HERO.primaryCta}
               <ArrowRight className="size-4" />
             </BookCallButton>
-            <a
-              href="#pricing"
+            <Link
+              href="/pricing"
               className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-white/15 px-6 text-sm font-semibold text-slate-100 transition hover:bg-white/5"
             >
               {HERO.secondaryCta}
-            </a>
+            </Link>
           </div>
 
           <ul

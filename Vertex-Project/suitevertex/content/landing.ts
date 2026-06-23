@@ -8,11 +8,18 @@ export const BRAND = {
 } as const;
 
 export const NAV_LINKS = [
-  { label: "Pricing", href: "#pricing" },
-  { label: "How it Works", href: "#how-it-works" },
-  { label: "Services", href: "#services" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Contact", href: "#contact" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "How it Works", href: "/#how-it-works" },
+  { label: "Services", href: "/#services" },
+  { label: "FAQ", href: "/#faq" },
+  { label: "Contact", href: "/#contact" },
+] as const;
+
+export const FOOTER_LINKS = [
+  { label: "Pricing", href: "/pricing" },
+  { label: "Services", href: "/#services" },
+  { label: "How it Works", href: "/#how-it-works" },
+  { label: "Contact", href: "/#contact" },
 ] as const;
 
 export const HERO = {

@@ -3,12 +3,14 @@ import { Section, SectionHeading } from "./section";
 import { BookCallButton } from "./cta-modal";
 import { PRICING, PLANS, SPRINT_NOTE, type Plan } from "@/content/landing";
 
-export function Pricing() {
+export function Pricing({ showHeading = true }: { showHeading?: boolean }) {
   return (
     <Section id="pricing">
-      <SectionHeading eyebrow={PRICING.eyebrow} title={PRICING.title} subtitle={PRICING.subtitle} />
+      {showHeading && (
+        <SectionHeading eyebrow={PRICING.eyebrow} title={PRICING.title} subtitle={PRICING.subtitle} />
+      )}
 
-      <div className="mt-14 grid gap-6 lg:grid-cols-3">
+      <div className={`grid gap-6 lg:grid-cols-3 ${showHeading ? "mt-14" : ""}`}>
         {PLANS.map((plan) => (
           <PlanCard key={plan.name} plan={plan} />
         ))}
