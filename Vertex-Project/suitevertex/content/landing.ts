@@ -49,9 +49,18 @@ export const HERO = {
   ],
 } as const;
 
+export type TrustItem = { name: string; logo?: string };
+
 export const TRUST = {
   label: "Works with",
-  items: ["NetSuite", "Shopify", "HubSpot", "Salesforce", "Celigo", "Slack"],
+  items: [
+    { name: "NetSuite", logo: "/logos/netsuite.png" },
+    { name: "Shopify" },
+    { name: "HubSpot" },
+    { name: "Salesforce" },
+    { name: "Celigo" },
+    { name: "Slack" },
+  ] satisfies TrustItem[],
 } as const;
 
 export const STATS = [
