@@ -100,3 +100,53 @@ export const PLANS: Plan[] = [
 
 export const SPRINT_NOTE =
   "Need one project? AI + Integration Sprints start at $4,999.";
+
+export type ProblemOption = {
+  label: string;
+  icon: "hire" | "firm" | "freelance";
+  title: string;
+  body: string;
+  price: string;
+  priceNote: string;
+};
+
+export const PROBLEM = {
+  eyebrow: "How most teams handle this today",
+  titleLead: "The usual options are",
+  titleEmphasis: "expensive, slow, or risky.",
+  paragraph:
+    "Most growing teams have already tried one of these options. Usually two. Sometimes all three, before they realize they need a more reliable way to manage ERP, integrations, AI automation, and reporting.",
+  options: [
+    {
+      label: "Option A · Hire someone",
+      icon: "hire",
+      title: "Hire an ERP admin",
+      body: "Finding someone who understands ERP, integrations, reporting, workflows, and automation takes months. One person usually cannot cover everything.",
+      price: "$120K–$180K",
+      priceNote: "/yr fully loaded",
+    },
+    {
+      label: "Option B · Hourly firm",
+      icon: "firm",
+      title: "Retain a consultancy",
+      body: "The work can be good, but every small request becomes a scope discussion, change order, and surprise invoice.",
+      price: "$125–$350",
+      priceNote: "/hr before markup",
+    },
+    {
+      label: "Option C · Random contractors",
+      icon: "freelance",
+      title: "Shop on freelance sites",
+      body: "Sometimes you get lucky. But quality varies, documentation is inconsistent, and support disappears when something breaks.",
+      price: "~$25–$60",
+      priceNote: "/hr quality varies",
+    },
+  ] satisfies ProblemOption[],
+  strip: {
+    eyebrow: "What we built instead",
+    headline: "A monthly plan. One senior team. Clear delivery every week.",
+    middle: "Predictable invoice. No change-order theatre. Cancel any month you want.",
+    price: "$2,499",
+    priceNote: "/mo",
+  },
+} as const;
