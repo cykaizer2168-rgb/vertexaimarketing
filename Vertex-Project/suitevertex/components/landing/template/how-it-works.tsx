@@ -1,6 +1,6 @@
 "use client";
 
-import { Reveal, SectionTitle } from "./ui";
+import { Reveal, SectionTitle, TiltCard } from "./ui";
 import { STEPS } from "@/content/landing";
 
 export function TemplateHowItWorks() {
@@ -13,14 +13,14 @@ export function TemplateHowItWorks() {
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.items.map((step, i) => (
-            <Reveal key={step.n} delay={i * 0.08}>
-              <div className="h-full rounded-2xl bg-white p-7 text-center">
+            <Reveal key={step.n} delay={i * 0.08} className="h-full">
+              <TiltCard className="rounded-2xl bg-white p-7 text-center">
                 <span className="font-display text-3xl font-semibold tracking-tight text-[color:var(--color-accent)]">
                   {step.n}
                 </span>
                 <h3 className="mt-4 font-semibold tracking-tight text-[color:var(--color-ink)]">{step.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-black/55">{step.body}</p>
-              </div>
+              </TiltCard>
             </Reveal>
           ))}
         </div>

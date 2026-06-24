@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, X } from "lucide-react";
-import { Reveal, SectionTitle } from "./ui";
+import { Reveal, SectionTitle, TiltCard } from "./ui";
 import { AUDIENCE } from "@/content/landing";
 
 export function TemplateAudience() {
@@ -13,8 +13,8 @@ export function TemplateAudience() {
         </Reveal>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Reveal>
-            <div className="h-full rounded-2xl bg-white p-8">
+          <Reveal className="h-full">
+            <TiltCard max={6} className="rounded-2xl bg-white p-8">
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[color:var(--color-accent)]">
                 {AUDIENCE.forYou.title}
               </p>
@@ -26,11 +26,11 @@ export function TemplateAudience() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </TiltCard>
           </Reveal>
 
-          <Reveal delay={0.1}>
-            <div className="h-full rounded-2xl bg-white p-8">
+          <Reveal delay={0.1} className="h-full">
+            <TiltCard max={6} className="rounded-2xl bg-white p-8">
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/40">
                 {AUDIENCE.notForYou.title}
               </p>
@@ -42,7 +42,7 @@ export function TemplateAudience() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </TiltCard>
           </Reveal>
         </div>
       </div>

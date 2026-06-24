@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, animate, useInView, useReducedMotion } from "framer-motion";
+import { motion, animate, useInView, useReducedMotion, useSpring } from "framer-motion";
 import { ImageIcon } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useBookCall } from "@/components/landing/cta-modal";
@@ -44,6 +44,56 @@ export function Reveal({
 /* Kept for compatibility; editorial cards mostly use border/bg hover instead. */
 export const cardHover = { y: -4 } as const;
 export const cardHoverTransition = { type: "spring" as const, stiffness: 300, damping: 24 };
+
+/* 3D tilt-on-hover card. The surface rotates toward the cursor in 3D. */
+export function TiltCard({
+  children,
+  className = "",
+  max = 9,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  max?: number;
+}) {
+  const reduced = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const rotateX = useSpring(0, { stiffness: 220, damping: 18, mass: 0.4 });
+  const rotateY = useSpring(0, { stiffness: 220, damping: 18, mass: 0.4 });
+
+  if (reduced) {
+    return <div className={cn("h-full", className)}>{children}</div>;
+  }
+
+  return (
+    <div
+      className="h-full [perspective:1000px]"
+      onMouseMove={(e) => {
+        const el = ref.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        rotateY.set(px * max * 2);
+        rotateX.set(-py * max * 2);
+      }}
+      onMouseLeave={() => {
+        rotateX.set(0);
+        rotateY.set(0);
+      }}
+    >
+      <motion.div
+        ref={ref}
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        className={cn(
+          "h-full transition-shadow duration-300 will-change-transform hover:shadow-2xl hover:shadow-black/10",
+          className
+        )}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
 
 /* ---------- editorial text bits ---------- */
 

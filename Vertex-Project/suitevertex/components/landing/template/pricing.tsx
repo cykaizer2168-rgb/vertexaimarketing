@@ -1,7 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { Reveal, SectionTitle, BookButton } from "./ui";
+import { Reveal, SectionTitle, BookButton, TiltCard } from "./ui";
 import { PRICING, PLANS, SPRINT_NOTE, type Plan } from "@/content/landing";
 
 export function TemplatePricing() {
@@ -14,7 +14,7 @@ export function TemplatePricing() {
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {PLANS.map((plan, i) => (
-            <Reveal key={plan.name} delay={i * 0.1}>
+            <Reveal key={plan.name} delay={i * 0.1} className="h-full">
               <PlanCard plan={plan} />
             </Reveal>
           ))}
@@ -36,9 +36,10 @@ export function TemplatePricing() {
 function PlanCard({ plan }: { plan: Plan }) {
   const featured = plan.featured;
   return (
-    <div
+    <TiltCard
+      max={6}
       className={[
-        "flex h-full flex-col rounded-2xl p-7",
+        "flex flex-col rounded-2xl p-7",
         featured ? "bg-[color:var(--color-accent)]/[0.06]" : "bg-[color:var(--color-paper)]",
       ].join(" ")}
     >
@@ -71,6 +72,6 @@ function PlanCard({ plan }: { plan: Plan }) {
       <BookButton variant={featured ? "primary" : "soft"} className="mt-7 w-full">
         {plan.ctaLabel}
       </BookButton>
-    </div>
+    </TiltCard>
   );
 }
