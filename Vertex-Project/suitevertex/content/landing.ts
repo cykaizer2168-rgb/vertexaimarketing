@@ -76,51 +76,73 @@ export const WHY_DIFFERENT = {
 export type ServiceGroup = { title: string; icon: string; items: string[] };
 
 export const SERVICES = {
-  eyebrow: "Capabilities",
-  title: "What your NetSuite copilot can do",
-  sub: "24/7, role-based help grounded in your business processes and policies — from troubleshooting live issues to reading audit trails.",
+  eyebrow: "What we do",
+  title: "Three ways SuiteVertex runs NetSuite with you",
+  sub: "From day-to-day operations, to new implementations, to an AI copilot working inside NetSuite.",
   groups: [
     {
-      title: "Troubleshoot live issues",
-      icon: "wrench",
+      title: "NetSuite Managed Services",
+      icon: "settings",
       items: [
-        "Bank rec: matched lines that won't clear",
-        "Period close & posting errors",
-        "Workflows that aren't triggering",
-        "Step-by-step fixes for your exact setup",
+        "Backlog-driven admin & support",
+        "Saved searches, reports, dashboards",
+        "Workflows, forms, roles",
+        "Integrations & fixes",
+        "Weekly progress digest",
       ],
+    },
+    {
+      title: "NetSuite Implementation",
+      icon: "rocket",
+      items: [
+        "New implementations & go-lives",
+        "Module rollouts",
+        "Data migration",
+        "Customizations & scripting",
+        "Process design & training",
+      ],
+    },
+    {
+      title: "NetSuite Copilot",
+      icon: "bot",
+      items: [
+        "24/7 AI support inside NetSuite",
+        "Grounded in your processes & policies",
+        "Troubleshoots real issues",
+        "Role-based & secure",
+      ],
+    },
+  ] satisfies ServiceGroup[],
+} as const;
+
+export type CopilotCapability = { title: string; icon: string; desc: string };
+
+export const COPILOT = {
+  eyebrow: "Product · NetSuite Copilot",
+  title: "Activate a NetSuite Copilot that knows your business.",
+  sub: "An AI copilot inside NetSuite that answers 24/7 from your actual business processes and company policies — not just generic SuiteAnswers. Role-based, and backed by senior consultants.",
+  capabilities: [
+    {
+      title: "Troubleshoots live issues",
+      icon: "wrench",
+      desc: "Bank rec lines that won't clear, period-close errors, workflows that don't fire — diagnosed against your real setup.",
     },
     {
       title: "Saved searches & reports",
       icon: "search",
-      items: [
-        "Explain and fix saved searches",
-        "Build the report you actually need",
-        "Diagnose why results look wrong",
-        "Scheduled / emailed report issues",
-      ],
+      desc: "Explains, fixes, and builds the saved searches and reports your team needs.",
     },
     {
       title: "Audit trail & system notes",
       icon: "history",
-      items: [
-        "Who changed this record, and when",
-        "Reads System Notes to trace changes",
-        "Finds the source of data discrepancies",
-        "Reconciles unexpected values",
-      ],
+      desc: "Reads System Notes to show who changed what and when, and traces data discrepancies.",
     },
     {
       title: "Role-based & secure",
       icon: "shield",
-      items: [
-        "Answers respect each user's NetSuite role",
-        "Financial data gated by permission",
-        "No exposure of restricted information",
-        "Read-first, audit-friendly",
-      ],
+      desc: "Answers respect each user's NetSuite role; financial data stays gated by permission.",
     },
-  ] satisfies ServiceGroup[],
+  ] satisfies CopilotCapability[],
   examplesLabel: "Try asking your copilot",
   examples: [
     "Why won't this reconciled bank line clear from the match list?",

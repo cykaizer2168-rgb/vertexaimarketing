@@ -1,15 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Wrench, Search, History, ShieldCheck, CheckCircle2, type LucideIcon } from "lucide-react";
+import { Settings, Rocket, Bot, CheckCircle2, type LucideIcon } from "lucide-react";
 import { Reveal, SectionTitle, cardHover, cardHoverTransition } from "./ui";
 import { SERVICES, type ServiceGroup } from "@/content/landing";
 
 const ICONS: Record<string, LucideIcon> = {
-  wrench: Wrench,
-  search: Search,
-  history: History,
-  shield: ShieldCheck,
+  settings: Settings,
+  rocket: Rocket,
+  bot: Bot,
 };
 
 export function TemplateServices() {
@@ -20,35 +19,18 @@ export function TemplateServices() {
           <SectionTitle eyebrow={SERVICES.eyebrow} title={SERVICES.title} sub={SERVICES.sub} />
         </Reveal>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {SERVICES.groups.map((group, i) => (
             <ServiceCard key={group.title} group={group} delay={i * 0.1} />
           ))}
         </div>
-
-        {/* Example questions */}
-        <Reveal className="mt-14">
-          <p className="text-center text-xs font-semibold uppercase tracking-widest text-gray-400">
-            {SERVICES.examplesLabel}
-          </p>
-          <div className="mt-5 flex flex-wrap justify-center gap-3">
-            {SERVICES.examples.map((q) => (
-              <span
-                key={q}
-                className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-600 shadow-sm"
-              >
-                &ldquo;{q}&rdquo;
-              </span>
-            ))}
-          </div>
-        </Reveal>
       </div>
     </section>
   );
 }
 
 function ServiceCard({ group, delay }: { group: ServiceGroup; delay: number }) {
-  const Icon = ICONS[group.icon] ?? Wrench;
+  const Icon = ICONS[group.icon] ?? Settings;
   return (
     <motion.div
       initial={{ opacity: 0, y: 28 }}

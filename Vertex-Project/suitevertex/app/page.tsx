@@ -4,6 +4,7 @@ import { TemplateNavbar } from "@/components/landing/template/navbar";
 import { TemplateHero } from "@/components/landing/template/hero";
 import { TemplateWhyDifferent } from "@/components/landing/template/why-different";
 import { TemplateServices } from "@/components/landing/template/services";
+import { TemplateCopilot } from "@/components/landing/template/copilot";
 import { TemplateHowItWorks } from "@/components/landing/template/how-it-works";
 import { TemplateAudience } from "@/components/landing/template/audience";
 import { TemplatePricing } from "@/components/landing/template/pricing";
@@ -22,6 +23,7 @@ export default function LandingPage() {
         <TemplateHero />
         <TemplateWhyDifferent />
         <TemplateServices />
+        <TemplateCopilot />
         <TemplateHowItWorks />
         <TemplateAudience />
         <TemplatePricing />
