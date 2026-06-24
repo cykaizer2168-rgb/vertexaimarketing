@@ -1,3 +1,4 @@
+import { MotionConfig } from "framer-motion";
 import { CtaProvider } from "@/components/landing/cta-modal";
 import { TemplateNavbar } from "@/components/landing/template/navbar";
 import { TemplateHero } from "@/components/landing/template/hero";
@@ -15,6 +16,7 @@ import { TemplateStickyCta } from "@/components/landing/template/sticky-cta";
 export default function LandingPage() {
   return (
     <CtaProvider>
+      <MotionConfig reducedMotion="user">
       <main className="bg-white">
         <TemplateNavbar />
         <TemplateHero />
@@ -29,6 +31,7 @@ export default function LandingPage() {
         <TemplateFooter />
         <TemplateStickyCta />
       </main>
+      </MotionConfig>
     </CtaProvider>
   );
 }

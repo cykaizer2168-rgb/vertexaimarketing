@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Reveal, SectionTitle } from "./ui";
 import { cn } from "@/lib/cn";
@@ -25,14 +26,27 @@ export function TemplateFaq() {
                   <button
                     onClick={() => setOpen(isOpen ? null : i)}
                     aria-expanded={isOpen}
-                    className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+                    className="flex w-full cursor-pointer items-center justify-between gap-4 px-6 py-5 text-left transition-colors hover:bg-gray-50"
                   >
                     <span className="text-base font-semibold text-gray-900">{faq.q}</span>
                     <ChevronDown
-                      className={cn("size-5 shrink-0 text-blue-500 transition-transform", isOpen && "rotate-180")}
+                      className={cn("size-5 shrink-0 text-blue-500 transition-transform duration-300", isOpen && "rotate-180")}
                     />
                   </button>
-                  {isOpen && <p className="px-6 pb-5 text-sm leading-relaxed text-gray-500">{faq.a}</p>}
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        key="answer"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <p className="px-6 pb-5 text-sm leading-relaxed text-gray-500">{faq.a}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </Reveal>
             );

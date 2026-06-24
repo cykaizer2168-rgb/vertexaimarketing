@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { CheckCircle2, Zap } from "lucide-react";
-import { Reveal, SectionTitle, BookButton } from "./ui";
+import { Reveal, SectionTitle, BookButton, cardHover, cardHoverTransition } from "./ui";
 import { PRICING, PLANS, SPRINT_NOTE, type Plan } from "@/content/landing";
 
 export function TemplatePricing() {
@@ -45,7 +45,8 @@ function PlanCard({ plan, delay }: { plan: Plan; delay: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.55, delay }}
-      className={`relative flex flex-col rounded-3xl border-2 p-7 transition-all duration-300 ${
+      whileHover={{ ...cardHover, transition: cardHoverTransition }}
+      className={`relative flex flex-col rounded-3xl border-2 p-7 ${
         featured
           ? "border-violet-400 shadow-xl shadow-violet-100"
           : "border-gray-200 hover:border-gray-300 hover:shadow-lg"

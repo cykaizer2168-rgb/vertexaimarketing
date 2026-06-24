@@ -1,7 +1,8 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Check, X } from "lucide-react";
-import { Reveal, SectionTitle } from "./ui";
+import { Reveal, SectionTitle, cardHover, cardHoverTransition } from "./ui";
 import { AUDIENCE } from "@/content/landing";
 
 export function TemplateAudience() {
@@ -14,7 +15,10 @@ export function TemplateAudience() {
 
         <div className="grid gap-6 md:grid-cols-2">
           <Reveal>
-            <div className="h-full rounded-3xl border border-emerald-100 bg-white p-8">
+            <motion.div
+              whileHover={{ ...cardHover, transition: cardHoverTransition }}
+              className="h-full rounded-3xl border border-emerald-100 bg-white p-8 hover:shadow-lg hover:shadow-emerald-100/50"
+            >
               <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900">
                 <span className="grid size-7 place-items-center rounded-full bg-emerald-100 text-emerald-600">
                   <Check className="size-4" strokeWidth={3} />
@@ -29,11 +33,14 @@ export function TemplateAudience() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           </Reveal>
 
           <Reveal delay={0.12}>
-            <div className="h-full rounded-3xl border border-gray-200 bg-white p-8">
+            <motion.div
+              whileHover={{ ...cardHover, transition: cardHoverTransition }}
+              className="h-full rounded-3xl border border-gray-200 bg-white p-8 hover:shadow-lg"
+            >
               <h3 className="flex items-center gap-2 text-lg font-bold text-gray-900">
                 <span className="grid size-7 place-items-center rounded-full bg-gray-100 text-gray-500">
                   <X className="size-4" strokeWidth={3} />
@@ -48,7 +55,7 @@ export function TemplateAudience() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           </Reveal>
         </div>
       </div>

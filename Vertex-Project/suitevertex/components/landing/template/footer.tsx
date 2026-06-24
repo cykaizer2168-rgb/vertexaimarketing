@@ -1,10 +1,11 @@
 import { ImageIcon } from "lucide-react";
+import { Reveal } from "./ui";
 import { BRAND, FOOTER_NAV, FOOTER_LEGAL } from "@/content/landing";
 
 export function TemplateFooter() {
   return (
     <footer className="bg-[#070a14] text-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr] lg:px-8">
+      <Reveal className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr] lg:px-8">
         {/* Brand */}
         <div className="max-w-sm">
           <div className="flex items-center gap-2.5">
@@ -44,7 +45,7 @@ export function TemplateFooter() {
             ))}
           </ul>
         </div>
-      </div>
+      </Reveal>
 
       <div className="border-t border-white/[0.06]">
         <div className="mx-auto max-w-7xl px-4 py-5 text-xs text-white/40 sm:px-6 lg:px-8">

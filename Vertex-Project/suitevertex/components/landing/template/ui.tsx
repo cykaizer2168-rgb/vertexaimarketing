@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, animate, useInView, useReducedMotion } from "framer-motion";
 import { ImageIcon, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useBookCall } from "@/components/landing/cta-modal";
@@ -25,17 +26,65 @@ export function Reveal({
   delay?: number;
   className?: string;
 }) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
       variants={fadeUp}
       custom={delay}
-      initial="hidden"
-      whileInView="visible"
+      initial={reduced ? false : "hidden"}
+      whileInView={reduced ? undefined : "visible"}
       viewport={{ once: true, margin: "-80px" }}
       className={className}
     >
       {children}
     </motion.div>
+  );
+}
+
+/** Hover-lift transition shared by interactive cards (transform-only, GPU-friendly). */
+export const cardHover = { y: -6 } as const;
+export const cardHoverTransition = { type: "spring" as const, stiffness: 300, damping: 22 };
+
+/** Count-up number for stat metrics. Parses a leading number, keeps prefix/suffix. */
+export function CountUp({ value, className = "" }: { value: string; className?: string }) {
+  const reduced = useReducedMotion();
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const match = /^(\D*?)(\d[\d,]*(?:\.\d+)?)(.*)$/.exec(value);
+  const prefix = match?.[1] ?? "";
+  const numStr = match?.[2] ?? "";
+  const suffix = match?.[3] ?? "";
+  const target = numStr ? parseFloat(numStr.replace(/,/g, "")) : 0;
+  const decimals = numStr.includes(".") ? numStr.split(".")[1].length : 0;
+  // Count state starts at 0 on server + client first render (no hydration
+  // mismatch). Updated only via the animation callback (async, not a sync
+  // setState in the effect body).
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!match || reduced || !inView) return;
+    const controls = animate(0, target, {
+      duration: 1.2,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (v) => setCount(v),
+    });
+    return () => controls.stop();
+  }, [inView, reduced, match, target]);
+
+  if (!match) {
+    return (
+      <span ref={ref} className={className}>
+        {value}
+      </span>
+    );
+  }
+  const shown = reduced ? target : count;
+  return (
+    <span ref={ref} className={className}>
+      {prefix}
+      {shown.toFixed(decimals)}
+      {suffix}
+    </span>
   );
 }
 

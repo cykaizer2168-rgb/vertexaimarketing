@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Database, Plug, Bot, LayoutPanelLeft, CheckCircle2, type LucideIcon } from "lucide-react";
-import { Reveal, SectionTitle } from "./ui";
+import { Reveal, SectionTitle, cardHover, cardHoverTransition } from "./ui";
 import { SERVICES, type ServiceGroup } from "@/content/landing";
 
 const ICONS: Record<string, LucideIcon> = {
@@ -38,7 +38,8 @@ function ServiceCard({ group, delay }: { group: ServiceGroup; delay: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
-      className="flex flex-col rounded-3xl border border-gray-200 bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:border-gray-300 hover:shadow-lg"
+      whileHover={{ ...cardHover, transition: cardHoverTransition }}
+      className="flex flex-col rounded-3xl border border-gray-200 bg-white p-7 hover:border-gray-300 hover:shadow-xl hover:shadow-blue-100/50"
     >
       <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 text-white">
         <Icon className="size-6" />
