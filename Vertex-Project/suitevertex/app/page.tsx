@@ -9,7 +9,6 @@ import { TemplateHowItWorks } from "@/components/landing/template/how-it-works";
 import { TemplateSuccessCenter } from "@/components/landing/template/success-center";
 import { TemplateAudience } from "@/components/landing/template/audience";
 import { TemplatePricing } from "@/components/landing/template/pricing";
-import { TemplateProof } from "@/components/landing/template/proof";
 import { TemplateFaq } from "@/components/landing/template/faq";
 import { TemplateFinalCta } from "@/components/landing/template/final-cta";
 import { TemplateFooter } from "@/components/landing/template/footer";
@@ -29,7 +28,6 @@ export default function LandingPage() {
         <TemplateSuccessCenter />
         <TemplateAudience />
         <TemplatePricing />
-        <TemplateProof />
         <TemplateFaq />
         <TemplateFinalCta />
         <TemplateFooter />
