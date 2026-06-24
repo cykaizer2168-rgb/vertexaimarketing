@@ -1,29 +1,25 @@
 import type { Metadata } from "next";
-import { Sora, Manrope } from "next/font/google";
 import "./globals.css";
-
-const sora = Sora({ subsets: ["latin"], variable: "--font-sora", display: "swap" });
-const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
 
 export const metadata: Metadata = {
   title: {
-    default: "SuiteVertex — ERP, AI Automation & Integration, on a Monthly Plan",
+    default: "SuiteVertex — NetSuite Implementation, Managed Services & AI Copilot",
     template: "%s | SuiteVertex",
   },
   description:
-    "NetSuite support, integrations, workflows, AI agents, CRM automation, and custom internal tools — handled by senior consultants for one predictable monthly fee.",
+    "Your complete NetSuite team — humans + AI. We implement NetSuite, run it month to month, and put an AI copilot inside it that answers 24/7 from your real processes and policies.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sora.variable} ${manrope.variable}`}>
-      <body className="font-sans">
+    <html lang="en">
+      <body>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
             "@context": "https://schema.org", "@type": "Organization",
             name: "SuiteVertex", url: "https://suitevertex.com",
-            description: "ERP, AI automation, and integration services for growing businesses.",
+            description: "NetSuite implementation, managed services, and an AI copilot for growing businesses.",
           }) }}
         />
         {children}

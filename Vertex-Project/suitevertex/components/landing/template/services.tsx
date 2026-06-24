@@ -1,64 +1,48 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Settings, Rocket, Bot, CheckCircle2, type LucideIcon } from "lucide-react";
-import { Reveal, SectionTitle, cardHover, cardHoverTransition } from "./ui";
-import { SERVICES, type ServiceGroup } from "@/content/landing";
-
-const ICONS: Record<string, LucideIcon> = {
-  settings: Settings,
-  rocket: Rocket,
-  bot: Bot,
-};
+import { Reveal, SectionTitle } from "./ui";
+import { SERVICES } from "@/content/landing";
 
 export function TemplateServices() {
   return (
-    <section id="services" className="scroll-mt-20 bg-gray-50 py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Reveal className="mb-14">
-          <SectionTitle eyebrow={SERVICES.eyebrow} title={SERVICES.title} sub={SERVICES.sub} />
+    <section id="services" className="scroll-mt-20 bg-[color:var(--color-paper)] py-24">
+      <div className="mx-auto max-w-6xl px-6">
+        <Reveal>
+          <div className="flex flex-col gap-6 border-b border-black/10 pb-10 md:flex-row md:items-end md:justify-between">
+            <SectionTitle eyebrow={SERVICES.eyebrow} title={SERVICES.title} />
+            <p className="max-w-xs text-sm leading-relaxed text-black/55">{SERVICES.sub}</p>
+          </div>
         </Reveal>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 md:divide-x md:divide-black/10">
           {SERVICES.groups.map((group, i) => (
-            <ServiceCard key={group.title} group={group} delay={i * 0.1} />
+            <Reveal key={group.title} delay={i * 0.1}>
+              <div className="py-8 md:px-8 md:first:pl-0 md:last:pr-0">
+                <div className="flex items-baseline justify-between">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/40">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {group.tag && (
+                    <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[color:var(--color-accent)]">
+                      {group.tag}
+                    </span>
+                  )}
+                </div>
+                <h3 className="mt-4 text-xl font-semibold tracking-tight text-[color:var(--color-ink)]">
+                  {group.title}
+                </h3>
+                <ul className="mt-5 divide-y divide-black/10 border-y border-black/10">
+                  {group.items.map((item) => (
+                    <li key={item} className="py-2.5 text-sm text-black/65">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
           ))}
         </div>
       </div>
     </section>
-  );
-}
-
-function ServiceCard({ group, delay }: { group: ServiceGroup; delay: number }) {
-  const Icon = ICONS[group.icon] ?? Settings;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay }}
-      whileHover={{ ...cardHover, transition: cardHoverTransition }}
-      className="flex flex-col rounded-3xl border border-gray-200 bg-white p-7 hover:border-gray-300 hover:shadow-xl hover:shadow-blue-100/50"
-    >
-      <div className="mb-5 flex items-center justify-between">
-        <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 text-white">
-          <Icon className="size-6" />
-        </div>
-        {group.tag && (
-          <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-600">
-            {group.tag}
-          </span>
-        )}
-      </div>
-      <h3 className="text-lg font-bold text-gray-900">{group.title}</h3>
-      <ul className="mt-4 space-y-2.5">
-        {group.items.map((item) => (
-          <li key={item} className="flex items-start gap-2 text-sm text-gray-600">
-            <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-blue-500" />
-            {item}
-          </li>
-        ))}
-      </ul>
-    </motion.div>
   );
 }

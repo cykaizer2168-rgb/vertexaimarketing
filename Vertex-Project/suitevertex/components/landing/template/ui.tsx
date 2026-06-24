@@ -2,14 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, animate, useInView, useReducedMotion } from "framer-motion";
-import { ImageIcon, ArrowUpRight } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useBookCall } from "@/components/landing/cta-modal";
 
 /* ---------- motion ---------- */
 
 export const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
+  hidden: { opacity: 0, y: 24 },
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
@@ -41,11 +41,130 @@ export function Reveal({
   );
 }
 
-/** Hover-lift transition shared by interactive cards (transform-only, GPU-friendly). */
-export const cardHover = { y: -6 } as const;
-export const cardHoverTransition = { type: "spring" as const, stiffness: 300, damping: 22 };
+/* Kept for compatibility; editorial cards mostly use border/bg hover instead. */
+export const cardHover = { y: -4 } as const;
+export const cardHoverTransition = { type: "spring" as const, stiffness: 300, damping: 24 };
 
-/** Count-up number for stat metrics. Parses a leading number, keeps prefix/suffix. */
+/* ---------- editorial text bits ---------- */
+
+export function Eyebrow({
+  children,
+  dark = false,
+  className = "",
+}: {
+  children: React.ReactNode;
+  dark?: boolean;
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "font-mono text-[11px] uppercase tracking-[0.22em]",
+        dark ? "text-white/55" : "text-[color:var(--color-accent)]",
+        className
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+export function SectionTitle({
+  eyebrow,
+  title,
+  sub,
+  align = "left",
+  dark = false,
+}: {
+  eyebrow?: string;
+  title: string;
+  sub?: string;
+  align?: "center" | "left";
+  dark?: boolean;
+}) {
+  return (
+    <div className={align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
+      {eyebrow && <Eyebrow dark={dark}>{eyebrow}</Eyebrow>}
+      <h2
+        className={cn(
+          "mt-4 font-display text-3xl font-semibold tracking-[-0.02em] sm:text-4xl md:text-5xl",
+          dark ? "text-white" : "text-[color:var(--color-ink)]"
+        )}
+      >
+        {title}
+      </h2>
+      {sub && (
+        <p className={cn("mt-4 text-base leading-relaxed", dark ? "text-white/60" : "text-black/55")}>
+          {sub}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ---------- image placeholder ---------- */
+
+export function ImagePlaceholder({
+  label,
+  className = "",
+  ratio = "aspect-video",
+  dark = false,
+}: {
+  label: string;
+  className?: string;
+  ratio?: string;
+  dark?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative flex w-full items-center justify-center overflow-hidden border",
+        ratio,
+        dark ? "border-white/15 bg-white/[0.03] text-white/40" : "border-black/10 bg-black/[0.02] text-black/35",
+        className
+      )}
+      role="img"
+      aria-label={`${label} (placeholder)`}
+    >
+      <div className="relative flex flex-col items-center gap-2 px-4 text-center">
+        <ImageIcon className="size-7" />
+        <span className="font-mono text-[11px] uppercase tracking-widest">{label}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- modal-triggering CTA (flat, editorial) ---------- */
+
+export function BookButton({
+  children = "Book a 15-min call",
+  variant = "primary",
+  size = "default",
+  className = "",
+}: {
+  children?: React.ReactNode;
+  variant?: "primary" | "glass" | "soft";
+  size?: "default" | "lg" | "sm";
+  className?: string;
+}) {
+  const { open } = useBookCall();
+  const base =
+    "inline-flex items-center justify-center gap-2 rounded-md font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent)]/50";
+  const sizes = { sm: "px-4 py-2 text-xs", default: "px-6 py-3 text-sm", lg: "px-7 py-3.5 text-sm" };
+  const variants = {
+    primary: "bg-[color:var(--color-accent)] text-white hover:opacity-90",
+    glass: "border border-white/25 text-white hover:bg-white/10",
+    soft: "border border-black/15 text-[color:var(--color-ink)] hover:bg-black/[0.04]",
+  };
+  return (
+    <button onClick={open} className={cn(base, sizes[size], variants[variant], className)}>
+      {children}
+    </button>
+  );
+}
+
+/* ---------- count-up stat ---------- */
+
 export function CountUp({ value, className = "" }: { value: string; className?: string }) {
   const reduced = useReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
@@ -56,9 +175,6 @@ export function CountUp({ value, className = "" }: { value: string; className?: 
   const suffix = match?.[3] ?? "";
   const target = numStr ? parseFloat(numStr.replace(/,/g, "")) : 0;
   const decimals = numStr.includes(".") ? numStr.split(".")[1].length : 0;
-  // Count state starts at 0 on server + client first render (no hydration
-  // mismatch). Updated only via the animation callback (async, not a sync
-  // setState in the effect body).
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -85,116 +201,5 @@ export function CountUp({ value, className = "" }: { value: string; className?: 
       {shown.toFixed(decimals)}
       {suffix}
     </span>
-  );
-}
-
-/* ---------- text bits ---------- */
-
-export function Eyebrow({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
-  return (
-    <span
-      className={cn(
-        "inline-block rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-widest",
-        dark
-          ? "border-white/20 bg-white/10 text-blue-200 backdrop-blur-sm"
-          : "border-blue-100 bg-blue-50 text-blue-600"
-      )}
-    >
-      {children}
-    </span>
-  );
-}
-
-export function SectionTitle({
-  eyebrow,
-  title,
-  sub,
-  align = "center",
-}: {
-  eyebrow?: string;
-  title: string;
-  sub?: string;
-  align?: "center" | "left";
-}) {
-  return (
-    <div className={align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
-      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <h2 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl md:text-5xl">
-        {title}
-      </h2>
-      {sub && <p className="mt-4 text-base leading-relaxed text-gray-500">{sub}</p>}
-    </div>
-  );
-}
-
-/* ---------- image placeholder (stands in for every image) ---------- */
-
-export function ImagePlaceholder({
-  label,
-  className = "",
-  ratio = "aspect-video",
-  dark = false,
-}: {
-  label: string;
-  className?: string;
-  ratio?: string;
-  dark?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-dashed",
-        ratio,
-        dark
-          ? "border-white/15 bg-white/[0.04] text-white/40"
-          : "border-gray-300 bg-gray-100 text-gray-400",
-        className
-      )}
-      role="img"
-      aria-label={`${label} (placeholder)`}
-    >
-      <div
-        className="absolute inset-0 opacity-50"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(45deg, rgba(120,120,140,0.08) 0, rgba(120,120,140,0.08) 1px, transparent 1px, transparent 12px)",
-        }}
-      />
-      <div className="relative flex flex-col items-center gap-2 px-4 text-center">
-        <ImageIcon className="size-7" />
-        <span className="text-xs font-medium">{label}</span>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- modal-triggering CTA ---------- */
-
-export function BookButton({
-  children = "Book a 15-min call",
-  variant = "primary",
-  size = "default",
-  className = "",
-}: {
-  children?: React.ReactNode;
-  variant?: "primary" | "glass" | "soft";
-  size?: "default" | "lg" | "sm";
-  className?: string;
-}) {
-  const { open } = useBookCall();
-  const base =
-    "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-all duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/60 active:scale-95";
-  const sizes = { sm: "px-5 py-2 text-xs", default: "px-7 py-3 text-sm", lg: "px-9 py-4 text-base" };
-  const variants = {
-    primary:
-      "bg-gradient-to-r from-blue-500 to-violet-600 text-white shadow-lg shadow-violet-500/25 hover:brightness-110 hover:scale-[1.03]",
-    glass: "border border-white/25 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:scale-[1.03]",
-    soft: "bg-gray-100 text-gray-800 hover:bg-gray-200",
-  };
-  return (
-    <button onClick={open} className={cn(base, sizes[size], variants[variant], className)}>
-      {children}
-      {variant === "primary" && <ArrowUpRight className="size-4" />}
-    </button>
   );
 }

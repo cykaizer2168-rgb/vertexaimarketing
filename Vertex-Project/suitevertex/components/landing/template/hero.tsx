@@ -2,16 +2,17 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { CheckCircle2, ImageIcon } from "lucide-react";
 import { fadeUp, BookButton } from "./ui";
 import { HERO, TRUST } from "@/content/landing";
 
 export function TemplateHero() {
   return (
-    <section id="top" className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#070a14]">
-      {/* video background */}
+    <section
+      id="top"
+      className="relative flex min-h-[92vh] flex-col justify-end overflow-hidden bg-[color:var(--color-ink)]"
+    >
       <video
-        className="absolute inset-0 h-full w-full scale-105 object-cover"
+        className="absolute inset-0 h-full w-full object-cover opacity-55"
         src="/hero-bg.mp4"
         autoPlay
         loop
@@ -19,128 +20,96 @@ export function TemplateHero() {
         playsInline
         aria-hidden="true"
       />
+      <div className="absolute inset-0 bg-[linear-gradient(to_top,#0a0b0d_6%,rgba(10,11,13,0.5)_55%,rgba(10,11,13,0.72)_100%)]" />
 
-      {/* overlays */}
-      <div
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(to bottom,rgba(7,10,20,.82) 0%,rgba(7,10,20,.6) 45%,rgba(7,10,20,.92) 100%)" }}
-        aria-hidden
-      />
-      <div
-        className="absolute inset-0 opacity-[0.12]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px)",
-          backgroundSize: "64px 64px",
-        }}
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "radial-gradient(ellipse 80% 50% at 50% -10%,rgba(99,102,241,.22) 0%,transparent 70%)" }}
-        aria-hidden
-      />
-
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center px-4 py-28 text-center sm:px-6">
-        <motion.div
+      {/* content — left aligned, editorial */}
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-14 pt-28">
+        <motion.p
           variants={fadeUp}
           custom={0}
           initial="hidden"
           animate="visible"
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium tracking-wide text-white/90 backdrop-blur-md sm:text-sm"
+          className="mb-6 font-mono text-[11px] uppercase tracking-[0.25em] text-white/55"
         >
-          <span className="size-1.5 rounded-full bg-blue-400" />
           {HERO.eyebrow}
-        </motion.div>
+        </motion.p>
 
         <motion.h1
           variants={fadeUp}
-          custom={0.15}
+          custom={0.1}
           initial="hidden"
           animate="visible"
-          className="mb-5 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
+          className="max-w-4xl font-display text-5xl font-semibold leading-[0.98] tracking-[-0.02em] text-white sm:text-6xl md:text-7xl"
         >
-          {HERO.headlineTop}<br />
-          <span
-            className="bg-clip-text text-transparent"
-            style={{ backgroundImage: "linear-gradient(90deg,#60a5fa 0%,#818cf8 50%,#a78bfa 100%)" }}
-          >
-            {HERO.headlineAccent}
-          </span>
+          {HERO.headlineTop}
+          <br />
+          <span className="text-[color:var(--color-accent)]">{HERO.headlineAccent}</span>
         </motion.h1>
 
         <motion.p
           variants={fadeUp}
-          custom={0.3}
+          custom={0.2}
           initial="hidden"
           animate="visible"
-          className="mx-auto mb-8 max-w-2xl text-base leading-relaxed text-white/65 sm:text-lg md:text-xl"
+          className="mt-6 max-w-xl text-lg leading-relaxed text-white/65"
         >
           {HERO.sub}
         </motion.p>
 
         <motion.div
           variants={fadeUp}
-          custom={0.4}
+          custom={0.3}
           initial="hidden"
           animate="visible"
-          className="mb-10 flex flex-wrap justify-center gap-2"
-        >
-          {HERO.badges.map((b) => (
-            <span
-              key={b}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-sm"
-            >
-              <CheckCircle2 className="size-3 text-blue-400" />
-              {b}
-            </span>
-          ))}
-        </motion.div>
-
-        <motion.div
-          variants={fadeUp}
-          custom={0.5}
-          initial="hidden"
-          animate="visible"
-          className="mb-16 flex flex-col justify-center gap-3 sm:flex-row"
+          className="mt-9 flex flex-wrap items-center gap-3"
         >
           <BookButton size="lg">{HERO.primaryCta}</BookButton>
-          <a href="#services">
-            <span className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-9 py-4 text-base font-semibold text-white backdrop-blur-sm transition-all hover:scale-[1.03] hover:bg-white/20">
-              {HERO.secondaryCta}
-            </span>
+          <a
+            href="#services"
+            className="inline-flex items-center justify-center rounded-md border border-white/25 px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
+          >
+            {HERO.secondaryCta} →
           </a>
         </motion.div>
 
-        {/* Trust bar */}
-        <motion.div variants={fadeUp} custom={0.65} initial="hidden" animate="visible" className="w-full">
-          <p className="mb-5 text-center text-xs font-semibold uppercase tracking-widest text-white/40">
-            {TRUST.label}
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-            {TRUST.items.map((item) =>
-              item.logo ? (
-                <span key={item.name} className="relative block h-9 w-28 overflow-hidden">
-                  <Image
-                    src={item.logo}
-                    alt={item.name}
-                    fill
-                    sizes="112px"
-                    className="object-cover object-center mix-blend-screen"
-                  />
-                </span>
-              ) : (
-                <div key={item.name} className="flex items-center gap-2 text-white/55">
-                  {/* logo image placeholder */}
-                  <span className="grid size-7 place-items-center rounded-md border border-dashed border-white/20 bg-white/[0.04]">
-                    <ImageIcon className="size-3.5" />
-                  </span>
-                  <span className="text-sm font-bold tracking-tight text-white/70">{item.name}</span>
-                </div>
-              )
-            )}
-          </div>
+        {/* spec row */}
+        <motion.div
+          variants={fadeUp}
+          custom={0.4}
+          initial="hidden"
+          animate="visible"
+          className="mt-12 flex flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-5"
+        >
+          {HERO.badges.map((b) => (
+            <span key={b} className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/55">
+              <span className="text-[color:var(--color-accent)]">—</span> {b}
+            </span>
+          ))}
         </motion.div>
+      </div>
+
+      {/* trust strip — real logos, blended on dark */}
+      <div className="relative z-10 border-t border-white/10">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-6 py-5">
+          <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/35">{TRUST.label}</span>
+          {TRUST.items.map((item) =>
+            item.logo ? (
+              <span key={item.name} className="relative block h-7 w-24 overflow-hidden">
+                <Image
+                  src={item.logo}
+                  alt={item.name}
+                  fill
+                  sizes="96px"
+                  className="object-cover object-center opacity-80 mix-blend-screen"
+                />
+              </span>
+            ) : (
+              <span key={item.name} className="font-mono text-[11px] uppercase tracking-[0.15em] text-white/60">
+                {item.name}
+              </span>
+            )
+          )}
+        </div>
       </div>
     </section>
   );

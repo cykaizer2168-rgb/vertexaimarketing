@@ -1,7 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand tokens (used by the light /marketing CMS pages) */
+  /* Technical-Editorial design tokens */
+  --color-ink: #0a0b0d; /* near-black, neutral (not navy) */
+  --color-ink-soft: #15171a;
+  --color-paper: #f7f6f3; /* warm paper for alternating light sections */
+  --color-accent: #2563eb; /* single flat accent — no gradients */
+
+  /* Legacy brand tokens — still used by the older /marketing CMS pages */
   --color-navy-950: #0a0f1f;
   --color-navy-900: #0f172a;
   --color-navy-800: #1e293b;
@@ -10,14 +16,12 @@
   --color-teal-500: #14b8a6;
   --color-teal-400: #2dd4bf;
 
-  /* Landing (dark) ink ramp */
-  --color-ink-950: #06060e;
-  --color-ink-900: #0b0b16;
-  --color-ink-800: #11111f;
-
-  /* Type pairing */
-  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  /* Apple system fonts — real SF Pro / SF Mono on Apple devices, clean fallbacks elsewhere */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, "Cascadia Code", monospace;
 }
 
 html {
@@ -25,7 +29,11 @@ html {
 }
 
 body {
-  @apply bg-ink-950 text-slate-100 antialiased;
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Soft staggered entrance used by the hero. */
