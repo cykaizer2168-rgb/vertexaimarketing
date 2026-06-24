@@ -225,7 +225,7 @@ export const AUDIENCE = {
 export const PRICING = {
   eyebrow: "Pricing",
   title: "Simple monthly plans. No surprise hourly invoices.",
-  sub: "Pick a tier, add work to a shared backlog, and get senior delivery for one predictable fee.",
+  sub: "Ongoing NetSuite support plus your AI copilot, on one predictable monthly fee. Implementation projects are scoped separately.",
 } as const;
 
 export type Plan = {
@@ -244,8 +244,14 @@ export const PLANS: Plan[] = [
     name: "Starter",
     price: "$2,499",
     cadence: "/mo",
-    bestFor: "Best for small ERP teams",
-    features: ["Backlog-based ERP support", "Saved searches and reports", "Workflow fixes", "Minor integrations", "Weekly progress digest"],
+    bestFor: "Best for small NetSuite teams",
+    features: [
+      "NetSuite admin & support (shared backlog)",
+      "Saved searches, reports & dashboards",
+      "Workflow & form fixes",
+      "NetSuite Copilot — business hours",
+      "Weekly progress digest",
+    ],
     ctaLabel: "Start with Starter",
   },
   {
@@ -255,19 +261,31 @@ export const PLANS: Plan[] = [
     bestFor: "Best for growing operations teams",
     featured: true,
     badge: "Most Popular",
-    features: ["Everything in Starter", "NetSuite + HubSpot + Shopify integrations", "Celigo / n8n workflows", "AI automation support", "Priority response"],
+    features: [
+      "Everything in Starter",
+      "Integrations: Shopify, HubSpot, Celigo & more",
+      "NetSuite Copilot — 24/7, grounded in your SOPs",
+      "AI Diagnostics & audit-trail troubleshooting",
+      "Priority response",
+    ],
     ctaLabel: "Choose Growth",
   },
   {
     name: "Enterprise",
     price: "Custom",
-    bestFor: "Best for complex operations",
-    features: ["Dedicated delivery lead", "Multi-system architecture", "Advanced integrations", "Custom dashboards", "Security and role reviews"],
+    bestFor: "Best for complex / multi-subsidiary",
+    features: [
+      "Everything in Growth",
+      "Dedicated delivery lead",
+      "Multi-subsidiary / OneWorld support",
+      "Advanced integrations & custom builds",
+      "Security, role & access reviews",
+    ],
     ctaLabel: "Talk to us",
   },
 ];
 
-export const SPRINT_NOTE = "Need one project? AI + Integration Sprints start at $4,999.";
+export const SPRINT_NOTE = "Need NetSuite implemented, or a one-off project? Implementation & integration sprints from $4,999.";
 
 export const PROOF = {
   eyebrow: "Proof",
