@@ -152,6 +152,41 @@ export const COPILOT = {
   ],
 } as const;
 
+export type SuccessModule = { title: string; icon: string; desc: string };
+
+export const SUCCESS_CENTER = {
+  eyebrow: "Success Center",
+  title: "Everything your team needs, in one Success Center.",
+  sub: "Tickets, answers, diagnostics, your SOPs, and training — one place that keeps NetSuite running smoothly.",
+  modules: [
+    {
+      title: "Support Tickets",
+      icon: "ticket",
+      desc: "Submit and track NetSuite requests in one shared backlog, senior-reviewed.",
+    },
+    {
+      title: "Knowledge Base",
+      icon: "book",
+      desc: "Searchable answers grounded in your setup — beyond generic SuiteAnswers.",
+    },
+    {
+      title: "AI Diagnostics",
+      icon: "activity",
+      desc: "The copilot pinpoints root causes using System Notes and audit trails.",
+    },
+    {
+      title: "SOP Library",
+      icon: "library",
+      desc: "Your business processes and policies, kept current and used to ground the copilot.",
+    },
+    {
+      title: "Training Center",
+      icon: "graduation",
+      desc: "Role-based guides and onboarding so your team ramps up fast.",
+    },
+  ] satisfies SuccessModule[],
+} as const;
+
 export const STEPS = {
   eyebrow: "How it works",
   title: "A shared backlog. Clear weekly progress.",

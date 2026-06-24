@@ -6,6 +6,7 @@ import { TemplateWhyDifferent } from "@/components/landing/template/why-differen
 import { TemplateServices } from "@/components/landing/template/services";
 import { TemplateCopilot } from "@/components/landing/template/copilot";
 import { TemplateHowItWorks } from "@/components/landing/template/how-it-works";
+import { TemplateSuccessCenter } from "@/components/landing/template/success-center";
 import { TemplateAudience } from "@/components/landing/template/audience";
 import { TemplatePricing } from "@/components/landing/template/pricing";
 import { TemplateProof } from "@/components/landing/template/proof";
@@ -25,6 +26,7 @@ export default function LandingPage() {
         <TemplateServices />
         <TemplateCopilot />
         <TemplateHowItWorks />
+        <TemplateSuccessCenter />
         <TemplateAudience />
         <TemplatePricing />
         <TemplateProof />
