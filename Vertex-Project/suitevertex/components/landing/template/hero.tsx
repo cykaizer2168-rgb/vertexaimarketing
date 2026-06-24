@@ -23,7 +23,7 @@ export function TemplateHero() {
       <div className="absolute inset-0 bg-[linear-gradient(to_top,#0a0b0d_6%,rgba(10,11,13,0.5)_55%,rgba(10,11,13,0.72)_100%)]" />
 
       {/* content — left aligned, editorial */}
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-14 pt-28">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-28">
         <motion.p
           variants={fadeUp}
           custom={0}
@@ -90,7 +90,7 @@ export function TemplateHero() {
 
       {/* trust strip — real logos, blended on dark */}
       <div className="relative z-10">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-6 py-5">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-6 pb-8 pt-8">
           <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/35">{TRUST.label}</span>
           {TRUST.items.map((item) =>
             item.logo ? (
