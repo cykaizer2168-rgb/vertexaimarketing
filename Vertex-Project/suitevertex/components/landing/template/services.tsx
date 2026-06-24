@@ -40,8 +40,15 @@ function ServiceCard({ group, delay }: { group: ServiceGroup; delay: number }) {
       whileHover={{ ...cardHover, transition: cardHoverTransition }}
       className="flex flex-col rounded-3xl border border-gray-200 bg-white p-7 hover:border-gray-300 hover:shadow-xl hover:shadow-blue-100/50"
     >
-      <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 text-white">
-        <Icon className="size-6" />
+      <div className="mb-5 flex items-center justify-between">
+        <div className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 text-white">
+          <Icon className="size-6" />
+        </div>
+        {group.tag && (
+          <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-600">
+            {group.tag}
+          </span>
+        )}
       </div>
       <h3 className="text-lg font-bold text-gray-900">{group.title}</h3>
       <ul className="mt-4 space-y-2.5">

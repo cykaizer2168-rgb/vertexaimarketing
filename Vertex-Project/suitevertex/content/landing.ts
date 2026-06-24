@@ -30,18 +30,13 @@ export const FOOTER_LEGAL = [
 ] as const;
 
 export const HERO = {
-  eyebrow: "ERP + AI + Automation — as a Service",
-  headlineTop: "Run Your Operations with AI.",
-  headlineAccent: "Not More Headcount.",
-  sub: "SuiteVertex combines ERP expertise, AI automation, integrations, and custom operations support into one monthly subscription.",
+  eyebrow: "Implementation · Managed Services · AI Copilot",
+  headlineTop: "Your complete NetSuite team.",
+  headlineAccent: "Humans + AI.",
+  sub: "We implement NetSuite, run it month to month, and put an AI copilot inside it that answers 24/7 from your real business processes and policies — not generic SuiteAnswers.",
   primaryCta: "Book a 15-min call",
-  secondaryCta: "See plans",
-  badges: [
-    "Month-to-month",
-    "Senior consultants",
-    "Response < 1 business day",
-    "Cancel anytime",
-  ],
+  secondaryCta: "See what we do",
+  badges: ["Inside NetSuite", "24/7 support", "Senior-reviewed", "Month-to-month"],
 } as const;
 
 export type TrustItem = { name: string; logo?: string };
@@ -73,26 +68,16 @@ export const WHY_DIFFERENT = {
   ],
 } as const;
 
-export type ServiceGroup = { title: string; icon: string; items: string[] };
+export type ServiceGroup = { title: string; icon: string; tag?: string; items: string[] };
 
 export const SERVICES = {
   eyebrow: "What we do",
-  title: "Three ways SuiteVertex runs NetSuite with you",
-  sub: "From day-to-day operations, to new implementations, to an AI copilot working inside NetSuite.",
+  title: "We build it. We run it. We make it smarter.",
+  sub: "One partner across the full NetSuite lifecycle — from go-live, to day-to-day operations, to an AI copilot inside your account.",
   groups: [
     {
-      title: "NetSuite Managed Services",
-      icon: "settings",
-      items: [
-        "Backlog-driven admin & support",
-        "Saved searches, reports, dashboards",
-        "Workflows, forms, roles",
-        "Integrations & fixes",
-        "Weekly progress digest",
-      ],
-    },
-    {
       title: "NetSuite Implementation",
+      tag: "Build",
       icon: "rocket",
       items: [
         "New implementations & go-lives",
@@ -103,7 +88,20 @@ export const SERVICES = {
       ],
     },
     {
+      title: "NetSuite Managed Services",
+      tag: "Run",
+      icon: "settings",
+      items: [
+        "Backlog-driven admin & support",
+        "Saved searches, reports, dashboards",
+        "Workflows, forms, roles",
+        "Integrations & fixes",
+        "Weekly progress digest",
+      ],
+    },
+    {
       title: "NetSuite Copilot",
+      tag: "Smarter",
       icon: "bot",
       items: [
         "24/7 AI support inside NetSuite",

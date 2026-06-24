@@ -105,7 +105,7 @@ export function TemplateHero() {
           className="mb-16 flex flex-col justify-center gap-3 sm:flex-row"
         >
           <BookButton size="lg">{HERO.primaryCta}</BookButton>
-          <a href="#pricing">
+          <a href="#services">
             <span className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-9 py-4 text-base font-semibold text-white backdrop-blur-sm transition-all hover:scale-[1.03] hover:bg-white/20">
               {HERO.secondaryCta}
             </span>
