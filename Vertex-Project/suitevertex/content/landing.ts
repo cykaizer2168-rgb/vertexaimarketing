@@ -185,6 +185,21 @@ export const SUCCESS_CENTER = {
   ] satisfies SuccessModule[],
 } as const;
 
+export type Testimonial = { quote: string; name: string; role: string };
+
+export const TESTIMONIALS = {
+  eyebrow: "Customers",
+  title: "Trusted by teams running NetSuite.",
+  sub: "Results from finance and operations teams. (Placeholder — add your real client quotes and logos.)",
+  logosLabel: "Client logos",
+  logoCount: 5,
+  items: [
+    { quote: "Add a short client quote about a result you delivered.", name: "Client name", role: "Title · Company" },
+    { quote: "Another quote highlighting speed, savings, or reliability.", name: "Client name", role: "Title · Company" },
+    { quote: "A third quote about the copilot or your support.", name: "Client name", role: "Title · Company" },
+  ] satisfies Testimonial[],
+} as const;
+
 export type SecurityPoint = { title: string; icon: string; desc: string };
 
 export const SECURITY = {

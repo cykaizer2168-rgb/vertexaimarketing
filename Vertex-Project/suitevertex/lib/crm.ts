@@ -10,7 +10,6 @@ export function validateContact(data: unknown): { ok: true; value: ContactInput 
   const message = typeof d.message === "string" ? d.message.trim() : "";
   if (!name) return { ok: false, error: "Name is required" };
   if (!EMAIL_RE.test(email)) return { ok: false, error: "Valid email is required" };
-  if (!message) return { ok: false, error: "Message is required" };
   return {
     ok: true,
     value: {

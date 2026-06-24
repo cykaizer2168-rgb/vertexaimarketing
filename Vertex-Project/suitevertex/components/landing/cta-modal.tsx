@@ -14,13 +14,45 @@ export function useBookCall() {
 
 export function CtaProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [error, setError] = useState("");
 
   const open = useCallback(() => {
-    setSent(false);
+    setStatus("idle");
+    setError("");
     setIsOpen(true);
   }, []);
   const close = useCallback(() => setIsOpen(false), []);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const payload = {
+      name: fd.get("name"),
+      email: fd.get("email"),
+      company: fd.get("company"),
+      message: fd.get("needs"),
+      website: fd.get("website"), // honeypot
+    };
+    setStatus("sending");
+    setError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (res.ok && body.ok) setStatus("sent");
+      else {
+        setStatus("error");
+        setError(body.error || "Something went wrong. Please try again.");
+      }
+    } catch {
+      setStatus("error");
+      setError("Network error. Please try again.");
+    }
+  }
 
   useEffect(() => {
     if (!isOpen) return;
@@ -43,8 +75,8 @@ export function CtaProvider({ children }: { children: React.ReactNode }) {
           aria-modal="true"
           aria-label="Book a 15-minute call"
         >
-          <div className="absolute inset-0 bg-ink-950/80 backdrop-blur-sm" onClick={close} />
-          <div className="sv-rise relative w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-ink-900 shadow-2xl shadow-black/60">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={close} />
+          <div className="sv-rise relative w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-[color:var(--color-ink-soft)] shadow-2xl shadow-black/60">
             <div className="pointer-events-none absolute -top-24 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-violet-600/30 blur-3xl" />
             <button
               onClick={close}
@@ -54,14 +86,14 @@ export function CtaProvider({ children }: { children: React.ReactNode }) {
               <X className="size-5" />
             </button>
 
-            {sent ? (
+            {status === "sent" ? (
               <div className="relative px-7 py-12 text-center">
                 <div className="mx-auto mb-5 grid size-14 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400">
                   <Check className="size-7" />
                 </div>
                 <h3 className="font-display text-xl font-semibold text-white">Request received</h3>
                 <p className="mt-2 text-sm text-slate-400">
-                  This is a placeholder form — no message was actually sent. We&apos;ll wire it to scheduling next.
+                  Thanks — we&apos;ll reach out within one business day to schedule your call.
                 </p>
                 <button
                   onClick={close}
@@ -71,13 +103,7 @@ export function CtaProvider({ children }: { children: React.ReactNode }) {
                 </button>
               </div>
             ) : (
-              <form
-                className="relative px-7 pb-7 pt-9"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setSent(true);
-                }}
-              >
+              <form className="relative px-7 pb-7 pt-9" onSubmit={handleSubmit}>
                 <div className="mb-6 flex items-center gap-3">
                   <div className="grid size-10 place-items-center rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 text-white">
                     <CalendarClock className="size-5" />
@@ -108,11 +134,15 @@ export function CtaProvider({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
 
+                {status === "error" && (
+                  <p className="mt-4 text-center text-sm text-rose-400">{error}</p>
+                )}
                 <button
                   type="submit"
-                  className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-violet-600 text-sm font-semibold text-white shadow-lg shadow-violet-900/40 transition hover:brightness-110"
+                  disabled={status === "sending"}
+                  className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-violet-600 text-sm font-semibold text-white shadow-lg shadow-violet-900/40 transition hover:brightness-110 disabled:opacity-60"
                 >
-                  Request my call
+                  {status === "sending" ? "Sending…" : "Request my call"}
                 </button>
                 <p className="mt-3 text-center text-[11px] text-slate-500">
                   No spam. We&apos;ll only reach out about your request.
@@ -174,7 +204,7 @@ export function BookCallButton({
       "h-12 px-6 text-sm bg-gradient-to-r from-blue-500 to-violet-600 text-white shadow-lg shadow-violet-900/40 hover:brightness-110",
     outline:
       "h-12 px-6 text-sm border border-white/15 text-slate-100 hover:bg-white/5",
-    nav: "h-10 px-4 text-sm bg-white text-ink-950 hover:bg-slate-200",
+    nav: "h-10 px-4 text-sm bg-white text-[color:var(--color-ink)] hover:bg-slate-200",
   };
   return (
     <button onClick={open} className={`${base} ${styles[variant]} ${className}`}>
