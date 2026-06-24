@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Reveal, SectionTitle, cardHover, cardHoverTransition } from "./ui";
+import { Reveal, SectionTitle } from "./ui";
 import { STEPS } from "@/content/landing";
 
 export function TemplateHowItWorks() {
@@ -20,8 +20,7 @@ export function TemplateHowItWorks() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              whileHover={{ ...cardHover, transition: cardHoverTransition }}
-              className="relative rounded-3xl border border-gray-200 bg-gray-50 p-7 hover:border-blue-200 hover:bg-white hover:shadow-lg"
+              className="relative rounded-3xl border border-gray-200 bg-gray-50 p-7 transition-all duration-300 hover:border-blue-200 hover:bg-white hover:shadow-lg"
             >
               <span className="bg-gradient-to-r from-blue-500 to-violet-600 bg-clip-text font-display text-4xl font-extrabold text-transparent">
                 {step.n}
