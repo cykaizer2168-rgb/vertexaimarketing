@@ -15,15 +15,15 @@ export function TemplateCopilot() {
   return (
     <section id="copilot" className="scroll-mt-20 bg-white py-24">
       <div className="mx-auto max-w-6xl px-6">
-        <Reveal className="border-b border-black/10 pb-10">
+        <Reveal className="mb-14">
           <SectionTitle eyebrow={COPILOT.eyebrow} title={COPILOT.title} sub={COPILOT.sub} />
         </Reveal>
 
-        <div className="grid gap-12 pt-12 lg:grid-cols-2 lg:items-start lg:gap-16">
-          <div className="divide-y divide-black/10 border-y border-black/10">
+        <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+          <div className="space-y-7">
             {COPILOT.capabilities.map((c, i) => (
               <Reveal key={c.title} delay={i * 0.06}>
-                <Capability cap={c} index={i + 1} />
+                <Capability cap={c} />
               </Reveal>
             ))}
           </div>
@@ -33,15 +33,11 @@ export function TemplateCopilot() {
           </Reveal>
         </div>
 
-        {/* example questions — mono chips */}
-        <Reveal className="mt-14">
+        <Reveal className="mt-14 text-center">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/40">{COPILOT.examplesLabel}</p>
-          <div className="mt-5 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
             {COPILOT.examples.map((q) => (
-              <span
-                key={q}
-                className="border border-black/12 px-4 py-2 text-sm text-black/65"
-              >
+              <span key={q} className="rounded-full bg-[color:var(--color-paper)] px-4 py-2 text-sm text-black/65">
                 &ldquo;{q}&rdquo;
               </span>
             ))}
@@ -52,13 +48,10 @@ export function TemplateCopilot() {
   );
 }
 
-function Capability({ cap, index }: { cap: CopilotCapability; index: number }) {
+function Capability({ cap }: { cap: CopilotCapability }) {
   const Icon = ICONS[cap.icon] ?? Wrench;
   return (
-    <div className="flex gap-5 py-5">
-      <span className="mt-0.5 flex items-center gap-2 font-mono text-[11px] text-black/35">
-        {String(index).padStart(2, "0")}
-      </span>
+    <div className="flex gap-4">
       <Icon className="mt-0.5 size-5 shrink-0 text-[color:var(--color-accent)]" />
       <div>
         <h3 className="font-semibold tracking-tight text-[color:var(--color-ink)]">{cap.title}</h3>

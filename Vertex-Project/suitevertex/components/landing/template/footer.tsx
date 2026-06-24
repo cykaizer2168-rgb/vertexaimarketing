@@ -4,7 +4,7 @@ import { BRAND, FOOTER_NAV, FOOTER_LEGAL } from "@/content/landing";
 export function TemplateFooter() {
   return (
     <footer className="bg-[color:var(--color-ink)] text-white">
-      <div className="mx-auto grid max-w-6xl gap-10 border-b border-white/10 px-6 py-14 md:grid-cols-[1.6fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 md:grid-cols-[1.6fr_1fr_1fr]">
         <div className="max-w-sm">
           <Image
             src="/logos/suitevertex-logo-trans.png"

@@ -73,7 +73,7 @@ export function SectionTitle({
   eyebrow,
   title,
   sub,
-  align = "left",
+  align = "center",
   dark = false,
 }: {
   eyebrow?: string;
@@ -118,9 +118,9 @@ export function ImagePlaceholder({
   return (
     <div
       className={cn(
-        "relative flex w-full items-center justify-center overflow-hidden border",
+        "relative flex w-full items-center justify-center overflow-hidden rounded-2xl",
         ratio,
-        dark ? "border-white/15 bg-white/[0.03] text-white/40" : "border-black/10 bg-black/[0.02] text-black/35",
+        dark ? "bg-white/[0.05] text-white/40" : "bg-black/[0.04] text-black/35",
         className
       )}
       role="img"

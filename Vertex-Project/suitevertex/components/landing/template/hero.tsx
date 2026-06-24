@@ -78,7 +78,7 @@ export function TemplateHero() {
           custom={0.4}
           initial="hidden"
           animate="visible"
-          className="mt-12 flex flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-5"
+          className="mt-12 flex flex-wrap gap-x-6 gap-y-2"
         >
           {HERO.badges.map((b) => (
             <span key={b} className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/55">
@@ -89,7 +89,7 @@ export function TemplateHero() {
       </div>
 
       {/* trust strip — real logos, blended on dark */}
-      <div className="relative z-10 border-t border-white/10">
+      <div className="relative z-10">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-6 py-5">
           <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/35">{TRUST.label}</span>
           {TRUST.items.map((item) =>

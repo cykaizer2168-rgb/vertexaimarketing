@@ -6,7 +6,7 @@ import { PRICING, PLANS, SPRINT_NOTE, type Plan } from "@/content/landing";
 
 export function TemplatePricing() {
   return (
-    <section id="pricing" className="scroll-mt-20 bg-[color:var(--color-paper)] py-24">
+    <section id="pricing" className="scroll-mt-20 bg-white py-24">
       <div className="mx-auto max-w-6xl px-6">
         <Reveal className="mb-14">
           <SectionTitle eyebrow={PRICING.eyebrow} title={PRICING.title} sub={PRICING.sub} />
@@ -21,7 +21,7 @@ export function TemplatePricing() {
         </div>
 
         <Reveal className="mt-6">
-          <div className="flex flex-col items-start gap-4 border border-black/10 bg-white px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col items-center gap-4 rounded-2xl bg-[color:var(--color-paper)] px-6 py-5 text-center sm:flex-row sm:justify-between sm:text-left">
             <p className="text-sm text-black/65">{SPRINT_NOTE}</p>
             <BookButton variant="soft" size="sm" className="shrink-0">
               Scope a sprint
@@ -38,8 +38,8 @@ function PlanCard({ plan }: { plan: Plan }) {
   return (
     <div
       className={[
-        "flex h-full flex-col border bg-white p-7",
-        featured ? "border-[color:var(--color-accent)]" : "border-black/10",
+        "flex h-full flex-col rounded-2xl p-7",
+        featured ? "bg-[color:var(--color-accent)]/[0.06]" : "bg-[color:var(--color-paper)]",
       ].join(" ")}
     >
       <div className="flex items-center justify-between">
@@ -52,14 +52,14 @@ function PlanCard({ plan }: { plan: Plan }) {
       </div>
       <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.12em] text-black/40">{plan.bestFor}</p>
 
-      <div className="mt-5 flex items-end gap-1 border-b border-black/10 pb-6">
+      <div className="mt-5 flex items-end gap-1 pb-6">
         <span className="font-display text-4xl font-semibold tracking-[-0.02em] text-[color:var(--color-ink)]">
           {plan.price}
         </span>
         {plan.cadence && <span className="mb-1 text-sm text-black/40">{plan.cadence}</span>}
       </div>
 
-      <ul className="mt-6 flex-1 space-y-3">
+      <ul className="flex-1 space-y-3">
         {plan.features.map((f) => (
           <li key={f} className="flex items-start gap-2.5 text-sm text-black/65">
             <Check className="mt-0.5 size-4 shrink-0 text-[color:var(--color-accent)]" strokeWidth={2.5} />
