@@ -11,7 +11,7 @@ export function TemplateFaq() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="scroll-mt-20 bg-white py-24">
+    <section id="faq" className="scroll-mt-20 bg-[color:var(--color-paper)] py-24">
       <div className="mx-auto max-w-3xl px-6">
         <Reveal className="mb-12">
           <SectionTitle eyebrow="FAQ" title="Questions, answered." />
@@ -22,7 +22,7 @@ export function TemplateFaq() {
             const isOpen = open === i;
             return (
               <Reveal key={faq.q} delay={i * 0.04}>
-                <div className="rounded-2xl bg-[color:var(--color-paper)] px-6">
+                <div className="rounded-2xl bg-white px-6">
                   <button
                     onClick={() => setOpen(isOpen ? null : i)}
                     aria-expanded={isOpen}

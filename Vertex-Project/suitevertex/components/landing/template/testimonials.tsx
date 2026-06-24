@@ -5,7 +5,7 @@ import { TESTIMONIALS } from "@/content/landing";
 
 export function TemplateTestimonials() {
   return (
-    <section className="bg-white py-24">
+    <section className="bg-[color:var(--color-paper)] py-24">
       <div className="mx-auto max-w-6xl px-6">
         <Reveal className="mb-12">
           <SectionTitle eyebrow={TESTIMONIALS.eyebrow} title={TESTIMONIALS.title} sub={TESTIMONIALS.sub} />
@@ -27,7 +27,7 @@ export function TemplateTestimonials() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {TESTIMONIALS.items.map((t, i) => (
             <Reveal key={i} delay={i * 0.1} className="h-full">
-              <TiltCard max={6} className="flex flex-col rounded-2xl bg-[color:var(--color-paper)] p-7">
+              <TiltCard max={6} className="flex flex-col rounded-2xl bg-white p-7">
                 <p className="flex-1 text-[15px] leading-relaxed text-black/70">&ldquo;{t.quote}&rdquo;</p>
                 <div className="mt-6 flex items-center gap-3">
                   <ImagePlaceholder label="" ratio="aspect-square" className="size-10 shrink-0 rounded-full" />

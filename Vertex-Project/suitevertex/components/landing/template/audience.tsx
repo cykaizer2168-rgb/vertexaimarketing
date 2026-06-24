@@ -6,7 +6,7 @@ import { AUDIENCE } from "@/content/landing";
 
 export function TemplateAudience() {
   return (
-    <section className="bg-[color:var(--color-paper)] py-24">
+    <section className="bg-white py-24">
       <div className="mx-auto max-w-6xl px-6">
         <Reveal className="mb-14">
           <SectionTitle eyebrow={AUDIENCE.eyebrow} title={AUDIENCE.title} />
@@ -14,7 +14,7 @@ export function TemplateAudience() {
 
         <div className="grid gap-6 md:grid-cols-2">
           <Reveal className="h-full">
-            <TiltCard max={6} className="rounded-2xl bg-white p-8">
+            <TiltCard max={6} className="rounded-2xl bg-[color:var(--color-paper)] p-8">
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[color:var(--color-accent)]">
                 {AUDIENCE.forYou.title}
               </p>
@@ -30,7 +30,7 @@ export function TemplateAudience() {
           </Reveal>
 
           <Reveal delay={0.1} className="h-full">
-            <TiltCard max={6} className="rounded-2xl bg-white p-8">
+            <TiltCard max={6} className="rounded-2xl bg-[color:var(--color-paper)] p-8">
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-black/40">
                 {AUDIENCE.notForYou.title}
               </p>

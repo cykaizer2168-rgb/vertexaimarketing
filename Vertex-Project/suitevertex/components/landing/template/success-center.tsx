@@ -14,7 +14,7 @@ const ICONS: Record<string, LucideIcon> = {
 
 export function TemplateSuccessCenter() {
   return (
-    <section id="success-center" className="scroll-mt-20 bg-white py-24">
+    <section id="success-center" className="scroll-mt-20 bg-[color:var(--color-paper)] py-24">
       <div className="mx-auto max-w-6xl px-6">
         <Reveal className="mb-14">
           <SectionTitle eyebrow={SUCCESS_CENTER.eyebrow} title={SUCCESS_CENTER.title} sub={SUCCESS_CENTER.sub} />
@@ -35,7 +35,7 @@ export function TemplateSuccessCenter() {
 function ModuleCell({ module }: { module: SuccessModule }) {
   const Icon = ICONS[module.icon] ?? Ticket;
   return (
-    <TiltCard className="flex flex-col items-center rounded-2xl bg-[color:var(--color-paper)] p-6 text-center">
+    <TiltCard className="flex flex-col items-center rounded-2xl bg-white p-6 text-center">
       <Icon className="size-6 text-[color:var(--color-accent)]" />
       <h3 className="mt-4 text-sm font-semibold tracking-tight text-[color:var(--color-ink)]">{module.title}</h3>
       <p className="mt-2 text-xs leading-relaxed text-black/55">{module.desc}</p>
