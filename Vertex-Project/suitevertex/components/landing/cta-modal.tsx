@@ -30,6 +30,7 @@ export function CtaProvider({ children }: { children: React.ReactNode }) {
     const payload = {
       name: fd.get("name"),
       email: fd.get("email"),
+      mobile: fd.get("mobile"),
       company: fd.get("company"),
       message: fd.get("needs"),
       website: fd.get("website"), // honeypot
@@ -117,8 +118,9 @@ export function CtaProvider({ children }: { children: React.ReactNode }) {
                 </div>
 
                 <div className="space-y-3">
-                  <Field label="Full name" name="name" placeholder="Jane Rivera" autoFocus />
-                  <Field label="Work email" name="email" type="email" placeholder="jane@company.com" />
+                  <Field label="Full name" name="name" placeholder="Jane Rivera" autoFocus required />
+                  <Field label="Work email" name="email" type="email" placeholder="jane@company.com" required />
+                  <Field label="Phone" name="mobile" type="tel" placeholder="+63 917 000 0000" required />
                   <Field label="Company" name="company" placeholder="Acme Operations" />
                   <div>
                     <label htmlFor="cta-needs" className="mb-1.5 block text-xs font-medium text-slate-300">
@@ -162,12 +164,14 @@ function Field({
   type = "text",
   placeholder,
   autoFocus,
+  required,
 }: {
   label: string;
   name: string;
   type?: string;
   placeholder?: string;
   autoFocus?: boolean;
+  required?: boolean;
 }) {
   return (
     <div>
@@ -180,6 +184,7 @@ function Field({
         type={type}
         placeholder={placeholder}
         autoFocus={autoFocus}
+        required={required}
         className="h-11 w-full rounded-xl border border-white/10 bg-white/[0.03] px-3.5 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-blue-400/60 focus:bg-white/[0.05]"
       />
     </div>
