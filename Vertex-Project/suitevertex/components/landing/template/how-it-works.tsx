@@ -22,9 +22,7 @@ export function TemplateHowItWorks() {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="relative rounded-3xl border border-gray-200 bg-gray-50 p-7 transition-all duration-300 hover:border-blue-200 hover:bg-white hover:shadow-lg"
             >
-              <span className="bg-gradient-to-r from-blue-500 to-violet-600 bg-clip-text font-display text-4xl font-extrabold text-transparent">
-                {step.n}
-              </span>
+              <span className="font-display text-4xl font-extrabold text-indigo-600">{step.n}</span>
               <h3 className="mt-3 text-lg font-bold text-gray-900">{step.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-500">{step.body}</p>
             </motion.div>

@@ -29,7 +29,7 @@ export function TemplateWhyDifferent() {
               <div className="h-full rounded-3xl border border-gray-200 bg-gray-50 p-8 text-center transition-all duration-300 hover:border-blue-200 hover:bg-white hover:shadow-lg">
                 <CountUp
                   value={m.value}
-                  className="block bg-gradient-to-r from-blue-500 to-violet-600 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent"
+                  className="block text-5xl font-extrabold tracking-tight text-indigo-600"
                 />
                 <p className="mt-3 text-sm leading-relaxed text-gray-600">{m.label}</p>
               </div>
