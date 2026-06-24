@@ -185,6 +185,46 @@ export const SUCCESS_CENTER = {
   ] satisfies SuccessModule[],
 } as const;
 
+export type SecurityPoint = { title: string; icon: string; desc: string };
+
+export const SECURITY = {
+  eyebrow: "Security & trust",
+  title: "Your ERP data stays yours.",
+  sub: "Built for finance and operations teams — secure by design, with senior consultants behind the AI.",
+  points: [
+    {
+      title: "Role-based access",
+      icon: "lock",
+      desc: "Answers respect each user's NetSuite role. Financial data stays gated by permission.",
+    },
+    {
+      title: "Read-first",
+      icon: "eye",
+      desc: "The copilot answers and diagnoses; any change to records is senior-reviewed first.",
+    },
+    {
+      title: "Grounded, with sources",
+      icon: "file",
+      desc: "Responses come from your SOPs, policies, and live system data — not guesses.",
+    },
+    {
+      title: "Audit-friendly",
+      icon: "history",
+      desc: "Reads System Notes and audit trails; every action stays traceable.",
+    },
+    {
+      title: "Your data, your control",
+      icon: "shield",
+      desc: "No training on your data without consent.",
+    },
+    {
+      title: "Senior backup",
+      icon: "users",
+      desc: "US business-hours NetSuite consultants behind the copilot for anything complex.",
+    },
+  ] satisfies SecurityPoint[],
+} as const;
+
 export const STEPS = {
   eyebrow: "How it works",
   title: "A shared backlog. Clear weekly progress.",
