@@ -76,31 +76,58 @@ export const WHY_DIFFERENT = {
 export type ServiceGroup = { title: string; icon: string; items: string[] };
 
 export const SERVICES = {
-  eyebrow: "Services",
-  title: "What we actually do",
-  sub: "ERP operations, integrations, AI automation, and custom internal tools — covered by one team.",
+  eyebrow: "Capabilities",
+  title: "What your NetSuite copilot can do",
+  sub: "24/7, role-based help grounded in your business processes and policies — from troubleshooting live issues to reading audit trails.",
   groups: [
     {
-      title: "ERP Operations",
-      icon: "database",
-      items: ["NetSuite administration", "Saved searches", "Reports & dashboards", "Workflows", "Role permissions", "Custom forms"],
+      title: "Troubleshoot live issues",
+      icon: "wrench",
+      items: [
+        "Bank rec: matched lines that won't clear",
+        "Period close & posting errors",
+        "Workflows that aren't triggering",
+        "Step-by-step fixes for your exact setup",
+      ],
     },
     {
-      title: "Integrations",
-      icon: "plug",
-      items: ["Celigo", "Shopify", "HubSpot", "Salesforce", "REST / SOAP APIs", "EDI workflows"],
+      title: "Saved searches & reports",
+      icon: "search",
+      items: [
+        "Explain and fix saved searches",
+        "Build the report you actually need",
+        "Diagnose why results look wrong",
+        "Scheduled / emailed report issues",
+      ],
     },
     {
-      title: "AI Automation",
-      icon: "bot",
-      items: ["AI sales agents", "AI chatbots", "n8n workflows", "Lead routing", "Follow-up automation", "Telegram / Slack alerts"],
+      title: "Audit trail & system notes",
+      icon: "history",
+      items: [
+        "Who changed this record, and when",
+        "Reads System Notes to trace changes",
+        "Finds the source of data discrepancies",
+        "Reconciles unexpected values",
+      ],
     },
     {
-      title: "Custom Tools",
-      icon: "layout",
-      items: ["Internal portals", "CRM dashboards", "Inventory systems", "Approval tools", "Client portals", "Mini ERP apps"],
+      title: "Role-based & secure",
+      icon: "shield",
+      items: [
+        "Answers respect each user's NetSuite role",
+        "Financial data gated by permission",
+        "No exposure of restricted information",
+        "Read-first, audit-friendly",
+      ],
     },
   ] satisfies ServiceGroup[],
+  examplesLabel: "Try asking your copilot",
+  examples: [
+    "Why won't this reconciled bank line clear from the match list?",
+    "Build a saved search for overdue purchase orders",
+    "Who changed this customer's credit limit, and when?",
+    "Why is my A/R aging report off this month?",
+  ],
 } as const;
 
 export const STEPS = {

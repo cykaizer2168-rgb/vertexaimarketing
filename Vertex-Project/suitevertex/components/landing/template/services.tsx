@@ -1,15 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Database, Plug, Bot, LayoutPanelLeft, CheckCircle2, type LucideIcon } from "lucide-react";
+import { Wrench, Search, History, ShieldCheck, CheckCircle2, type LucideIcon } from "lucide-react";
 import { Reveal, SectionTitle, cardHover, cardHoverTransition } from "./ui";
 import { SERVICES, type ServiceGroup } from "@/content/landing";
 
 const ICONS: Record<string, LucideIcon> = {
-  database: Database,
-  plug: Plug,
-  bot: Bot,
-  layout: LayoutPanelLeft,
+  wrench: Wrench,
+  search: Search,
+  history: History,
+  shield: ShieldCheck,
 };
 
 export function TemplateServices() {
@@ -25,13 +25,30 @@ export function TemplateServices() {
             <ServiceCard key={group.title} group={group} delay={i * 0.1} />
           ))}
         </div>
+
+        {/* Example questions */}
+        <Reveal className="mt-14">
+          <p className="text-center text-xs font-semibold uppercase tracking-widest text-gray-400">
+            {SERVICES.examplesLabel}
+          </p>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            {SERVICES.examples.map((q) => (
+              <span
+                key={q}
+                className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-600 shadow-sm"
+              >
+                &ldquo;{q}&rdquo;
+              </span>
+            ))}
+          </div>
+        </Reveal>
       </div>
     </section>
   );
 }
 
 function ServiceCard({ group, delay }: { group: ServiceGroup; delay: number }) {
-  const Icon = ICONS[group.icon] ?? Database;
+  const Icon = ICONS[group.icon] ?? Wrench;
   return (
     <motion.div
       initial={{ opacity: 0, y: 28 }}
