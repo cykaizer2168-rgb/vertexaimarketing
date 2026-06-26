@@ -178,12 +178,20 @@
   /* ── MOBILE ROW CARDS ── */
   .row-cards { display: flex; flex-direction: column; }
   .row-card {
-    padding: 15px 18px; border-bottom: 1px solid var(--hairline);
+    padding: 12px 16px; border-bottom: 1px solid var(--hairline);
     display: flex; flex-direction: column; gap: 6px;
   }
   .row-card:last-child { border-bottom: none; }
-  .row-card-top { display: flex; align-items: center; justify-content: space-between; }
-  .row-card-name { font-size: 15px; font-weight: 700; color: var(--navy); }
+  .row-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .row-card-name { font-size: 16px; font-weight: 600; color: var(--navy); letter-spacing: -0.01em; }
+  .row-avatar {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--blue-50); color: var(--blue);
+    font-size: 14px; font-weight: 700; letter-spacing: 0.01em; margin-right: 12px;
+  }
+  .row-card-head { display: flex; align-items: center; }
+  .row-card-head .row-card-top { flex: 1; }
   .row-card-meta { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 2px; }
   .row-meta-item { display: flex; flex-direction: column; gap: 1px; }
   .row-meta-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
@@ -1144,6 +1152,16 @@ async function loadBorrowers() {
   renderBorrowers();
 }
 
+function initials(name) {
+  const parts = String(name || '?').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+function avatarHtml(name) {
+  return `<div class="row-avatar">${initials(name)}</div>`;
+}
+
 function renderBorrowers() {
   const q = (document.getElementById('borrower-search').value || '').toLowerCase();
   const filtered = borrowers.filter(b =>
@@ -1159,10 +1177,12 @@ function renderBorrowers() {
   list.innerHTML = filtered.map(b => {
     const activeLoans = loans.filter(l => l.BorrowerID === b.ID && l.Status === 'Active').length;
     return `<div class="row-card">
+      <div class="row-card-head">
+      ${avatarHtml(b.Name)}
       <div class="row-card-top">
         <div class="row-card-name">${b.Name}</div>
         ${activeLoans ? `<span class="badge badge-blue">${activeLoans} active</span>` : '<span class="badge badge-green">Clear</span>'}
-      </div>
+      </div></div>
       <div class="row-card-meta">
         <div class="row-meta-item"><div class="row-meta-label">Phone</div><div class="row-meta-value">${b.Phone || '—'}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Address</div><div class="row-meta-value">${b.Address || '—'}</div></div>
@@ -1335,13 +1355,15 @@ function renderLoans() {
     const lPmt      = parseFloat(l.TotalAmount) / Math.max(1, lPeriods);
     const lPmtLabel = lFreq === 'weekly' ? 'Payment/Week' : lFreq === 'semi-monthly' ? 'Payment/2Wks' : 'Monthly Pay';
     return `<div class="row-card">
+      <div class="row-card-head">
+      ${avatarHtml(l.BorrowerName)}
       <div class="row-card-top">
         <div class="row-card-name">${l.BorrowerName}</div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
           ${l.RefNo ? `<span style="background:var(--blue-100);color:var(--blue);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;letter-spacing:.05em;">${l.RefNo}</span>` : ''}
           <span class="badge ${badge}">${status}</span>
         </div>
-      </div>
+      </div></div>
       <div class="row-card-meta">
         <div class="row-meta-item"><div class="row-meta-label">Principal</div><div class="row-meta-value">${peso(l.Principal)}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Interest Income</div><div class="row-meta-value" style="color:var(--blue);font-weight:700">${peso(parseFloat(l.TotalAmount||0) - parseFloat(l.Principal||0))}</div></div>
@@ -1587,13 +1609,15 @@ function renderPayments() {
     const color = method ? (methodColor[method] || 'var(--navy)') : null;
     const bg    = method ? (methodBg[method]    || '#F1F5F9') : null;
     return `<div class="row-card">
+    <div class="row-card-head">
+    ${avatarHtml(p.BorrowerName)}
     <div class="row-card-top">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div class="row-card-name">${p.BorrowerName}</div>
         ${p.RefNo ? `<span style="background:var(--blue-100);color:var(--blue);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;letter-spacing:.05em;align-self:flex-start;">${p.RefNo}</span>` : ''}
       </div>
       <div style="font-size:18px;font-weight:800;color:var(--green)">${peso(p.Amount)}</div>
-    </div>
+    </div></div>
     <div class="row-card-meta">
       <div class="row-meta-item"><div class="row-meta-label">Date</div><div class="row-meta-value">${fDate(p.Date)}</div></div>
       ${method ? `<div class="row-meta-item"><div class="row-meta-label">Method</div><div class="row-meta-value"><span style="background:${bg};color:${color};padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;">${icon} ${method}</span></div></div>` : ''}
