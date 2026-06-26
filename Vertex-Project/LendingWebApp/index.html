@@ -2,45 +2,102 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Lending Manager</title>
+<!-- PWA -->
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#2563EB" />
+<link rel="apple-touch-icon" href="/apple-touch-icon-180.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Lending" />
 <style>
   :root {
-    --blue:      #2563EB;
-    --blue-d:    #1D4ED8;
-    --blue-50:   #EFF6FF;
-    --blue-100:  #DBEAFE;
-    --navy:      #0F172A;
-    --body:      #475569;
-    --muted:     #94A3B8;
-    --border:    #E2E8F0;
-    --bg:        #F8FAFC;
+    --blue:      #007AFF;   /* iOS system blue (light) */
+    --blue-d:    #0A6CE0;
+    --blue-50:   #EAF3FF;   /* tinted fill */
+    --blue-100:  #D6E8FF;
+    --navy:      #1C1C1E;   /* label */
+    --body:      #3A3A3C;   /* secondary label */
+    --muted:     #8E8E93;   /* tertiary label */
+    --border:    #D1D1D6;   /* opaque separator */
+    --hairline:  rgba(60,60,67,0.12);  /* iOS separator */
+    --separator: rgba(60,60,67,0.18);
+    --card-border: rgba(60,60,67,0.08);
+    --bg:        #F2F2F7;   /* grouped background */
     --card:      #FFFFFF;
-    --green:     #10B981;
-    --red:       #EF4444;
-    --orange:    #F59E0B;
-    --radius:    12px;
+    --card-2:    #FFFFFF;
+    --fill:      rgba(118,118,128,0.12); /* iOS tertiary fill */
+    --green:     #34C759;
+    --red:       #FF3B30;
+    --orange:    #FF9500;
+    --radius:    14px;
+    --radius-sm: 10px;
+    --radius-lg: 20px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow:    0 1px 3px rgba(0,0,0,0.05), 0 8px 24px rgba(0,0,0,0.05);
+    --shadow-md: 0 6px 20px rgba(0,0,0,0.10);
     --bottom-nav-h: 64px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --blue:      #0A84FF;   /* iOS system blue (dark) */
+      --blue-d:    #409CFF;
+      --blue-50:   rgba(10,132,255,0.16);
+      --blue-100:  rgba(10,132,255,0.24);
+      --navy:      #FFFFFF;
+      --body:      #EBEBF5;
+      --muted:     #98989F;
+      --border:    rgba(84,84,88,0.65);
+      --hairline:  rgba(84,84,88,0.55);
+      --separator: rgba(84,84,88,0.65);
+      --card-border: rgba(255,255,255,0.06);
+      --bg:        #000000;   /* true black grouped bg */
+      --card:      #1C1C1E;   /* elevated surface */
+      --card-2:    #2C2C2E;
+      --fill:      rgba(118,118,128,0.24);
+      --green:     #30D158;
+      --red:       #FF453A;
+      --orange:    #FF9F0A;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
+      --shadow:    0 1px 3px rgba(0,0,0,0.5);
+      --shadow-md: 0 6px 20px rgba(0,0,0,0.6);
+    }
+    /* Surfaces that were hard-coded white in light mode */
+    .form-input, .form-select, .form-textarea,
+    .pay-method-label { background: var(--card-2); }
+    .search-wrap input:focus { background: var(--card-2); }
+    .topbar { background: rgba(28,28,30,0.72); }
+    .bottom-nav { background: rgba(28,28,30,0.72); }
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
     background: var(--bg); color: var(--body);
     display: flex; flex-direction: column; height: 100dvh; overflow: hidden;
     -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
   }
 
   /* ── TOPBAR ── */
   .topbar {
-    background: var(--navy); color: #fff;
-    padding: 0 16px; height: 56px;
+    background: rgba(255,255,255,0.72); color: var(--navy);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--hairline);
+    box-sizing: border-box;
+    padding: 0 16px; padding-top: env(safe-area-inset-top, 0px);
+    height: calc(52px + env(safe-area-inset-top, 0px));
     display: flex; align-items: center; justify-content: space-between;
     flex-shrink: 0; position: relative; z-index: 10;
   }
   .topbar-brand { display: flex; align-items: center; gap: 8px; }
   .topbar-brand-icon { font-size: 20px; }
-  .topbar-brand-text { font-size: 16px; font-weight: 700; color: #fff; }
-  .topbar-title { font-size: 16px; font-weight: 600; color: #fff; }
+  .topbar-brand-text { font-size: 16px; font-weight: 700; color: var(--navy); letter-spacing: -0.02em; }
+  .topbar-title { font-size: 16px; font-weight: 600; color: var(--navy); letter-spacing: -0.02em; }
   .topbar-actions { display: flex; align-items: center; gap: 8px; }
 
   /* ── MAIN ── */
@@ -60,12 +117,12 @@
     gap: 12px; margin-bottom: 16px;
   }
   .stat-card {
-    background: var(--card); border-radius: var(--radius); padding: 16px;
-    border: 1px solid var(--border);
+    background: var(--card); border-radius: var(--radius); padding: 18px;
+    border: 1px solid var(--card-border); box-shadow: var(--shadow-sm);
   }
-  .stat-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-  .stat-value { font-size: 24px; font-weight: 800; color: var(--navy); line-height: 1; }
-  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .stat-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+  .stat-value { font-size: 26px; font-weight: 700; color: var(--navy); line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 5px; }
   .stat-card.blue   .stat-value { color: var(--blue); }
   .stat-card.green  .stat-value { color: var(--green); }
   .stat-card.red    .stat-value { color: var(--red); }
@@ -74,41 +131,44 @@
   /* ── CARD ── */
   .card {
     background: var(--card); border-radius: var(--radius);
-    border: 1px solid var(--border); overflow: hidden;
+    border: 1px solid var(--card-border); box-shadow: var(--shadow-sm); overflow: hidden;
     margin-bottom: 16px;
   }
   .card-header {
-    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    padding: 16px 18px; border-bottom: 1px solid var(--hairline);
     display: flex; align-items: center; justify-content: space-between;
     gap: 10px; flex-wrap: wrap;
   }
-  .card-title { font-size: 14px; font-weight: 700; color: var(--navy); }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--navy); letter-spacing: -0.02em; }
 
   /* ── BUTTON ── */
   .btn {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 9px 16px; border-radius: 9px; font-size: 13px; font-weight: 600;
-    cursor: pointer; border: none; transition: opacity 0.15s;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600;
+    letter-spacing: -0.01em;
+    cursor: pointer; border: none;
+    transition: transform 0.12s ease, opacity 0.15s, box-shadow 0.15s, filter 0.15s;
     touch-action: manipulation; user-select: none;
-    min-height: 40px;
+    min-height: 42px;
   }
-  .btn:active { opacity: 0.75; }
-  .btn-primary { background: var(--blue); color: #fff; }
-  .btn-danger  { background: var(--red);  color: #fff; }
+  .btn:active { transform: scale(0.97); opacity: 0.92; }
+  .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 1px 2px rgba(37,99,235,0.25); }
+  .btn-primary:active { filter: brightness(0.95); }
+  .btn-danger  { background: var(--red);  color: #fff; box-shadow: 0 1px 2px rgba(239,68,68,0.25); }
   .btn-ghost   { background: var(--blue-50); color: var(--blue); }
-  .btn-sm      { padding: 6px 12px; font-size: 12px; min-height: 34px; }
-  .btn-icon    { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 50%; }
+  .btn-sm      { padding: 7px 13px; font-size: 13px; min-height: 36px; }
+  .btn-icon    { width: 38px; height: 38px; padding: 0; justify-content: center; border-radius: 50%; }
 
   /* ── TABLE (mobile: card rows) ── */
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   thead th {
-    background: var(--bg); color: var(--muted);
-    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
-    padding: 10px 14px; text-align: left; white-space: nowrap;
-    border-bottom: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 12px 16px; text-align: left; white-space: nowrap;
+    border-bottom: 1px solid var(--hairline);
   }
-  tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--body); }
+  tbody td { padding: 14px 16px; border-bottom: 1px solid var(--hairline); color: var(--body); }
   tbody tr:last-child td { border-bottom: none; }
   .td-name { font-weight: 600; color: var(--navy); }
   .td-actions { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -116,7 +176,7 @@
   /* ── MOBILE ROW CARDS ── */
   .row-cards { display: flex; flex-direction: column; }
   .row-card {
-    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    padding: 15px 18px; border-bottom: 1px solid var(--hairline);
     display: flex; flex-direction: column; gap: 6px;
   }
   .row-card:last-child { border-bottom: none; }
@@ -194,32 +254,33 @@
 
   /* ── MODAL ── */
   .overlay {
-    position: fixed; inset: 0; background: rgba(15,23,42,0.6);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     display: none; align-items: flex-end; justify-content: center; z-index: 100;
   }
   .overlay.open { display: flex; }
   .modal {
     background: var(--card);
-    border-radius: 20px 20px 0 0;
-    padding: 20px 20px 32px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 22px 22px 32px;
     width: 100%; max-height: 92dvh; overflow-y: auto;
-    box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 -8px 48px rgba(0,0,0,0.16);
     animation: slideUp 0.28s cubic-bezier(0.32,0.72,0,1);
   }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .modal-drag { width: 40px; height: 4px; background: #CBD5E1; border-radius: 2px; margin: 0 auto 18px; }
-  .modal-title { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 18px; }
+  .modal-drag { width: 38px; height: 5px; background: #D1D1D6; border-radius: 99px; margin: 0 auto 18px; }
+  .modal-title { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 18px; letter-spacing: -0.02em; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .form-grid .full { grid-column: 1 / -1; }
   .form-group { display: flex; flex-direction: column; gap: 5px; }
   .form-label { font-size: 12px; font-weight: 600; color: var(--navy); }
   .form-input, .form-select, .form-textarea {
-    padding: 11px 13px; border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
     font-size: 16px; color: var(--navy); background: #fff;
-    transition: border-color 0.15s; outline: none; width: 100%;
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none; width: 100%;
     -webkit-appearance: none;
   }
-  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--blue); }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(37,99,235,0.12); }
   .form-textarea { resize: vertical; min-height: 72px; }
   .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
   .modal-footer .btn { flex: 1; justify-content: center; }
@@ -227,10 +288,11 @@
   /* ── SEARCH ── */
   .search-wrap { position: relative; width: 100%; }
   .search-wrap input {
-    padding: 10px 12px 10px 36px; border: 1.5px solid var(--border); border-radius: 10px;
-    font-size: 14px; outline: none; width: 100%; background: var(--bg);
+    padding: 11px 12px 11px 38px; border: 1px solid transparent; border-radius: var(--radius-sm);
+    font-size: 15px; outline: none; width: 100%; background: rgba(118,118,128,0.10);
+    transition: background 0.15s, box-shadow 0.15s;
   }
-  .search-wrap input:focus { border-color: var(--blue); background: #fff; }
+  .search-wrap input:focus { background: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,0.12); border-color: var(--blue); }
   .search-wrap .search-icon {
     position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
     color: var(--muted); pointer-events: none;
@@ -241,7 +303,7 @@
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 14px; gap: 10px;
   }
-  .section-header-title { font-size: 16px; font-weight: 700; color: var(--navy); }
+  .section-header-title { font-size: 22px; font-weight: 700; color: var(--navy); letter-spacing: -0.03em; }
   .desktop-add-btn { display: none; }
   @media (min-width: 768px) { .desktop-add-btn { display: inline-flex; } }
 
@@ -268,8 +330,11 @@
 
   /* ── BOTTOM NAV ── */
   .bottom-nav {
-    height: var(--bottom-nav-h); background: var(--card);
-    border-top: 1px solid var(--border);
+    height: var(--bottom-nav-h);
+    background: rgba(255,255,255,0.72);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-top: 1px solid var(--hairline);
     display: flex; align-items: stretch;
     position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
     padding-bottom: env(safe-area-inset-bottom);
@@ -278,10 +343,11 @@
     flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 3px; border: none; background: none; cursor: pointer;
     color: var(--muted); font-size: 10px; font-weight: 600;
-    transition: color 0.15s; padding: 8px 0;
+    transition: color 0.15s, transform 0.12s ease; padding: 8px 0;
     touch-action: manipulation;
   }
-  .bnav-item svg { width: 22px; height: 22px; }
+  .bnav-item svg { width: 26px; height: 26px; flex-shrink: 0; min-height: 26px; }
+  .bnav-item:active { transform: scale(0.90); }
   .bnav-item.active { color: var(--blue); }
   .bnav-item.active svg { stroke: var(--blue); }
 
@@ -332,7 +398,7 @@
     .content { padding: 28px; padding-bottom: 28px; }
     .bottom-nav { display: none; }
     .fab { display: none !important; }
-    .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stats-grid { grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
     .stat-value { font-size: 28px; }
     .dash-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .modal { border-radius: 14px; max-width: 480px; padding: 28px; animation: none; }
@@ -354,25 +420,25 @@
   </div>
   <nav class="sidebar-nav">
     <button class="nav-item-desktop active" data-section="dashboard">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
       Dashboard
     </button>
     <button class="nav-item-desktop" data-section="borrowers">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Borrowers
     </button>
     <button class="nav-item-desktop" data-section="loans">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
       Loans
     </button>
     <button class="nav-item-desktop" data-section="payments">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
       Payments
     </button>
   </nav>
   <div style="padding: 12px 10px 8px;">
     <button class="btn btn-primary" style="width:100%;justify-content:center;gap:6px;" onclick="openNewPaymentModal()">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Record Payment
     </button>
   </div>
@@ -388,7 +454,7 @@
     </div>
     <div class="topbar-title" id="topbar-title">Dashboard</div>
     <div class="topbar-actions">
-      <button class="btn btn-ghost btn-sm" onclick="refreshAll()" style="background:rgba(255,255,255,0.12);color:#fff;font-size:18px;padding:6px 10px;min-height:36px;">↻</button>
+      <button class="btn btn-ghost btn-sm" onclick="refreshAll()" style="background:rgba(0,0,0,0.05);color:var(--blue);font-size:18px;padding:6px 10px;min-height:36px;">↻</button>
     </div>
   </div>
 
@@ -417,6 +483,11 @@
           <div class="stat-label">Overdue</div>
           <div class="stat-value" id="d-overdue">—</div>
           <div class="stat-sub">needs attention</div>
+        </div>
+        <div class="stat-card" style="border-color:var(--blue);background:var(--blue-50);">
+          <div class="stat-label">Total Interest Income</div>
+          <div class="stat-value" id="d-interest" style="color:var(--blue)">—</div>
+          <div class="stat-sub" id="d-interest-sub">from all loans</div>
         </div>
       </div>
 
@@ -473,7 +544,7 @@
       </div>
       <div class="search-wrap" style="margin-bottom:14px">
         <span class="search-icon">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </span>
         <input type="text" placeholder="Search borrowers…" id="borrower-search" oninput="filterBorrowers()" />
       </div>
@@ -520,21 +591,17 @@
 
 <!-- ═══ BOTTOM NAV ════════════════════════════════════════════ -->
 <nav class="bottom-nav">
-  <button class="bnav-item active" data-section="dashboard">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-    Home
+  <button class="bnav-item active" data-section="dashboard" aria-label="Home">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
   </button>
-  <button class="bnav-item" data-section="borrowers">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-    Borrowers
+  <button class="bnav-item" data-section="borrowers" aria-label="Borrowers">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
   </button>
-  <button class="bnav-item" data-section="loans">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-    Loans
+  <button class="bnav-item" data-section="loans" aria-label="Loans">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
   </button>
-  <button class="bnav-item" data-section="payments">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-    Payments
+  <button class="bnav-item" data-section="payments" aria-label="Payments">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
   </button>
 </nav>
 
@@ -1032,6 +1099,8 @@ async function loadDashboard() {
   document.getElementById('d-today').textContent       = peso(res.collectedToday);
   document.getElementById('d-total-collected').textContent = peso(res.totalCollected) + ' total';
   document.getElementById('d-overdue').textContent     = res.overdueLoans;
+  document.getElementById('d-interest').textContent    = peso(res.totalInterestIncome || 0);
+  document.getElementById('d-interest-sub').textContent = res.totalLoans + ' loan' + (res.totalLoans !== 1 ? 's' : '') + ' total';
 
   const rp = document.getElementById('d-recent-payments');
   rp.innerHTML = res.recentPayments.length
@@ -1262,6 +1331,7 @@ function renderLoans() {
       </div>
       <div class="row-card-meta">
         <div class="row-meta-item"><div class="row-meta-label">Principal</div><div class="row-meta-value">${peso(l.Principal)}</div></div>
+        <div class="row-meta-item"><div class="row-meta-label">Interest Income</div><div class="row-meta-value" style="color:var(--blue);font-weight:700">${peso(parseFloat(l.TotalAmount||0) - parseFloat(l.Principal||0))}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Balance</div><div class="row-meta-value" style="${parseFloat(l.Balance)>0?'color:var(--orange)':'color:var(--green)'}">${peso(l.Balance)}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Date Borrowed</div><div class="row-meta-value">${fDate(l.BorrowedDate || l.StartDate)}</div></div>
         <div class="row-meta-item"><div class="row-meta-label">Repayment Starts</div><div class="row-meta-value">${fDate(l.StartDate)}</div></div>
@@ -2033,6 +2103,15 @@ if (GAS_URL === 'YOUR_GAS_WEB_APP_URL_HERE') {
 } else {
   loadCurrentSection(); // only load dashboard on startup
 }
+</script>
+<script>
+  // Register the service worker (enables PWA install). Skip inside the Capacitor
+  // native wrapper to avoid intercepting native requests.
+  if ("serviceWorker" in navigator && !window.Capacitor) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js").catch(function () {});
+    });
+  }
 </script>
 </body>
 </html>
