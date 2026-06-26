@@ -96,6 +96,8 @@
   }
   .topbar-brand { display: flex; align-items: center; gap: 8px; }
   .topbar-brand-icon { font-size: 20px; }
+  .brand-mark { width: 26px; height: 26px; flex-shrink: 0; display: block; }
+  .sidebar-brand .brand-mark { width: 24px; height: 24px; }
   .topbar-brand-text { font-size: 16px; font-weight: 700; color: var(--navy); letter-spacing: -0.02em; }
   .topbar-title { font-size: 16px; font-weight: 600; color: var(--navy); letter-spacing: -0.02em; }
   .topbar-actions { display: flex; align-items: center; gap: 8px; }
@@ -415,7 +417,14 @@
 <!-- ═══ DESKTOP SIDEBAR (hidden on mobile) ══════════════════ -->
 <aside class="sidebar-desktop" style="display:none" id="sidebar-desktop">
   <div class="sidebar-brand">
-    <h1>💰 LendTrack</h1>
+    <h1 style="display:flex;align-items:center;gap:8px;">
+      <svg class="brand-mark" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="28" height="28" rx="7" fill="var(--blue)"/>
+        <path d="M10 7.5v11.5a1 1 0 0 0 1 1h6.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="18.5" cy="10.5" r="2.4" stroke="#fff" stroke-width="2.2"/>
+      </svg>
+      LendTrack
+    </h1>
     <span>Lending Manager</span>
   </div>
   <nav class="sidebar-nav">
@@ -449,7 +458,11 @@
 <main class="main">
   <div class="topbar">
     <div class="topbar-brand">
-      <span class="topbar-brand-icon">💰</span>
+      <svg class="brand-mark" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect width="28" height="28" rx="7" fill="var(--blue)"/>
+        <path d="M10 7.5v11.5a1 1 0 0 0 1 1h6.5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="18.5" cy="10.5" r="2.4" stroke="#fff" stroke-width="2.2"/>
+      </svg>
       <span class="topbar-brand-text">LendTrack</span>
     </div>
     <div class="topbar-title" id="topbar-title">Dashboard</div>
