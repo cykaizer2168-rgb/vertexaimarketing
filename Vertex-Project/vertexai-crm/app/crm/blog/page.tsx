@@ -5,7 +5,7 @@ import { Plus, RefreshCw, Pencil, Trash2, ExternalLink, RotateCw, Loader2 } from
 import type { Post } from '@/lib/supabase';
 import BlogPostForm from '@/components/crm/blog-post-form';
 
-const PORTFOLIO = 'https://angelo-franco-portfolio.vercel.app';
+const PORTFOLIO = 'https://buildwithfranco.com';
 
 export default function BlogPage() {
   const [items, setItems] = useState<Post[]>([]);

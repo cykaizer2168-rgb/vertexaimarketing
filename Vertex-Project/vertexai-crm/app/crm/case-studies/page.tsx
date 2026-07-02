@@ -5,7 +5,7 @@ import { Plus, RefreshCw, Pencil, Trash2, ExternalLink, RotateCw, Loader2 } from
 import type { CaseStudy } from '@/lib/supabase';
 import CaseStudyForm from '@/components/crm/case-study-form';
 
-const PORTFOLIO = 'https://angelo-franco-portfolio.vercel.app';
+const PORTFOLIO = 'https://buildwithfranco.com';
 
 export default function CaseStudiesPage() {
   const [items, setItems] = useState<CaseStudy[]>([]);

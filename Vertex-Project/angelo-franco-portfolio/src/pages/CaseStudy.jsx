@@ -3,7 +3,7 @@ import { useLoaderData, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Linkedin, Calendar, Image as ImageIcon } from "lucide-react";
 
-const SITE = "https://angelo-franco-portfolio.vercel.app";
+const SITE = "https://buildwithfranco.com";
 
 export default function CaseStudy() {
   const { caseStudy: cs } = useLoaderData();

@@ -5,7 +5,7 @@ import { readingMinutes } from "../data/posts";
 import { cardHover } from "../lib/cardHover";
 import { ImagePlaceholder } from "../components/Placeholder";
 
-const SITE = "https://angelo-franco-portfolio.vercel.app";
+const SITE = "https://buildwithfranco.com";
 
 function formatDate(iso) {
   if (!iso) return "";

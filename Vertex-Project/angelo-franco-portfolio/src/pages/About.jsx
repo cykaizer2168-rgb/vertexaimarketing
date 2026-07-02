@@ -1,7 +1,7 @@
 import { Head } from "vite-react-ssg";
 import { Link } from "react-router-dom";
 
-const SITE = "https://angelo-franco-portfolio.vercel.app";
+const SITE = "https://buildwithfranco.com";
 
 export default function AboutPage() {
   return (

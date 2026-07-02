@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://angelo-franco-portfolio.vercel.app/sitemap.xml
+Sitemap: https://buildwithfranco.com/sitemap.xml

@@ -1,13 +1,13 @@
 import { Head } from "vite-react-ssg";
 
-const SITE = "https://angelo-franco-portfolio.vercel.app";
+const SITE = "https://buildwithfranco.com";
 
 export default function Privacy() {
   return (
     <>
       <Head>
         <title>Privacy Policy — Angelo B. Franco</title>
-        <meta name="description" content="Privacy policy for angelofranco.dev, including cookies and third-party advertising (Google AdSense)." />
+        <meta name="description" content="Privacy policy for buildwithfranco.com, including cookies and third-party advertising (Google AdSense)." />
         <link rel="canonical" href={`${SITE}/privacy`} />
         <meta name="robots" content="index,follow" />
       </Head>

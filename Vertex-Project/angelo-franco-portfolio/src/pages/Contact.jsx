@@ -1,7 +1,7 @@
 import { Head } from "vite-react-ssg";
 import { Mail, Linkedin, MapPin } from "lucide-react";
 
-const SITE = "https://angelo-franco-portfolio.vercel.app";
+const SITE = "https://buildwithfranco.com";
 
 export default function Contact() {
   return (

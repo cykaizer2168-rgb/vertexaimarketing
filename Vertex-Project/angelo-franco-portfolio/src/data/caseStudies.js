@@ -23,7 +23,7 @@ const LOCAL_FALLBACK = [
       poster: "/case-studies/ai-automation-hero.jpg",
       alt: "AI automation workflow built with n8n and LLMs",
     },
-    ogImage: "https://angelo-franco-portfolio.vercel.app/case-studies/ai-automation-og.png",
+    ogImage: "https://buildwithfranco.com/case-studies/ai-automation-og.png",
     sections: [
       { heading: "Overview", body: "A growing operations team was drowning in repetitive, manual tasks — copying data between systems, triaging inbound messages, and chasing follow-ups by hand. The goal was to design an AI-powered automation layer that could handle these workflows reliably, 24/7, without adding headcount. [Replace with your own overview.]" },
       { heading: "The Challenge", body: "Data lived in disconnected tools, and every process depended on someone manually moving information from A to B. This created bottlenecks, delayed responses, and a high risk of human error. [Replace with the real problem you solved.]" },

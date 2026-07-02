@@ -6,7 +6,7 @@ import { ArrowLeft, Linkedin, Calendar } from "lucide-react";
 import { readingMinutes } from "../data/posts";
 import Ad from "../components/Ad";
 
-const SITE = "https://angelo-franco-portfolio.vercel.app";
+const SITE = "https://buildwithfranco.com";
 const AD_TOP = import.meta.env.VITE_ADSENSE_SLOT_ARTICLE_TOP;
 const AD_BOTTOM = import.meta.env.VITE_ADSENSE_SLOT_ARTICLE_BOTTOM;
 
