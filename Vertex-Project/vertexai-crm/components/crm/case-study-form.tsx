@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { X, Plus, Trash2, Loader2 } from 'lucide-react';
 import type { CaseStudy, CaseStudySection, CaseStudyResult } from '@/lib/supabase';
 import ImageUpload from './image-upload';
+import ImagePrompt from './image-prompt';
 
 type Draft = Omit<CaseStudy, 'id' | 'created_at' | 'updated_at'>;
 
@@ -128,6 +129,9 @@ export default function CaseStudyForm({
                   <input className={input} value={d.hero_src ?? ''} onChange={(e) => set('hero_src', e.target.value)} placeholder="/case-studies/demo.mp4" />
                 ) : (
                   <ImageUpload value={d.hero_src} folder="case-studies" onChange={(url) => { set('hero_src', url); if (url) set('hero_placeholder', false); }} />
+                )}
+                {d.hero_type !== 'video' && (
+                  <ImagePrompt title={d.title} keywords={[d.category ?? '', ...techInput.split(',').map((t) => t.trim())].filter(Boolean)} kind="case study hero" aspect="16:9" />
                 )}
               </div>
               {d.hero_type === 'video' && (
