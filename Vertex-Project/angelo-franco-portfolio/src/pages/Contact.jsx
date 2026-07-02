@@ -21,11 +21,11 @@ export default function Contact() {
         </p>
 
         <div className="mt-8 space-y-3">
-          <a href="mailto:angelo.franco2168@gmail.com" className="flex items-center gap-3 bg-panel border border-line rounded-xl px-5 py-4 hover:border-cyan/45 transition-colors">
+          <a href="mailto:angelo.franco@buildwithfranco.com" className="flex items-center gap-3 bg-panel border border-line rounded-xl px-5 py-4 hover:border-cyan/45 transition-colors">
             <Mail className="text-cyan" size={20} />
             <div>
               <div className="text-sm font-medium">Email</div>
-              <div className="text-sm text-mist">angelo.franco2168@gmail.com</div>
+              <div className="text-sm text-mist">angelo.franco@buildwithfranco.com</div>
             </div>
           </a>
           <a href="https://linkedin.com/in/kaizer2168" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-panel border border-line rounded-xl px-5 py-4 hover:border-cyan/45 transition-colors">

@@ -104,7 +104,7 @@ export function CTA() {
           </p>
         </div>
         <div className="flex flex-col items-center gap-2 shrink-0">
-          <a href="mailto:angelo.franco2168@gmail.com?subject=NetSuite%2FAI%20Automation%20Opportunity" className="inline-flex items-center gap-2 bg-cyan text-ink font-semibold text-sm px-6 py-3.5 rounded-lg hover:bg-cyan/90 transition-colors">
+          <a href="mailto:angelo.franco@buildwithfranco.com?subject=NetSuite%2FAI%20Automation%20Opportunity" className="inline-flex items-center gap-2 bg-cyan text-ink font-semibold text-sm px-6 py-3.5 rounded-lg hover:bg-cyan/90 transition-colors">
             <Calendar size={16} /> Book a Free Consultation
           </a>
           <span className="text-[11px] text-mist">No obligation. Just a friendly conversation.</span>
@@ -124,7 +124,7 @@ export function Footer() {
           <p className="text-xs text-mist">AI Automation Expert</p>
         </div>
         <div className="text-sm text-mist space-y-2">
-          <a href="mailto:angelo.franco2168@gmail.com" className="flex items-center gap-2 hover:text-cyan transition-colors"><Mail size={14} /> angelo.franco2168@gmail.com</a>
+          <a href="mailto:angelo.franco@buildwithfranco.com" className="flex items-center gap-2 hover:text-cyan transition-colors"><Mail size={14} /> angelo.franco@buildwithfranco.com</a>
           <a href="https://linkedin.com/in/kaizer2168" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-cyan transition-colors"><Linkedin size={14} /> linkedin.com/in/kaizer2168</a>
           <p className="flex items-center gap-2"><Globe size={14} /> Bulacan, Philippines</p>
         </div>

@@ -38,7 +38,7 @@ export default function Privacy() {
         <p>You may request access to, correction of, or deletion of any personal information you have shared with us by emailing the address below.</p>
 
         <h2>Contact</h2>
-        <p>Questions about this policy? Email <a href="mailto:angelo.franco2168@gmail.com">angelo.franco2168@gmail.com</a>.</p>
+        <p>Questions about this policy? Email <a href="mailto:angelo.franco@buildwithfranco.com">angelo.franco@buildwithfranco.com</a>.</p>
       </article>
     </>
   );

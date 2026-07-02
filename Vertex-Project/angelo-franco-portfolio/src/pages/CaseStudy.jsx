@@ -153,7 +153,7 @@ export default function CaseStudy() {
           </p>
           <div className="flex flex-wrap justify-center gap-3 mt-6">
             <a
-              href="mailto:angelo.franco2168@gmail.com?subject=Project%20Inquiry"
+              href="mailto:angelo.franco@buildwithfranco.com?subject=Project%20Inquiry"
               className="inline-flex items-center gap-2 bg-cyan text-ink font-semibold text-sm px-5 py-3 rounded-lg hover:bg-cyan/90 transition-colors"
             >
               <Calendar size={16} /> Book a Free Consultation
