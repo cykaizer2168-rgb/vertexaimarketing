@@ -5,6 +5,7 @@ import { X, Loader2, Eye, Pencil } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { Post } from '@/lib/supabase';
+import ImageUpload from './image-upload';
 
 type Draft = Omit<Post, 'id' | 'created_at' | 'updated_at' | 'published_at'>;
 
@@ -79,8 +80,8 @@ export default function BlogPostForm({
               <textarea className={input} rows={2} value={d.excerpt ?? ''} onChange={(e) => set('excerpt', e.target.value)} />
             </div>
             <div className="col-span-2">
-              <label className={label}>Cover image URL</label>
-              <input className={input} value={d.cover_image ?? ''} onChange={(e) => set('cover_image', e.target.value)} placeholder="/blog/my-article-cover.jpg" />
+              <label className={label}>Cover image</label>
+              <ImageUpload value={d.cover_image} folder="blog" onChange={(url) => set('cover_image', url)} />
             </div>
           </div>
 

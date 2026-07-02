@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Plus, Trash2, Loader2 } from 'lucide-react';
 import type { CaseStudy, CaseStudySection, CaseStudyResult } from '@/lib/supabase';
+import ImageUpload from './image-upload';
 
 type Draft = Omit<CaseStudy, 'id' | 'created_at' | 'updated_at'>;
 
@@ -122,8 +123,12 @@ export default function CaseStudyForm({
                 </label>
               </div>
               <div className="col-span-2">
-                <label className={label}>Media URL/path (src)</label>
-                <input className={input} value={d.hero_src ?? ''} onChange={(e) => set('hero_src', e.target.value)} placeholder="/case-studies/ai-automation-hero.jpg" />
+                <label className={label}>{d.hero_type === 'video' ? 'Video URL/path (src)' : 'Hero image'}</label>
+                {d.hero_type === 'video' ? (
+                  <input className={input} value={d.hero_src ?? ''} onChange={(e) => set('hero_src', e.target.value)} placeholder="/case-studies/demo.mp4" />
+                ) : (
+                  <ImageUpload value={d.hero_src} folder="case-studies" onChange={(url) => { set('hero_src', url); if (url) set('hero_placeholder', false); }} />
+                )}
               </div>
               {d.hero_type === 'video' && (
                 <div className="col-span-2">
