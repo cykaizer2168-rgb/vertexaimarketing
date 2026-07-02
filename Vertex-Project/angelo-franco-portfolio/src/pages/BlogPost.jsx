@@ -52,6 +52,32 @@ export default function BlogPost() {
         <meta name="twitter:title" content={p.title} />
         <meta name="twitter:description" content={p.excerpt || p.title} />
         <meta name="twitter:image" content={ogImage} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: p.title,
+            description: p.excerpt || p.title,
+            image: ogImage,
+            datePublished: p.publishedAt || undefined,
+            dateModified: p.publishedAt || undefined,
+            author: { "@type": "Person", name: p.author || "Angelo B. Franco", url: SITE },
+            publisher: { "@type": "Person", name: "Angelo B. Franco", url: SITE },
+            mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+            keywords: (p.tags || []).join(", "),
+          })}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
+              { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE}/blog` },
+              { "@type": "ListItem", position: 3, name: p.title, item: pageUrl },
+            ],
+          })}
+        </script>
       </Head>
 
       <article className="max-w-3xl mx-auto px-6 lg:px-8 pt-32 pb-24">

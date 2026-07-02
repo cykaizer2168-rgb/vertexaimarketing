@@ -44,6 +44,31 @@ export default function CaseStudy() {
         <meta name="twitter:title" content={`${cs.title} — Case Study`} />
         <meta name="twitter:description" content={cs.summary} />
         <meta name="twitter:image" content={cs.ogImage} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: `${cs.title} — Case Study`,
+            description: cs.summary,
+            image: cs.ogImage,
+            author: { "@type": "Person", name: "Angelo B. Franco", url: SITE },
+            publisher: { "@type": "Person", name: "Angelo B. Franco", url: SITE },
+            mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+            about: cs.category,
+            keywords: (cs.techStack || []).join(", "),
+          })}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
+              { "@type": "ListItem", position: 2, name: "Projects", item: `${SITE}/#projects` },
+              { "@type": "ListItem", position: 3, name: cs.title, item: pageUrl },
+            ],
+          })}
+        </script>
       </Head>
 
       <article className="max-w-3xl mx-auto px-6 lg:px-8 pt-32 pb-24">
