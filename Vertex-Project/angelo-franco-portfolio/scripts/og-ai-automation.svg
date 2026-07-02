@@ -1,0 +1,67 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070B16"/>
+      <stop offset="1" stop-color="#0D1326"/>
+    </linearGradient>
+    <radialGradient id="glowCyan" cx="0.82" cy="0.2" r="0.55">
+      <stop offset="0" stop-color="#3DA9FC" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#3DA9FC" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowAmber" cx="0.08" cy="0.92" r="0.5">
+      <stop offset="0" stop-color="#F2A93B" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#F2A93B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3DA9FC"/>
+      <stop offset="1" stop-color="#F2A93B"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glowCyan)"/>
+  <rect width="1200" height="630" fill="url(#glowAmber)"/>
+
+  <g stroke="#1E2A4A" stroke-width="1" opacity="0.5">
+    <line x1="0" y1="157" x2="1200" y2="157"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="472" x2="1200" y2="472"/>
+    <line x1="300" y1="0" x2="300" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="900" y1="0" x2="900" y2="630"/>
+  </g>
+
+  <g transform="translate(985,315)" fill="none">
+    <circle r="150" stroke="#3DA9FC" stroke-opacity="0.18" stroke-width="1.5"/>
+    <circle r="108" stroke="url(#ring)" stroke-opacity="0.6" stroke-width="2"/>
+    <circle cx="0" cy="-150" r="6" fill="#3DA9FC"/>
+    <circle cx="150" cy="0" r="6" fill="#F2A93B"/>
+    <circle cx="0" cy="150" r="5" fill="#3DA9FC"/>
+    <circle cx="-150" cy="0" r="5" fill="#3DA9FC"/>
+    <text x="0" y="-6" font-family="'JetBrains Mono','Courier New',monospace" font-size="30" font-weight="700" fill="#3DA9FC" text-anchor="middle">n8n</text>
+    <text x="0" y="34" font-family="'JetBrains Mono','Courier New',monospace" font-size="20" fill="#F2A93B" text-anchor="middle">+ LLM</text>
+  </g>
+
+  <rect x="80" y="118" width="300" height="40" rx="20" fill="none" stroke="#3DA9FC" stroke-opacity="0.5"/>
+  <text x="104" y="144" font-family="'JetBrains Mono','Courier New',monospace" font-size="16" letter-spacing="3" fill="#3DA9FC">AI AUTOMATION · CASE STUDY</text>
+
+  <text x="78" y="245" font-family="'Space Grotesk','Arial',sans-serif" font-size="60" font-weight="700" fill="#FFFFFF">AI Automation &amp;</text>
+  <text x="78" y="315" font-family="'Space Grotesk','Arial',sans-serif" font-size="60" font-weight="700" fill="#FFFFFF">Workflow</text>
+  <text x="78" y="385" font-family="'Space Grotesk','Arial',sans-serif" font-size="60" font-weight="700" fill="#3DA9FC">Orchestration</text>
+
+  <text x="80" y="446" font-family="'Inter','Arial',sans-serif" font-size="22" fill="#8C9AC4">AI agents &amp; automation that eliminate manual work — running 24/7.</text>
+
+  <g font-family="'JetBrains Mono','Courier New',monospace" font-size="16" fill="#8C9AC4">
+    <rect x="80"  y="492" width="90"  height="40" rx="20" fill="#0D1326" stroke="#1E2A4A"/>
+    <text x="100" y="517">n8n</text>
+    <rect x="186" y="492" width="110" height="40" rx="20" fill="#0D1326" stroke="#1E2A4A"/>
+    <text x="206" y="517">LLMs</text>
+    <rect x="312" y="492" width="150" height="40" rx="20" fill="#0D1326" stroke="#1E2A4A"/>
+    <text x="332" y="517">REST APIs</text>
+    <rect x="478" y="492" width="150" height="40" rx="20" fill="#0D1326" stroke="#1E2A4A"/>
+    <text x="498" y="517">NetSuite</text>
+  </g>
+
+  <text x="80" y="590" font-family="'Space Grotesk','Arial',sans-serif" font-size="20" font-weight="600" fill="#E8EEFF">Angelo B. Franco</text>
+  <text x="266" y="590" font-family="'Inter','Arial',sans-serif" font-size="18" fill="#8C9AC4">— Senior NetSuite ERP Consultant</text>
+</svg>

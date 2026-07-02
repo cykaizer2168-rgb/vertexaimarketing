@@ -1,0 +1,66 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#070B16"/>
+      <stop offset="1" stop-color="#0D1326"/>
+    </linearGradient>
+    <radialGradient id="glowCyan" cx="0.82" cy="0.2" r="0.55">
+      <stop offset="0" stop-color="#3DA9FC" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#3DA9FC" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowAmber" cx="0.08" cy="0.92" r="0.5">
+      <stop offset="0" stop-color="#F2A93B" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#F2A93B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3DA9FC"/>
+      <stop offset="1" stop-color="#F2A93B"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glowCyan)"/>
+  <rect width="1200" height="630" fill="url(#glowAmber)"/>
+
+  <g stroke="#1E2A4A" stroke-width="1" opacity="0.5">
+    <line x1="0" y1="157" x2="1200" y2="157"/>
+    <line x1="0" y1="315" x2="1200" y2="315"/>
+    <line x1="0" y1="472" x2="1200" y2="472"/>
+    <line x1="300" y1="0" x2="300" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="900" y1="0" x2="900" y2="630"/>
+  </g>
+
+  <g transform="translate(960,315)" fill="none">
+    <circle r="190" stroke="#3DA9FC" stroke-opacity="0.18" stroke-width="1.5"/>
+    <circle r="140" stroke="#3DA9FC" stroke-opacity="0.12" stroke-width="1.5"/>
+    <circle r="92" stroke="url(#ring)" stroke-opacity="0.6" stroke-width="2"/>
+    <text x="0" y="22" font-family="'Space Grotesk','Arial',sans-serif" font-size="64" font-weight="700" fill="#E8EEFF" text-anchor="middle">AF</text>
+    <circle cx="0" cy="-190" r="7" fill="#3DA9FC"/>
+    <circle cx="190" cy="0" r="7" fill="#F2A93B"/>
+    <circle cx="0" cy="190" r="6" fill="#3DA9FC"/>
+    <circle cx="-190" cy="0" r="6" fill="#3DA9FC"/>
+    <circle cx="134" cy="-134" r="5" fill="#F2A93B"/>
+  </g>
+
+  <rect x="80" y="120" width="360" height="40" rx="20" fill="none" stroke="#F2A93B" stroke-opacity="0.4"/>
+  <text x="104" y="146" font-family="'JetBrains Mono','Courier New',monospace" font-size="17" letter-spacing="3" fill="#F2A93B">SENIOR NETSUITE ERP CONSULTANT</text>
+
+  <text x="78" y="250" font-family="'Space Grotesk','Arial',sans-serif" font-size="78" font-weight="700" fill="#FFFFFF">Angelo B. Franco</text>
+
+  <text x="80" y="330" font-family="'Space Grotesk','Arial',sans-serif" font-size="40" font-weight="600" fill="#3DA9FC">Smarter ERP Systems,</text>
+  <text x="80" y="384" font-family="'Space Grotesk','Arial',sans-serif" font-size="40" font-weight="600" fill="#F2A93B">powered by AI Automation.</text>
+
+  <text x="80" y="446" font-family="'Inter','Arial',sans-serif" font-size="23" fill="#8C9AC4">7+ years · End-to-end NetSuite ERP · eCommerce integrations · AI agents</text>
+
+  <g font-family="'JetBrains Mono','Courier New',monospace" font-size="16" fill="#8C9AC4">
+    <rect x="80"  y="492" width="150" height="40" rx="20" fill="#0D1326" stroke="#1E2A4A"/>
+    <text x="100" y="517">Oracle ACS</text>
+    <rect x="246" y="492" width="206" height="40" rx="20" fill="#0D1326" stroke="#1E2A4A"/>
+    <text x="266" y="517">NetSuite Certified</text>
+    <rect x="468" y="492" width="170" height="40" rx="20" fill="#0D1326" stroke="#1E2A4A"/>
+    <text x="488" y="517">40+ Projects</text>
+    <rect x="654" y="492" width="200" height="40" rx="20" fill="#0D1326" stroke="#1E2A4A"/>
+    <text x="674" y="517">n8n Automation</text>
+  </g>
+</svg>
