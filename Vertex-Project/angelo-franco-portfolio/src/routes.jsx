@@ -6,8 +6,10 @@ import BlogPost from "./pages/BlogPost";
 import Privacy from "./pages/Privacy";
 import AboutPage from "./pages/About";
 import Contact from "./pages/Contact";
+import ProjectCaseStudy from "./pages/ProjectCaseStudy";
 import { fetchPublishedCaseStudies, fetchCaseStudy } from "./data/caseStudies";
 import { fetchPublishedPosts, fetchPost } from "./data/posts";
+import { projects } from "./data/projects";
 
 export const routes = [
   {
@@ -46,6 +48,12 @@ export const routes = [
           const list = await fetchPublishedPosts();
           return list.map((p) => `blog/${p.slug}`);
         },
+      },
+      {
+        path: "projects/:slug",
+        Component: ProjectCaseStudy,
+        entry: "src/pages/ProjectCaseStudy.jsx",
+        getStaticPaths: () => projects.map((p) => `projects/${p.slug}`),
       },
       { path: "about", Component: AboutPage, entry: "src/pages/About.jsx" },
       { path: "contact", Component: Contact, entry: "src/pages/Contact.jsx" },
