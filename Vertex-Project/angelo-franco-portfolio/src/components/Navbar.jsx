@@ -24,8 +24,8 @@ export default function Navbar() {
       }`}
     >
       <nav className="max-w-7xl mx-auto px-6 lg:px-10 h-16 flex items-center justify-between">
-        <a href="/" className="font-display font-semibold text-lg tracking-tight">
-          AB<span className="text-cyan">F</span>
+        <a href="/" className="flex items-center" aria-label="buildwithfranco — home">
+          <img src="/logo-mark.png" alt="buildwithfranco" className="h-8 w-auto" />
         </a>
 
         <ul className="hidden lg:flex items-center gap-8 text-sm text-mist">

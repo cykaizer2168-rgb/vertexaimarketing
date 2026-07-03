@@ -119,8 +119,8 @@ export function Footer() {
     <footer className="border-t border-line bg-panel/40">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <div>
-          <p className="font-display font-semibold text-lg">ANGELO B. FRANCO</p>
-          <p className="text-xs text-mist mt-1">Senior NetSuite ERP Consultant</p>
+          <img src="/logo-lockup.png" alt="buildwithfranco" className="h-9 w-auto mb-3" />
+          <p className="text-xs text-mist">Senior NetSuite ERP Consultant</p>
           <p className="text-xs text-mist">AI Automation Expert</p>
         </div>
         <div className="text-sm text-mist space-y-2">
