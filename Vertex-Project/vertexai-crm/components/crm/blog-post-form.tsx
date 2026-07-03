@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm';
 import type { Post } from '@/lib/supabase';
 import ImageUpload from './image-upload';
 import ImagePrompt from './image-prompt';
+import LinkedInCaption from './linkedin-caption';
 
 type Draft = Omit<Post, 'id' | 'created_at' | 'updated_at' | 'published_at'>;
 
@@ -102,6 +103,14 @@ export default function BlogPostForm({
               </div>
             )}
           </div>
+
+          {/* Share helper */}
+          <LinkedInCaption
+            title={d.title}
+            excerpt={d.excerpt ?? ''}
+            tags={tagsInput.split(',').map((t) => t.trim()).filter(Boolean)}
+            slug={d.slug}
+          />
 
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 text-[13px] font-medium text-gray-800">
