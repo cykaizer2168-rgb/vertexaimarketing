@@ -41,6 +41,12 @@ export default function AboutPage() {
           <Link to="/blog" className="inline-flex items-center gap-2 bg-cyan text-ink font-semibold text-sm px-5 py-3 rounded-lg hover:bg-cyan/90 transition-colors">Read the blog</Link>
           <Link to="/contact" className="inline-flex items-center gap-2 border border-line text-white font-medium text-sm px-5 py-3 rounded-lg hover:bg-panel transition-colors">Get in touch</Link>
         </p>
+
+        <p className="not-prose mt-10 pt-6 border-t border-line text-xs text-mist/70 leading-relaxed">
+          This is a personal portfolio and blog. All views expressed here are my own and do not
+          represent any employer. NetSuite® and Oracle® are trademarks of their respective owners;
+          this site is not affiliated with, endorsed by, or sponsored by them.
+        </p>
       </article>
     </>
   );
