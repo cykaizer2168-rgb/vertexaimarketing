@@ -51,7 +51,7 @@ export function ProofStrip() {
           improved our reporting significantly."
         </p>
         <div className="flex items-center gap-2 mt-5">
-          <div className="placeholder-img w-9 h-9 rounded-full" />
+          <img src="/testimonial-avatar.png" alt="" className="w-9 h-9 rounded-full object-cover border border-line" />
           <div>
             <p className="text-xs text-amber">★★★★★</p>
             <p className="text-[11px] text-mist">— Manufacturing Client | USA</p>
