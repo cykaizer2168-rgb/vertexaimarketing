@@ -24,9 +24,9 @@ export default function AboutPage() {
 
         <h2>What I do</h2>
         <p>
-          I help businesses eliminate manual work and scale by connecting their ERP, storefronts,
-          and back-office processes into automated, reliable workflows. From manufacturing and
-          inventory to order fulfillment and compliance, I design systems that run efficiently — and
+          My work centers on eliminating manual work — connecting ERP, storefronts, and back-office
+          processes into automated, reliable workflows. Across manufacturing, inventory, order
+          fulfillment, and compliance, I focus on building systems that run efficiently — and
           increasingly, that run themselves with AI.
         </p>
 

@@ -171,17 +171,17 @@ export default function CaseStudy() {
         {/* CTA */}
         <div className="mt-16 bg-gradient-to-br from-panel to-panel2 border border-line rounded-2xl p-8 text-center">
           <h2 className="font-display font-bold text-2xl">
-            Want results like this for <span className="text-cyan">your business?</span>
+            Interested in this kind of <span className="text-cyan">work?</span>
           </h2>
           <p className="text-mist mt-3 max-w-md mx-auto">
-            Let's discuss how NetSuite and AI automation can streamline your operations.
+            Happy to connect, answer questions, or talk shop about NetSuite and AI automation.
           </p>
           <div className="flex flex-wrap justify-center gap-3 mt-6">
             <a
-              href="mailto:angelo.franco@buildwithfranco.com?subject=Project%20Inquiry"
+              href="mailto:angelo.franco@buildwithfranco.com?subject=Hello%20from%20your%20site"
               className="inline-flex items-center gap-2 bg-cyan text-ink font-semibold text-sm px-5 py-3 rounded-lg hover:bg-cyan/90 transition-colors"
             >
-              <Calendar size={16} /> Book a Free Consultation
+              <Calendar size={16} /> Get in Touch
             </a>
             <a
               href={shareUrl}

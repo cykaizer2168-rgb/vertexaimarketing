@@ -15,7 +15,7 @@ const STATS = [
   { value: "40+", label: "Projects Delivered" },
   { value: "7+", label: "Years of Experience" },
   { value: "15+", label: "Industries Served" },
-  { value: "100%", label: "Client Focus" },
+  { value: "100%", label: "Quality Focus" },
 ];
 
 export function ProofStrip() {
@@ -43,7 +43,7 @@ export function ProofStrip() {
         whileHover={cardHover}
         className="bg-panel border border-line rounded-2xl p-7 flex flex-col transition-colors hover:border-cyan/45"
       >
-        <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-cyan mb-4">Client Testimonials</span>
+        <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-cyan mb-4">Testimonials</span>
         <Quote className="text-amber mb-3" size={26} />
         <p className="text-sm text-mist leading-relaxed flex-1">
           "Angelo quickly understood our business process and delivered an
@@ -96,16 +96,16 @@ export function CTA() {
       >
         <div>
           <h2 className="font-display font-bold text-2xl sm:text-3xl">
-            Let's Build Your Next <span className="text-cyan">Enterprise Solution.</span>
+            Let's <span className="text-cyan">Connect.</span>
           </h2>
           <p className="text-mist mt-3 max-w-md">
-            Need NetSuite implementation? AI automation? System integration?
-            Let's discuss how I can help your business grow and scale.
+            Interested in my work, have a question about NetSuite or AI automation,
+            or just want to talk shop? I'm always happy to connect.
           </p>
         </div>
         <div className="flex flex-col items-center gap-2 shrink-0">
           <a href="mailto:angelo.franco@buildwithfranco.com?subject=NetSuite%2FAI%20Automation%20Opportunity" className="inline-flex items-center gap-2 bg-cyan text-ink font-semibold text-sm px-6 py-3.5 rounded-lg hover:bg-cyan/90 transition-colors">
-            <Calendar size={16} /> Book a Free Consultation
+            <Calendar size={16} /> Get in Touch
           </a>
           <span className="text-[11px] text-mist">No obligation. Just a friendly conversation.</span>
         </div>
@@ -130,7 +130,7 @@ export function Footer() {
         </div>
         <div className="text-sm text-mist space-y-2">
           <p className="text-white font-medium mb-2">Quick Links</p>
-          <a href="/#services" className="block hover:text-cyan transition-colors">Services</a>
+          <a href="/#expertise" className="block hover:text-cyan transition-colors">Expertise</a>
           <a href="/#projects" className="block hover:text-cyan transition-colors">Projects</a>
           <a href="/blog" className="block hover:text-cyan transition-colors">Blog</a>
           <a href="/about" className="block hover:text-cyan transition-colors">About</a>
@@ -143,8 +143,13 @@ export function Footer() {
           <a href="https://linkedin.com/in/kaizer2168" target="_blank" rel="noopener noreferrer" className="block hover:text-cyan transition-colors">LinkedIn</a>
         </div>
       </div>
-      <div className="border-t border-line py-5 text-center text-[11px] text-mist">
-        © {new Date().getFullYear()} Angelo B. Franco. All rights reserved.
+      <div className="border-t border-line py-5 px-6 text-center text-[11px] text-mist space-y-1.5">
+        <p className="max-w-3xl mx-auto leading-relaxed text-mist/80">
+          This is a personal portfolio and blog. All views are my own and do not represent any
+          employer. NetSuite® and Oracle® are trademarks of their respective owners; this site is
+          not affiliated with or endorsed by them.
+        </p>
+        <p>© {new Date().getFullYear()} Angelo B. Franco. All rights reserved.</p>
       </div>
     </footer>
   );

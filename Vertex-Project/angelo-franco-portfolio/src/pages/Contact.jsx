@@ -16,7 +16,7 @@ export default function Contact() {
         <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-cyan">Get in touch</span>
         <h1 className="font-display font-bold text-4xl mt-3">Contact</h1>
         <p className="text-mist mt-4 leading-relaxed">
-          Have a NetSuite, AI automation, or systems project in mind — or just want to talk shop?
+          Want to connect, ask a question, or talk shop about NetSuite and AI automation?
           The fastest way to reach me is by email or LinkedIn.
         </p>
 

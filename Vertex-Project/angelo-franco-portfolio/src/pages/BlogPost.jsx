@@ -120,8 +120,8 @@ export default function BlogPost() {
           <a href={shareUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border border-line text-white font-medium text-sm px-5 py-3 rounded-lg hover:bg-panel transition-colors">
             <Linkedin size={16} /> Share on LinkedIn
           </a>
-          <a href="mailto:angelo.franco@buildwithfranco.com?subject=Project%20Inquiry" className="inline-flex items-center gap-2 bg-cyan text-ink font-semibold text-sm px-5 py-3 rounded-lg hover:bg-cyan/90 transition-colors">
-            <Calendar size={16} /> Work with me
+          <a href="mailto:angelo.franco@buildwithfranco.com?subject=Hello%20from%20your%20site" className="inline-flex items-center gap-2 bg-cyan text-ink font-semibold text-sm px-5 py-3 rounded-lg hover:bg-cyan/90 transition-colors">
+            <Calendar size={16} /> Get in Touch
           </a>
           <Link to="/blog" className="text-cyan text-sm font-medium ml-auto hover:underline">← More articles</Link>
         </div>

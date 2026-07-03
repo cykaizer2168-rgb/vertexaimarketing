@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Menu, X, CalendarCheck } from "lucide-react";
 
-const LINKS = ["Home", "About", "Services", "Projects", "Blog", "Experience", "Contact"];
+const LINKS = ["Home", "About", "Expertise", "Projects", "Blog", "Experience", "Contact"];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -50,7 +50,7 @@ export default function Navbar() {
           href="/#contact"
           className="hidden lg:inline-flex items-center gap-2 bg-cyan hover:bg-cyan/90 text-ink font-semibold text-sm px-4 py-2.5 rounded-lg transition-colors"
         >
-          <CalendarCheck size={16} /> Book a Discovery Call
+          <CalendarCheck size={16} /> Get in Touch
         </a>
 
         <button onClick={() => setOpen(!open)} className="lg:hidden text-white">
@@ -66,7 +66,7 @@ export default function Navbar() {
             </a>
           ))}
           <a href="/#contact" className="bg-cyan text-ink text-center font-semibold text-sm px-4 py-2.5 rounded-lg">
-            Book a Discovery Call
+            Get in Touch
           </a>
         </div>
       )}

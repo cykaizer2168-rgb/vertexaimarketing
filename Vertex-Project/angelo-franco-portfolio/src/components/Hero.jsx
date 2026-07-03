@@ -82,7 +82,7 @@ export default function Hero() {
             className="flex flex-wrap gap-4 mt-8"
           >
             <a href="#contact" className="inline-flex items-center gap-2 bg-cyan text-ink font-semibold text-sm px-5 py-3 rounded-lg hover:bg-cyan/90 transition-colors">
-              <Calendar size={16} /> Schedule Consultation
+              <Calendar size={16} /> Get in Touch
             </a>
             <a href="/Angelo-Franco-Resume.pdf" download className="inline-flex items-center gap-2 bg-amber/90 text-ink font-semibold text-sm px-5 py-3 rounded-lg hover:bg-amber transition-colors">
               <Download size={16} /> Download CV

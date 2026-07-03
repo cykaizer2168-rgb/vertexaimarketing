@@ -37,11 +37,11 @@ const SERVICES = [
 
 export default function Services() {
   return (
-    <section id="services" className="max-w-7xl mx-auto px-6 lg:px-10 py-24">
+    <section id="expertise" className="max-w-7xl mx-auto px-6 lg:px-10 py-24">
       <div className="text-center mb-14">
         <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-cyan">What I Do</span>
         <h2 className="font-display font-bold text-3xl sm:text-4xl mt-3">
-          Services <span className="text-cyan">I Offer</span>
+          Areas of <span className="text-cyan">Expertise</span>
         </h2>
       </div>
 
