@@ -36,6 +36,7 @@ function handleRequest(e) {
       case 'deletePayment':            result = deletePayment(payload);            break;
       case 'getLoanSummaryByBorrower': result = getLoanSummaryByBorrower(payload); break;
       case 'saveAttachment':           result = saveAttachment(payload);           break;
+      case 'syncCalendarReminders':    result = syncCalendarReminders();           break;
       default: result = { error: 'Unknown action: ' + action };
     }
     return jsonResponse(result);
@@ -173,7 +174,8 @@ function deleteBorrower(p) {
 const LOAN_HEADERS = [
   'ID', 'BorrowerID', 'BorrowerName', 'Principal', 'InterestRate',
   'InterestType', 'TermMonths', 'StartDate', 'DueDate',
-  'TotalAmount', 'PaidAmount', 'Balance', 'Status', 'Notes', 'CreatedAt', 'RefNo', 'BorrowedDate'
+  'TotalAmount', 'PaidAmount', 'Balance', 'Status', 'Notes', 'CreatedAt', 'RefNo', 'BorrowedDate',
+  'CalendarEvents'
 ];
 // InterestType column (col 6) stores repayment frequency: monthly | semi-monthly | weekly
 
@@ -230,6 +232,10 @@ function addLoan(p) {
     startDate, formatDate(dueDate), totalAmount, 0, totalAmount,
     'Active', p.notes || '', new Date().toISOString(), refNo, borrowedDate
   ]);
+  // Auto-create Google Calendar reminders for this loan's upcoming installments.
+  // Non-blocking: if Calendar isn't authorized yet, loan creation still succeeds.
+  try { syncCalendarReminders(); } catch (e) {}
+
   return { success: true, id, refNo, totalAmount, periodPayment: totalAmount / totalPeriods, dueDate: formatDate(dueDate) };
 }
 
@@ -286,9 +292,12 @@ function deleteLoan(p) {
 
   // Delete the loan row
   const loanData = loanSheet.getDataRange().getValues();
+  const calIdx = loanData[0].indexOf('CalendarEvents');
   let deleted = false;
   for (let i = 1; i < loanData.length; i++) {
     if (loanData[i][0] === p.id) {
+      // Remove this loan's Google Calendar reminder events
+      if (calIdx >= 0) removeCalendarEventsFromMap_(loanData[i][calIdx]);
       loanSheet.deleteRow(i + 1);
       deleted = true;
       break;
@@ -395,6 +404,7 @@ function getDashboard() {
   const collectedToday   = payments
     .filter(p => formatDate(new Date(p.Date)) === todayStr)
     .reduce((s, p) => s + parseFloat(p.Amount || 0), 0);
+  const totalInterestIncome = loans.reduce((s, l) => s + (parseFloat(l.TotalAmount || 0) - parseFloat(l.Principal || 0)), 0);
   const collectionRate   = totalLent > 0 ? Math.round((totalCollected / totalLent) * 100) : 0;
 
   // Monthly collections for last 6 months
@@ -423,7 +433,7 @@ function getDashboard() {
   return {
     totalLoans: loans.length, activeLoans: active.length,
     paidLoans:  paid.length,  overdueLoans: overdue.length,
-    totalOutstanding, totalLent, totalCollected, collectedToday,
+    totalOutstanding, totalLent, totalCollected, collectedToday, totalInterestIncome,
     collectionRate, monthlyCollections, topBorrowers,
     recentPayments: payments.slice(-5).reverse(),
     overdueList:    overdue.slice(0, 5),
@@ -525,6 +535,108 @@ function saveAttachment(p) {
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
   return { success: true, url: file.getUrl() };
+}
+
+// ── GOOGLE CALENDAR PAYMENT REMINDERS ─────────────────────────
+// Creates a 9:00 AM reminder event on each upcoming installment due date, on the
+// deploying user's default Google Calendar. Idempotent via each loan's
+// 'CalendarEvents' column (JSON map { 'yyyy-MM-dd': eventId }).
+
+// Every installment due date for a loan, matching the app's due-date logic.
+function loanInstallmentDueDates_(loan) {
+  const start = new Date(loan.StartDate || loan.BorrowedDate || loan.CreatedAt);
+  if (isNaN(start.getTime())) return [];
+  const freq  = String(loan.InterestType || 'monthly');
+  const term  = parseInt(loan.TermMonths) || 1;
+  const perMonth = freq === 'weekly' ? 4 : freq === 'semi-monthly' ? 2 : 1;
+  const totalPeriods = Math.max(1, term * perMonth);
+  const total  = parseFloat(loan.TotalAmount) || 0;
+  const perPay = Math.round(total / totalPeriods);
+  const out = [];
+  for (let k = 0; k < totalPeriods; k++) {
+    const d = new Date(start);
+    if (freq === 'weekly')            d.setDate(d.getDate() + k * 7);
+    else if (freq === 'semi-monthly') d.setDate(d.getDate() + k * 14);
+    else                              d.setMonth(d.getMonth() + k);
+    out.push({ iso: formatDate(d), amount: perPay });
+  }
+  return out;
+}
+
+function removeCalendarEventsFromMap_(mapJson) {
+  let map = {};
+  try { map = JSON.parse(mapJson || '{}'); } catch (e) { return; }
+  const cal = CalendarApp.getDefaultCalendar();
+  Object.keys(map).forEach(function (iso) {
+    try { const ev = cal.getEventById(map[iso]); if (ev) ev.deleteEvent(); } catch (e) {}
+  });
+}
+
+// Reconcile one loan's reminders: create missing future events, delete obsolete
+// ones (past, paid, or non-active). Returns number of events created.
+function syncLoanCalendar_(loan, sheet, row1, calCol0) {
+  const cal = CalendarApp.getDefaultCalendar();
+  let map = {};
+  try { map = JSON.parse(loan.CalendarEvents || '{}'); } catch (e) { map = {}; }
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const active = String(loan.Status) === 'Active' && (parseFloat(loan.Balance) || 0) > 0;
+
+  const needed = {};
+  if (active) {
+    loanInstallmentDueDates_(loan).forEach(function (inst) {
+      const parts = inst.iso.split('-');
+      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      if (d >= today) needed[inst.iso] = inst.amount;
+    });
+  }
+
+  let created = 0;
+  // Create missing events
+  Object.keys(needed).forEach(function (iso) {
+    let ok = false;
+    if (map[iso]) { try { ok = !!cal.getEventById(map[iso]); } catch (e) { ok = false; } }
+    if (!ok) {
+      const parts = iso.split('-');
+      const startAt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 9, 0, 0);
+      const endAt   = new Date(startAt.getTime() + 30 * 60 * 1000);
+      const amt = needed[iso];
+      const ev = cal.createEvent(
+        '💰 ₱' + amt.toLocaleString() + ' payment due — ' + loan.BorrowerName,
+        startAt, endAt,
+        { description: 'Loan ' + (loan.RefNo || loan.ID) + '\nBorrower: ' + loan.BorrowerName +
+                       '\nInstallment: ₱' + amt + '\nRemaining balance: ₱' + (loan.Balance || '') +
+                       '\n\nAuto-created by Lending Manager.' }
+      );
+      try { ev.addPopupReminder(24 * 60); } catch (e) {} // 1 day before
+      try { ev.addPopupReminder(0); } catch (e) {}        // 9:00 AM on the day
+      map[iso] = ev.getId();
+      created++;
+    }
+  });
+  // Delete obsolete events
+  Object.keys(map).forEach(function (iso) {
+    if (!needed[iso]) {
+      try { const ev = cal.getEventById(map[iso]); if (ev) ev.deleteEvent(); } catch (e) {}
+      delete map[iso];
+    }
+  });
+
+  sheet.getRange(row1, calCol0 + 1).setValue(JSON.stringify(map));
+  return created;
+}
+
+function syncCalendarReminders() {
+  const sheet = getOrCreateSheet('Loans', LOAN_HEADERS);
+  ensureColumns(sheet, LOAN_HEADERS);
+  const loans = sheetToObjects(sheet);
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const calCol0 = headers.indexOf('CalendarEvents');
+  let created = 0;
+  loans.forEach(function (loan, idx) {
+    created += syncLoanCalendar_(loan, sheet, idx + 2, calCol0);
+  });
+  return { success: true, created: created, loans: loans.length };
 }
 
 // ── SETUP ─────────────────────────────────────────────────────
