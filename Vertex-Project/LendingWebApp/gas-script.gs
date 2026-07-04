@@ -563,19 +563,19 @@ function loanInstallmentDueDates_(loan) {
   return out;
 }
 
-// Target calendar for reminders. Set to a specific Google account / calendar ID,
-// or '' to use the authorizing user's default calendar. NOTE: the account that
-// AUTHORIZES the script must own this calendar or have edit access to it (share it).
-const REMINDER_CALENDAR_ID = 'herlorie1420@gmail.com';
+// Reminders go into a dedicated calendar (auto-created on first run) OWNED by the
+// script owner's account. Share this calendar from Google Calendar to let others
+// (e.g. herlorie1420@gmail.com) see the reminders. Set to '' to use the default.
+const REMINDER_CALENDAR_NAME = 'Lending Reminders';
 
 function getReminderCalendar_() {
-  if (REMINDER_CALENDAR_ID) {
-    const c = CalendarApp.getCalendarById(REMINDER_CALENDAR_ID);
-    if (c) return c;
-    throw new Error('Cannot access calendar ' + REMINDER_CALENDAR_ID +
-      '. Authorize as that account, or share the calendar (edit access) with the script owner.');
-  }
-  return CalendarApp.getDefaultCalendar();
+  if (!REMINDER_CALENDAR_NAME) return CalendarApp.getDefaultCalendar();
+  const found = CalendarApp.getCalendarsByName(REMINDER_CALENDAR_NAME);
+  if (found && found.length) return found[0];
+  return CalendarApp.createCalendar(REMINDER_CALENDAR_NAME, {
+    summary: 'Payment due reminders from Lending Manager',
+    color: CalendarApp.Color.BLUE,
+  });
 }
 
 function removeCalendarEventsFromMap_(mapJson) {
