@@ -563,10 +563,25 @@ function loanInstallmentDueDates_(loan) {
   return out;
 }
 
+// Target calendar for reminders. Set to a specific Google account / calendar ID,
+// or '' to use the authorizing user's default calendar. NOTE: the account that
+// AUTHORIZES the script must own this calendar or have edit access to it (share it).
+const REMINDER_CALENDAR_ID = 'herlorie1420@gmail.com';
+
+function getReminderCalendar_() {
+  if (REMINDER_CALENDAR_ID) {
+    const c = CalendarApp.getCalendarById(REMINDER_CALENDAR_ID);
+    if (c) return c;
+    throw new Error('Cannot access calendar ' + REMINDER_CALENDAR_ID +
+      '. Authorize as that account, or share the calendar (edit access) with the script owner.');
+  }
+  return CalendarApp.getDefaultCalendar();
+}
+
 function removeCalendarEventsFromMap_(mapJson) {
   let map = {};
   try { map = JSON.parse(mapJson || '{}'); } catch (e) { return; }
-  const cal = CalendarApp.getDefaultCalendar();
+  const cal = getReminderCalendar_();
   Object.keys(map).forEach(function (iso) {
     try { const ev = cal.getEventById(map[iso]); if (ev) ev.deleteEvent(); } catch (e) {}
   });
@@ -575,7 +590,7 @@ function removeCalendarEventsFromMap_(mapJson) {
 // Reconcile one loan's reminders: create missing future events, delete obsolete
 // ones (past, paid, or non-active). Returns number of events created.
 function syncLoanCalendar_(loan, sheet, row1, calCol0) {
-  const cal = CalendarApp.getDefaultCalendar();
+  const cal = getReminderCalendar_();
   let map = {};
   try { map = JSON.parse(loan.CalendarEvents || '{}'); } catch (e) { map = {}; }
 
