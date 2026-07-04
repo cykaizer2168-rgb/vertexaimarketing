@@ -1,78 +1,125 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { ImagePlaceholder } from "./Placeholder";
 import { cardHover } from "../lib/cardHover";
 import { projects } from "../data/projects";
 
 export default function SelectedWork({ caseStudies = [] }) {
+  const items = [
+    ...projects.map((p) => ({
+      key: p.slug,
+      image: p.image,
+      category: p.category,
+      title: p.title,
+      summary: p.summary,
+      to: `/projects/${p.slug}`,
+      cta: "Learn More",
+    })),
+    ...caseStudies.map((cs) => ({
+      key: cs.slug,
+      image: cs.hero && !cs.hero.placeholder && cs.hero.type === "image" && cs.hero.src ? cs.hero.src : null,
+      category: cs.category,
+      title: cs.title,
+      summary: cs.summary,
+      to: `/case-studies/${cs.slug}`,
+      cta: "View Case Study",
+    })),
+  ];
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", dragFree: true, containScroll: "trimSnaps" });
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+  const [snaps, setSnaps] = useState([]);
+  const [selected, setSelected] = useState(0);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const update = () => {
+      setCanPrev(emblaApi.canScrollPrev());
+      setCanNext(emblaApi.canScrollNext());
+      setSelected(emblaApi.selectedScrollSnap());
+    };
+    setSnaps(emblaApi.scrollSnapList());
+    update();
+    emblaApi.on("select", update);
+    emblaApi.on("reInit", update);
+    return () => emblaApi.off("select", update);
+  }, [emblaApi]);
+
+  const navBtn =
+    "inline-flex items-center justify-center w-10 h-10 rounded-full border border-line text-white transition-colors hover:bg-panel disabled:opacity-30 disabled:pointer-events-none";
+
   return (
-    <section id="projects" className="max-w-7xl mx-auto px-6 lg:px-10 py-24">
-      <div className="text-center mb-14">
-        <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-cyan">Featured Projects</span>
-        <h2 className="font-display font-bold text-3xl sm:text-4xl mt-3">
-          Selected <span className="text-cyan">Work</span>
-        </h2>
+    <section id="projects" className="py-24">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10">
+        <div className="flex items-end justify-between mb-10 lg:mb-12">
+          <div>
+            <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-cyan">Featured Projects</span>
+            <h2 className="font-display font-bold text-3xl sm:text-4xl mt-3">
+              Selected <span className="text-cyan">Work</span>
+            </h2>
+          </div>
+          <div className="hidden md:flex shrink-0 gap-2">
+            <button aria-label="Previous" className={navBtn} onClick={() => emblaApi?.scrollPrev()} disabled={!canPrev}>
+              <ArrowLeft size={18} />
+            </button>
+            <button aria-label="Next" className={navBtn} onClick={() => emblaApi?.scrollNext()} disabled={!canNext}>
+              <ArrowRight size={18} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Project case studies */}
-        {projects.map((p, i) => (
-          <motion.article
-            key={p.slug}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ delay: i * 0.08, duration: 0.5 }}
-            whileHover={cardHover}
-            className="bg-panel border border-line rounded-2xl overflow-hidden group transition-colors hover:border-cyan/45 flex flex-col"
-          >
-            <Link to={`/projects/${p.slug}`} className="block overflow-hidden">
-              <img
-                src={p.image}
-                alt={p.title}
-                className="w-full aspect-[16/10] object-cover object-top transition-transform duration-300 group-hover:scale-105"
-              />
-            </Link>
-            <div className="p-5 flex flex-col flex-1">
-              <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-cyan">{p.category}</span>
-              <h3 className="font-display font-semibold text-base mb-2 mt-1 leading-snug">{p.title}</h3>
-              <p className="text-sm text-mist leading-relaxed mb-4 line-clamp-3 flex-1">{p.summary}</p>
-              <Link
-                to={`/projects/${p.slug}`}
-                className="inline-flex items-center gap-1.5 text-cyan text-sm font-medium group-hover:gap-2.5 transition-all"
+      {/* Carousel */}
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex gap-6 max-w-7xl mx-auto px-6 lg:px-10">
+          {items.map((it, i) => (
+            <div key={it.key} className="min-w-0 shrink-0 grow-0 basis-[85%] sm:basis-[47%] lg:basis-[32%]">
+              <motion.article
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ delay: (i % 3) * 0.08, duration: 0.5 }}
+                whileHover={cardHover}
+                className="bg-panel border border-line rounded-2xl overflow-hidden group h-full flex flex-col transition-colors hover:border-cyan/45"
               >
-                Learn More <ArrowRight size={14} />
-              </Link>
+                <Link to={it.to} className="block overflow-hidden">
+                  {it.image ? (
+                    <img
+                      src={it.image}
+                      alt={it.title}
+                      className="w-full aspect-[16/10] object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <ImagePlaceholder label={`Project — ${it.title}`} ratio="aspect-[16/10]" className="rounded-none rounded-t-2xl border-x-0 border-t-0" />
+                  )}
+                </Link>
+                <div className="p-5 flex flex-col flex-1">
+                  {it.category && <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-cyan">{it.category}</span>}
+                  <h3 className="font-display font-semibold text-base mb-2 mt-1 leading-snug">{it.title}</h3>
+                  <p className="text-sm text-mist leading-relaxed mb-4 line-clamp-3 flex-1">{it.summary}</p>
+                  <Link to={it.to} className="inline-flex items-center gap-1.5 text-cyan text-sm font-medium group-hover:gap-2.5 transition-all">
+                    {it.cta} <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </motion.article>
             </div>
-          </motion.article>
-        ))}
+          ))}
+        </div>
+      </div>
 
-        {/* Published case studies from the CMS (if any) */}
-        {caseStudies.map((cs, i) => (
-          <motion.article
-            key={cs.slug}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ delay: (projects.length + i) * 0.08, duration: 0.5 }}
-            whileHover={cardHover}
-            className="bg-panel border border-line rounded-2xl overflow-hidden group transition-colors hover:border-cyan/45 flex flex-col"
-          >
-            {cs.hero && !cs.hero.placeholder && cs.hero.type === "image" && cs.hero.src ? (
-              <img src={cs.hero.src} alt={cs.hero.alt || cs.title} className="w-full aspect-[16/10] object-cover" />
-            ) : (
-              <ImagePlaceholder label={`Project — ${cs.title}`} ratio="aspect-[16/10]" className="rounded-none rounded-t-2xl border-x-0 border-t-0" />
-            )}
-            <div className="p-5 flex flex-col flex-1">
-              {cs.category && <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-cyan">{cs.category}</span>}
-              <h3 className="font-display font-semibold text-base mb-2 mt-1 leading-snug">{cs.title}</h3>
-              <p className="text-sm text-mist leading-relaxed mb-4 line-clamp-3 flex-1">{cs.summary}</p>
-              <Link to={`/case-studies/${cs.slug}`} className="inline-flex items-center gap-1.5 text-cyan text-sm font-medium group-hover:gap-2.5 transition-all">
-                View Case Study <span aria-hidden>→</span>
-              </Link>
-            </div>
-          </motion.article>
+      {/* Dots */}
+      <div className="mt-8 flex justify-center gap-2">
+        {snaps.map((_, i) => (
+          <button
+            key={i}
+            aria-label={`Go to slide ${i + 1}`}
+            onClick={() => emblaApi?.scrollTo(i)}
+            className={`h-2 rounded-full transition-all ${selected === i ? "w-6 bg-cyan" : "w-2 bg-cyan/25 hover:bg-cyan/50"}`}
+          />
         ))}
       </div>
     </section>
