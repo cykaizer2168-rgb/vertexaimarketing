@@ -1151,7 +1151,11 @@ async function syncCalendar() {
   if (btn) { btn.disabled = false; btn.textContent = label; }
   if (res.error) { toast('Calendar sync failed: ' + res.error, 'error'); return; }
   const n = res.created || 0;
-  toast(n > 0 ? (n + ' reminder' + (n !== 1 ? 's' : '') + ' added to Google Calendar 📅') : 'Calendar reminders up to date 📅', 'success');
+  if (res.rateLimited) {
+    toast(n + ' added — Calendar rate limit reached. Tap Sync again in a few minutes to continue. 📅', 'success');
+  } else {
+    toast(n > 0 ? (n + ' reminder' + (n !== 1 ? 's' : '') + ' added to Google Calendar 📅') : 'Calendar reminders up to date 📅', 'success');
+  }
 }
 
 // ─────────────────────────────────────────────────────────────

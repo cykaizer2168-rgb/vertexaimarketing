@@ -587,71 +587,87 @@ function removeCalendarEventsFromMap_(mapJson) {
   });
 }
 
-// Reconcile one loan's reminders: create missing future events, delete obsolete
-// ones (past, paid, or non-active). Returns number of events created.
-function syncLoanCalendar_(loan, sheet, row1, calCol0) {
-  const cal = getReminderCalendar_();
-  let map = {};
-  try { map = JSON.parse(loan.CalendarEvents || '{}'); } catch (e) { map = {}; }
+// Only create reminders for installments due within this many days from today.
+// Keeps event volume within Google's calendar rate limits; re-running rolls it
+// forward as time passes.
+const REMINDER_HORIZON_DAYS = 60;
 
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const active = String(loan.Status) === 'Active' && (parseFloat(loan.Balance) || 0) > 0;
+function nfmt_(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 
-  const needed = {};
-  if (active) {
-    loanInstallmentDueDates_(loan).forEach(function (inst) {
-      const parts = inst.iso.split('-');
-      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-      if (d >= today) needed[inst.iso] = inst.amount;
-    });
-  }
-
-  let created = 0;
-  // Create missing events
-  Object.keys(needed).forEach(function (iso) {
-    let ok = false;
-    if (map[iso]) { try { ok = !!cal.getEventById(map[iso]); } catch (e) { ok = false; } }
-    if (!ok) {
-      const parts = iso.split('-');
-      const startAt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]), 9, 0, 0);
-      const endAt   = new Date(startAt.getTime() + 30 * 60 * 1000);
-      const amt = needed[iso];
-      const ev = cal.createEvent(
-        '💰 ₱' + amt.toLocaleString() + ' payment due — ' + loan.BorrowerName,
-        startAt, endAt,
-        { description: 'Loan ' + (loan.RefNo || loan.ID) + '\nBorrower: ' + loan.BorrowerName +
-                       '\nInstallment: ₱' + amt + '\nRemaining balance: ₱' + (loan.Balance || '') +
-                       '\n\nAuto-created by Lending Manager.' }
-      );
-      try { ev.addPopupReminder(24 * 60); } catch (e) {} // 1 day before
-      try { ev.addPopupReminder(0); } catch (e) {}        // 9:00 AM on the day
-      map[iso] = ev.getId();
-      created++;
-    }
-  });
-  // Delete obsolete events
-  Object.keys(map).forEach(function (iso) {
-    if (!needed[iso]) {
-      try { const ev = cal.getEventById(map[iso]); if (ev) ev.deleteEvent(); } catch (e) {}
-      delete map[iso];
-    }
-  });
-
-  sheet.getRange(row1, calCol0 + 1).setValue(JSON.stringify(map));
-  return created;
-}
-
+// Reconcile all loans' reminders. Bounded (horizon), throttled, and resumable:
+// saves progress after each event and stops gracefully if the calendar rate limit
+// is hit, so re-running continues where it left off without creating duplicates.
 function syncCalendarReminders() {
   const sheet = getOrCreateSheet('Loans', LOAN_HEADERS);
   ensureColumns(sheet, LOAN_HEADERS);
   const loans = sheetToObjects(sheet);
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   const calCol0 = headers.indexOf('CalendarEvents');
-  let created = 0;
-  loans.forEach(function (loan, idx) {
-    created += syncLoanCalendar_(loan, sheet, idx + 2, calCol0);
-  });
-  return { success: true, created: created, loans: loans.length };
+  const cal = getReminderCalendar_();
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const horizon = new Date(today.getTime() + REMINDER_HORIZON_DAYS * 86400000);
+
+  let created = 0, rateLimited = false;
+
+  for (let i = 0; i < loans.length && !rateLimited; i++) {
+    const loan = loans[i];
+    const row1 = i + 2;
+    let map = {};
+    try { map = JSON.parse(loan.CalendarEvents || '{}'); } catch (e) { map = {}; }
+
+    const active = String(loan.Status) === 'Active' && (parseFloat(loan.Balance) || 0) > 0;
+    const needed = {};
+    if (active) {
+      loanInstallmentDueDates_(loan).forEach(function (inst) {
+        const p = inst.iso.split('-');
+        const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+        if (d >= today && d <= horizon) needed[inst.iso] = inst.amount;
+      });
+    }
+
+    // Delete obsolete events (outside window / paid / inactive)
+    Object.keys(map).forEach(function (iso) {
+      if (!needed[iso]) {
+        try { const ev = cal.getEventById(map[iso]); if (ev) ev.deleteEvent(); } catch (e) {}
+        delete map[iso];
+      }
+    });
+
+    // Create missing events (throttled + resumable)
+    const isos = Object.keys(needed).sort();
+    for (let k = 0; k < isos.length; k++) {
+      const iso = isos[k];
+      let ok = false;
+      if (map[iso]) { try { ok = !!cal.getEventById(map[iso]); } catch (e) { ok = false; } }
+      if (ok) continue;
+      const p = iso.split('-');
+      const startAt = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]), 9, 0, 0);
+      const endAt   = new Date(startAt.getTime() + 30 * 60 * 1000);
+      const amt = needed[iso];
+      try {
+        const ev = cal.createEvent(
+          '💰 ₱' + nfmt_(amt) + ' payment due — ' + loan.BorrowerName,
+          startAt, endAt,
+          { description: 'Loan ' + (loan.RefNo || loan.ID) + ' · ' + loan.BorrowerName +
+                         '\nInstallment: ₱' + nfmt_(amt) + ' · Balance: ₱' + (loan.Balance || '') +
+                         '\nLending Manager reminder.' }
+        );
+        try { ev.addPopupReminder(24 * 60); } catch (e) {} // 1 day before
+        try { ev.addPopupReminder(0); } catch (e) {}        // 9:00 AM on the day
+        map[iso] = ev.getId();
+        created++;
+        sheet.getRange(row1, calCol0 + 1).setValue(JSON.stringify(map)); // save progress
+        Utilities.sleep(400); // throttle to stay under the burst rate limit
+      } catch (err) {
+        rateLimited = true; // most likely the calendar rate limit — stop gracefully
+        break;
+      }
+    }
+
+    sheet.getRange(row1, calCol0 + 1).setValue(JSON.stringify(map));
+  }
+
+  return { success: true, created: created, rateLimited: rateLimited };
 }
 
 // ── SETUP ─────────────────────────────────────────────────────
