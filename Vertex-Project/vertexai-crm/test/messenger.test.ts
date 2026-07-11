@@ -180,7 +180,9 @@ test('buildSystemPrompt grounds the agent in Vertex knowledge + rules', () => {
   assert.match(sp, /Vertex AI Marketing/);
   assert.match(sp, /SERVICES:/);
   assert.match(sp, /Taglish/);
-  assert.match(sp, /Do NOT quote any price/i);
+  assert.match(sp, /PACKAGES/);
+  assert.match(sp, /Starter — Get Found/);
+  assert.match(sp, /starting at/i);
 });
 
 test('buildConversationPrompt shows known slots + the latest message', () => {

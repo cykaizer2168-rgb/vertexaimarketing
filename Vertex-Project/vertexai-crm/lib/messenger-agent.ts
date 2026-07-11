@@ -51,6 +51,9 @@ export const agentSchema = jsonSchema<AgentOutput>({
 export function buildSystemPrompt(kb: VertexKB = VERTEX_KB): string {
   const services = kb.services.map((s) => `- ${s.name}: ${s.blurb}`).join('\n');
   const props = kb.valueProps.map((v) => `- ${v}`).join('\n');
+  const packages = kb.packages
+    .map((p) => `- ${p.name} (${p.priceFrom}) — ${p.tagline} Includes: ${p.includes.join(', ')}.`)
+    .join('\n');
   const faq = kb.faq.map((f) => `Q: ${f.q}\nA: ${f.a}`).join('\n');
   const rails = kb.guardrails.map((g) => `- ${g}`).join('\n');
 
@@ -63,6 +66,9 @@ export function buildSystemPrompt(kb: VertexKB = VERTEX_KB): string {
     '',
     'WHY VERTEX:',
     props,
+    '',
+    'PACKAGES (quote these "starting at" prices when asked; exact total after a scope call):',
+    packages,
     '',
     'FAQ (answer from these; do not go beyond them):',
     faq,
@@ -81,7 +87,7 @@ export function buildSystemPrompt(kb: VertexKB = VERTEX_KB): string {
     '',
     'GUARDRAILS:',
     rails,
-    '- Do NOT quote any price; if asked how much, use the FAQ pricing answer and offer a quick call.',
+    '- When asked about price, quote the package "starting at" figures above, frame them as "starting at", and offer a quick call to confirm the exact scope. Never invent numbers beyond the packages.',
     '',
     buildPersuasionBlock(),
   ].join('\n');
