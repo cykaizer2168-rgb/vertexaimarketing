@@ -5,7 +5,7 @@ const key  = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
 export const supabase = url && key ? createClient(url, key) : null;
 
-export type LeadStage = 'new' | 'contacted' | 'proposal' | 'negotiating' | 'closed_won' | 'cold';
+export type LeadStage = 'new' | 'qualified' | 'contacted' | 'proposal' | 'negotiating' | 'closed_won' | 'cold';
 
 export interface Lead {
   id: string;

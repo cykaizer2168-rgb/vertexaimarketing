@@ -1,0 +1,151 @@
+{
+  "name": "Vertex AI Marketing — Messenger Engine (AI Agent)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "messenger-engine",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "msg-webhook-001",
+      "name": "Messenger Event In",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 400],
+      "webhookId": "messenger-engine"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the raw Meta webhook payload forwarded by the CRM /api/meta/webhook.\n// Emits one item per REAL user text message; skips echoes and receipts.\n// Mode: \"Run Once for All Items\".\nconst out = [];\nfor (const item of $input.all()) {\n  const body = item.json.body || item.json;\n  const entries = Array.isArray(body.entry) ? body.entry : [];\n  for (const entry of entries) {\n    const events = Array.isArray(entry.messaging) ? entry.messaging : [];\n    for (const ev of events) {\n      const msg = ev.message;\n      if (!msg) continue;          // delivery / read receipt / postback\n      if (msg.is_echo) continue;   // our own outbound message echoed back — never loop\n      const psid = ev.sender && ev.sender.id;\n      if (!psid) continue;\n      const text = (msg.text || '').trim();\n      out.push({ json: { psid: String(psid), text, mid: msg.mid || '' } });\n    }\n  }\n}\nreturn out;\n"
+      },
+      "id": "msg-parse-002",
+      "name": "Parse Meta Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_BASE_URL + '/api/messages/inbound' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ channel: 'messenger', psid: $json.psid, text: $json.text, mid: $json.mid }) }}",
+        "options": {}
+      },
+      "id": "msg-log-003",
+      "name": "Log Inbound → CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CRM_BASE_URL + '/api/messenger/agent' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "x-vertex-key", "value": "={{ $env.INTERNAL_API_KEY }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ psid: $('Parse Meta Event').item.json.psid, text: $('Parse Meta Event').item.json.text }) }}",
+        "options": {}
+      },
+      "id": "msg-agent-004",
+      "name": "AI Sales Agent (CRM)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "has-reply-cond",
+              "leftValue": "={{ $json.reply }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "msg-hasreply-005",
+      "name": "Has Reply?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1120, 480]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/me/messages?access_token={{ $env.FB_PAGE_TOKEN }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ recipient: { id: $('Parse Meta Event').item.json.psid }, messaging_type: 'RESPONSE', message: { text: $json.reply } }) }}",
+        "options": {}
+      },
+      "id": "msg-send-006",
+      "name": "Send FB Reply (Send API)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 480]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "wants-human-cond",
+              "leftValue": "={{ $json.wantsHuman }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "msg-human-007",
+      "name": "Human Requested?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1120, 260]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "={{ '🙋 *Human requested* — customer (PSID ' + $('Parse Meta Event').item.json.psid + ') asked to talk to a person. Jump into Messenger now.' }}",
+        "additionalFields": { "parse_mode": "Markdown" }
+      },
+      "id": "msg-telegram-008",
+      "name": "Telegram: Human Requested",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1340, 200]
+    }
+  ],
+  "connections": {
+    "Messenger Event In": { "main": [[{ "node": "Parse Meta Event", "type": "main", "index": 0 }]] },
+    "Parse Meta Event": { "main": [[{ "node": "Log Inbound → CRM", "type": "main", "index": 0 }]] },
+    "Log Inbound → CRM": { "main": [[{ "node": "AI Sales Agent (CRM)", "type": "main", "index": 0 }]] },
+    "AI Sales Agent (CRM)": {
+      "main": [[
+        { "node": "Has Reply?", "type": "main", "index": 0 },
+        { "node": "Human Requested?", "type": "main", "index": 0 }
+      ]]
+    },
+    "Has Reply?": { "main": [[{ "node": "Send FB Reply (Send API)", "type": "main", "index": 0 }]] },
+    "Human Requested?": { "main": [[{ "node": "Telegram: Human Requested", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}

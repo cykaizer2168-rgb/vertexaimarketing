@@ -1,0 +1,73 @@
+{
+  "name": "Vertex AI Marketing — Handoff Recovery",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "handoff-recovery",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "hr-webhook-001",
+      "name": "Qualified Event In",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 400],
+      "webhookId": "handoff-recovery"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Receives HOT / lead_qualified events fired by the CRM stage webhook.\n// Only acts on genuine qualification events; everything else is dropped so this\n// workflow can safely share the stage webhook feed.\n// Mode: \"Run Once for All Items\".\nconst out = [];\nfor (const item of $input.all()) {\n  const d = item.json.body || item.json;\n  const event = d.event_type || '';\n  const stage = d.stage || '';\n  if (event !== 'lead_qualified' && stage !== 'qualified') continue;\n  out.push({ json: {\n    name: (d.name || 'HOT lead').trim(),\n    email: (d.email || '').trim(),\n    mobile: (d.mobile || '').trim(),\n    location: (d.location || '').trim(),\n    stageLabel: (d.stage_label || 'Qualified (HOT)').trim()\n  } });\n}\nreturn out;\n"
+      },
+      "id": "hr-filter-002",
+      "name": "Only HOT / Qualified",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 400]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "={{ '🔥 *NEW HOT LEAD — claim now!*\\n👤 ' + $json.name + '\\n📞 ' + ($json.mobile || '—') + '\\n📍 ' + ($json.location || '—') + '\\n\\nReply within the 24-hour window. First response wins.' }}",
+        "additionalFields": { "parse_mode": "Markdown" }
+      },
+      "id": "hr-alert1-003",
+      "name": "Telegram: Claim Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "amount": 20,
+        "unit": "minutes"
+      },
+      "id": "hr-wait-004",
+      "name": "Wait 20 min",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [900, 400],
+      "webhookId": "handoff-recovery-wait"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "={{ '⚠️ *HOT lead still needs attention* (20 min elapsed)\\n👤 ' + $json.name + '\\n📞 ' + ($json.mobile || '—') + '\\n\\nHas anyone claimed ' + $json.name + '? Escalate if not.' }}",
+        "additionalFields": { "parse_mode": "Markdown" }
+      },
+      "id": "hr-alert2-005",
+      "name": "Telegram: Escalation",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1120, 400]
+    }
+  ],
+  "connections": {
+    "Qualified Event In": { "main": [[{ "node": "Only HOT / Qualified", "type": "main", "index": 0 }]] },
+    "Only HOT / Qualified": { "main": [[{ "node": "Telegram: Claim Alert", "type": "main", "index": 0 }]] },
+    "Telegram: Claim Alert": { "main": [[{ "node": "Wait 20 min", "type": "main", "index": 0 }]] },
+    "Wait 20 min": { "main": [[{ "node": "Telegram: Escalation", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}

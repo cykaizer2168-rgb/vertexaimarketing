@@ -1,0 +1,41 @@
+{
+  "name": "Vertex AI Marketing — Messenger Follow-ups",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            { "field": "minutes", "minutesInterval": 15 }
+          ]
+        }
+      },
+      "id": "fu-schedule-001",
+      "name": "Every 15 min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 400]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.CRM_BASE_URL + '/api/messenger/followup/run' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authorization", "value": "={{ 'Bearer ' + $env.CRON_SECRET }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fu-run-002",
+      "name": "Run Follow-ups",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 400]
+    }
+  ],
+  "connections": {
+    "Every 15 min": { "main": [[{ "node": "Run Follow-ups", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}

@@ -134,6 +134,7 @@ export async function logMessage(opts: {
 
 export const STAGE_LABEL: Record<string, string> = {
   new: 'New',
+  qualified: 'Qualified (HOT)',
   contacted: 'Contacted',
   proposal: 'Proposal Sent',
   negotiating: 'Negotiating',
