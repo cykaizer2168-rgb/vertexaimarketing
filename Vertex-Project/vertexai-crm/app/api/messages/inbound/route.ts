@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
     direction: 'inbound',
     channel: 'email',
     kind: 'reply',
-    subject: subject ?? 'Re: Balcony Solar',
+    subject: subject ?? 'Re: Vertex AI Marketing',
     body: text ?? '',
     from_addr: fromEmail,
     to_addr: 'cykaizer2168@gmail.com',
