@@ -1,0 +1,247 @@
+{
+  "name": "Vertex AI — FB Messenger Follow-ups",
+  "nodes": [
+    {
+      "id": "sched",
+      "name": "Every 30 min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fetch",
+      "name": "Fetch Quiet Threads",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -340,
+        0
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput",
+      "parameters": {
+        "method": "GET",
+        "url": "=https://ejpmupwpoqkqkzfbjren.supabase.co/rest/v1/messenger_threads?select=*&updated_at=gt.{{ new Date(Date.now()-23*3600000).toISOString() }}&updated_at=lt.{{ new Date(Date.now()-60*60000).toISOString() }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "__SUPABASE_KEY__"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer __SUPABASE_KEY__"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "due",
+      "name": "Select Due",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Split the fetched threads into items and keep only the ones DUE for a nudge.\n// 24h-window-safe: updated_at (last real conversation turn) must be < 23h old.\n// Cap: max 2 nudges; spacing: 1st after 1h quiet, 2nd after 6h. Skip booked leads.\nlet rows = $input.all().map(i => i.json);\nif (rows.length === 1 && Array.isArray(rows[0])) rows = rows[0];\nconst now = Date.now();\nconst out = [];\nfor (const t of rows) {\n  if (!t || !t.psid) continue;\n  const info = (t.info && typeof t.info === 'object') ? t.info : {};\n  if (info.preferred_datetime) continue;                 // already booked → skip\n  const sent = info.followups_sent || 0;\n  if (sent >= 2) continue;                                // cap reached\n  const updatedAt = new Date(t.updated_at).getTime();\n  if (!(updatedAt > 0)) continue;\n  const hoursSinceConvo = (now - updatedAt) / 3600000;\n  if (hoursSinceConvo >= 23) continue;                    // outside 24h window\n  const lastActivity = info.last_followup_at ? new Date(info.last_followup_at).getTime() : updatedAt;\n  const minsSince = (now - lastActivity) / 60000;\n  const need = sent === 0 ? 60 : 360;                     // 1h then 6h\n  if (minsSince < need) continue;                         // not quiet enough yet\n\n  const history = Array.isArray(t.history) ? t.history : [];\n  const attempt = sent + 1;\n  const sys = [\n    'You are \"Vertex Assistant\" on the Facebook Page of Vertex AI Marketing (we build landing page funnels, lead capture, FB Messenger integration, FB ads, and booking + email follow-up automation for PH SMBs).',\n    'PACKAGES (quote exactly if relevant): BASIC \\u20b15,000, STANDARD \\u20b16,990, PREMIUM \\u20b110,000. All include FB Messenger integration + 1 Year Free Domain.',\n    'This customer went QUIET and has not replied. Write ONE short, warm Taglish follow-up nudge (this is follow-up #' + attempt + ') to gently re-engage them:',\n    '- reference the conversation so far, add a little value or a soft reason to continue, and end with an easy question toward booking a FREE call/demo.',\n    '- persuade with TRUTH (value over price, gentle urgency), never pushy, never repeat yourself, no fake scarcity or invented stats.',\n    'Keep it 1-2 lines, few tasteful emojis.',\n    'Output ONLY a valid JSON object, nothing else: {\"reply\": \"<your Taglish message>\"}'\n  ].join('\\n');\n\n  const messages = [{ role: 'system', content: sys }, ...history.slice(-10)];\n  out.push({ json: {\n    psid: String(t.psid),\n    name: t.name || '',\n    info,\n    history,\n    attempt,\n    openaiBody: { model: 'gpt-4o-mini', messages, max_tokens: 220, response_format: { type: 'json_object' } }\n  }});\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        100,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer __OPENAI_KEY__"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.openaiBody) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "nudge",
+      "name": "Build Nudge",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Parse the model reply and prepare the FB send + thread update.\nconst src = $('Select Due').item.json;\nlet reply = '';\ntry { const p = JSON.parse($json.choices[0].message.content); reply = (p.reply || '').toString().trim(); } catch (e) { reply = ''; }\nif (!reply) { return []; } // nothing to send\nconst info = Object.assign({}, src.info || {});\ninfo.followups_sent = (info.followups_sent || 0) + 1;\ninfo.last_followup_at = new Date().toISOString();\nconst newHistory = [...(src.history || []), { role: 'assistant', content: reply }].slice(-16);\nreturn [{ json: { psid: src.psid, reply, info, newHistory } }];"
+      }
+    },
+    {
+      "id": "send",
+      "name": "FB Send",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        540,
+        0
+      ],
+      "onError": "continueRegularOutput",
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/me/messages?access_token=__FB_PAGE_TOKEN__",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ recipient:{id:$json.psid}, messaging_type:\"RESPONSE\", message:{text:$json.reply} }) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "save",
+      "name": "Update Thread",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        0
+      ],
+      "onError": "continueRegularOutput",
+      "parameters": {
+        "method": "POST",
+        "url": "=https://ejpmupwpoqkqkzfbjren.supabase.co/rest/v1/messenger_threads?on_conflict=psid",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "__SUPABASE_KEY__"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer __SUPABASE_KEY__"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ psid:$json.psid, info:$json.info, history:$json.newHistory }) }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Every 30 min": {
+      "main": [
+        [
+          {
+            "node": "Fetch Quiet Threads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Quiet Threads": {
+      "main": [
+        [
+          {
+            "node": "Select Due",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Due": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Build Nudge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Nudge": {
+      "main": [
+        [
+          {
+            "node": "FB Send",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FB Send": {
+      "main": [
+        [
+          {
+            "node": "Update Thread",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}
