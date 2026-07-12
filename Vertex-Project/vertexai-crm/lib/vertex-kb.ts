@@ -38,40 +38,40 @@ export const VERTEX_KB = {
     'First response in under 60 seconds via automation — speed wins deals.',
   ],
 
-  // ⚠️ DRAFT PRICING — replace with Vertex's real numbers. These are "starting
-  // at" figures the agent may quote; the exact total is confirmed on a short
-  // scope call. Currency: PHP. Setup = one-time; retainer = per month.
+  // REAL PRICING — matches the live FB Messenger agent. Quote these EXACT prices;
+  // do NOT invent others. All packages include FB Messenger integration + 1 Year
+  // Free Domain. Currency: PHP, one-time setup.
   packages: [
     {
-      name: 'Starter — Get Found',
-      tagline: 'For businesses that need a proper online presence.',
-      priceFrom: 'from ₱25,000 one-time',
+      name: 'BASIC',
+      tagline: 'Landing page funnel + lead capture to start getting inquiries.',
+      priceFrom: '₱5,000',
       includes: [
-        'Professional landing page (mobile-first, fast)',
-        'Google Business Profile setup + optimization',
-        'Lead form wired to the CRM',
+        'Landing page funnel setup',
+        'Lead capture system + clear conversion structure',
+        'FB Page Messenger integration',
+        'Payment gateway setup if needed (Card/PayPal)',
+        '1 Year Free Domain',
       ],
     },
     {
-      name: 'Growth — Get Leads',
-      tagline: 'For businesses that want a steady flow of inquiries.',
-      priceFrom: 'from ₱18,000 / month (+ setup)',
+      name: 'STANDARD',
+      tagline: 'Basic + paid traffic to drive more leads.',
+      priceFrom: '₱6,990',
       includes: [
-        'Everything in Starter',
-        'FB Messenger + ad-lead automation (AI qualifies 24/7)',
-        'SEO foundations',
-        'Automated follow-up sequences',
+        'Everything in Basic',
+        'FB Ads setup (2 free creatives)',
       ],
     },
     {
-      name: 'Scale — Full Growth Engine',
-      tagline: 'Done-for-you marketing + sales system.',
-      priceFrom: 'from ₱35,000 / month (custom)',
+      name: 'PREMIUM',
+      tagline: 'Full funnel with booking + follow-up automation.',
+      priceFrom: '₱10,000',
       includes: [
-        'Everything in Growth',
-        'Managed Meta / Google Ads (ad spend billed separately)',
-        'Full CRM pipeline + reporting',
-        'Priority support + monthly strategy call',
+        'Everything in Standard',
+        'Appointment Booking System + online Zoom booking presentation',
+        'Calendar Booking',
+        'Email follow-up automation (3 editable sequences)',
       ],
     },
   ] as Package[],
@@ -81,7 +81,7 @@ export const VERTEX_KB = {
   faq: [
     {
       q: 'How much / magkano?',
-      a: 'May tatlong package kami: Starter (Get Found) from ₱25k one-time, Growth (Get Leads) from ₱18k/month, at Scale (Full Growth Engine) from ₱35k/month. Depende sa scope ang exact total — mabilis lang i-confirm sa isang chat, walang hidden fees.',
+      a: 'May tatlong package kami: BASIC ₱5,000 (landing page funnel + lead capture), STANDARD ₱6,990 (Basic + FB Ads, 2 free creatives), at PREMIUM ₱10,000 (Standard + appointment/Zoom booking + email follow-up automation). Lahat may FB Messenger integration + 1 Year Free Domain. Pwede mag-start sa Basic, upgrade anytime — walang hidden fees.',
     },
     {
       q: 'Do you handle everything or DIY?',
@@ -95,8 +95,9 @@ export const VERTEX_KB = {
 
   // Anything the agent must never do.
   guardrails: [
-    'Only quote the "from / starting at" package prices above — never invent other numbers, discounts, guarantees, or timelines.',
-    'Always frame price as "starting at" and note the exact total is confirmed on a short scope call.',
+    'Quote the EXACT package prices above (₱5,000 / ₱6,990 / ₱10,000) — never invent other numbers, custom discounts, guarantees, or timelines.',
+    'The moment someone asks price/cost/budget/"magkano", state the exact peso amount of the relevant package immediately — never say the quote is only on a call.',
+    'Map need → package: booking/Zoom/email follow-up → PREMIUM ₱10,000; FB ads/creatives → STANDARD ₱6,990; landing page + leads → BASIC ₱5,000. Suggest "start with Basic, upgrade anytime."',
     'Never promise specific rankings or revenue numbers.',
     'If unsure or out of scope, offer to connect the person to a specialist.',
   ],

@@ -67,7 +67,7 @@ export function buildSystemPrompt(kb: VertexKB = VERTEX_KB): string {
     'WHY VERTEX:',
     props,
     '',
-    'PACKAGES (quote these "starting at" prices when asked; exact total after a scope call):',
+    'PACKAGES (quote these EXACT prices immediately when asked about cost — do not invent others):',
     packages,
     '',
     'FAQ (answer from these; do not go beyond them):',
@@ -87,7 +87,7 @@ export function buildSystemPrompt(kb: VertexKB = VERTEX_KB): string {
     '',
     'GUARDRAILS:',
     rails,
-    '- When asked about price, quote the package "starting at" figures above, frame them as "starting at", and offer a quick call to confirm the exact scope. Never invent numbers beyond the packages.',
+    '- When asked about price, immediately state the EXACT package price(s) above (₱5,000 / ₱6,990 / ₱10,000). Never invent other numbers or custom discounts; suggest starting with Basic and upgrading anytime.',
     '',
     buildPersuasionBlock(),
   ].join('\n');
